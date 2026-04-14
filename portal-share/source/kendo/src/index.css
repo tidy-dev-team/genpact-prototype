@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg-dark: #1a1a1a;
+  --bg-sidebar: #474747;
+  --bg-white: #ffffff;
+  --bg-light: #f6f6f6;
+  --bg-medium: #bdbdbd;
+  --bg-dark-badge: #474747;
+  --text-primary: #1a1a1a;
+  --text-secondary: #474747;
+  --text-muted: #7a7a7a;
+  --text-light: #f6f6f6;
+  --border: #e0e0e0;
+  --border-light: #eeeeee;
+  --hover-row: #fafafa;
+  --sidebar-width: 48px;
+  --topbar-height: 44px;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg-white);
+  color: var(--text-primary);
+  height: 100vh;
+  overflow: hidden;
+  margin: 0;
+}
+
+#root {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  text-align: left;
+  max-width: none;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  min-height: auto;
+  flex-direction: row;
+  border-inline: none;
+}
