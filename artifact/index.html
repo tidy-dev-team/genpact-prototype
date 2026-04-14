@@ -74,7 +74,14 @@
     padding: 0 3px !important;
     justify-content: center;
   }
-  .solution-btn .logo-icon { font-size: 17px !important; }
+  .solution-avatar {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: #fff; color: #1a1a1a;
+    font-size: 14px; font-weight: 700; font-family: inherit;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; line-height: 1; text-transform: uppercase;
+    letter-spacing: 0;
+  }
   .solution-btn .solution-chevron {
     font-size: 16px !important;
     color: rgba(225,225,225,0.85);
@@ -150,7 +157,7 @@
     min-width: 0;
   }
   .topbar .case-tab {
-    display: flex; align-items: center; gap: 5px;
+    display: flex; align-items: center; gap: 8px;
     padding: 0 10px;
     height: var(--topbar-height);
     border: none; background: transparent;
@@ -197,19 +204,144 @@
   }
   .topbar .topbar-actions .icon-btn:hover { background: #d4d4d4; }
   .topbar .topbar-actions .icon-btn .material-symbols-outlined { font-size: 20px; }
+  /* AI button */
+  .ai-btn {
+    display: flex; align-items: center; gap: 5px;
+    height: 28px; padding: 0 10px;
+    border: 1px solid #292929; border-radius: 6px;
+    background: #1a1a1a;
+    color: #fff; font-size: 12px; font-weight: 600; font-family: inherit;
+    cursor: pointer; white-space: nowrap;
+    transition: background 0.15s;
+  }
+  .ai-btn:hover { background: #333; }
+  .ai-btn.active { background: #000; }
+  .ai-btn .material-symbols-outlined { font-size: 15px; }
+  /* Main body wrapper — sits below topbar, enables push layout */
+  .main-body {
+    display: flex; flex-direction: row;
+    flex: 1; min-height: 0; overflow: hidden;
+  }
+  /* AI Drawer — inline, pushes content */
+  .ai-drawer {
+    width: 0; overflow: hidden;
+    display: flex; flex-direction: column;
+    background: #1a1a1a;
+    border-left: 0px solid #333;
+    flex-shrink: 0;
+    transition: width 0.22s ease, border-color 0.22s;
+  }
+  .ai-drawer.open {
+    width: 360px;
+    border-left: 1px solid #333;
+  }
+  .ai-drawer-inner {
+    width: 360px;
+    display: flex; flex-direction: column;
+    height: 100%; overflow: hidden;
+  }
+  .ai-drawer-header {
+    display: flex; align-items: center; gap: 8px;
+    height: 52px; padding: 0 16px;
+    border-bottom: 1px solid #333;
+    flex-shrink: 0;
+  }
+  .ai-drawer-icon {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .ai-drawer-icon .material-symbols-outlined { font-size: 16px; color: #1a1a1a; }
+  .ai-drawer-title {
+    font-size: 14px; font-weight: 600; color: #fff; flex: 1;
+  }
+  .ai-drawer-close {
+    width: 28px; height: 28px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    border: none; background: none; cursor: pointer;
+    color: #888; transition: background 0.15s, color 0.15s;
+  }
+  .ai-drawer-close:hover { background: #333; color: #fff; }
+  .ai-drawer-close .material-symbols-outlined { font-size: 18px; }
+  .ai-drawer-body {
+    flex: 1; overflow-y: auto;
+    display: flex; flex-direction: column;
+    padding: 16px; gap: 12px;
+  }
+  .ai-drawer-footer {
+    padding: 12px 16px;
+    border-top: 1px solid #333;
+    flex-shrink: 0;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .ai-input {
+    flex: 1; height: 36px; padding: 0 12px;
+    border: 1px solid #444; border-radius: 8px;
+    font-size: 13px; font-family: inherit; color: #fff;
+    outline: none; transition: border-color 0.15s;
+    background: #2c2c2c;
+  }
+  .ai-input::placeholder { color: #666; }
+  .ai-input:focus { border-color: #fff; }
+  .ai-send-btn {
+    width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    border: none; background: #fff;
+    color: #1a1a1a; cursor: pointer; transition: background 0.15s;
+  }
+  .ai-send-btn:hover { background: #ddd; }
+  .ai-send-btn .material-symbols-outlined { font-size: 18px; }
+  .ai-empty {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 8px; text-align: center; padding: 40px 20px;
+  }
+  .ai-empty .material-symbols-outlined { font-size: 36px; color: #555; }
+  .ai-empty-title { font-size: 14px; font-weight: 600; color: #aaa; }
+  .ai-empty-sub { font-size: 12px; color: #666; }
+  /* AI message bubbles */
+  .ai-msg { display: flex; flex-direction: column; gap: 2px; }
+  .ai-msg.user { align-items: flex-end; }
+  .ai-msg.assistant { align-items: flex-start; }
+  .ai-bubble {
+    max-width: 88%; padding: 8px 12px;
+    border-radius: 12px; font-size: 13px; line-height: 1.5;
+  }
+  .ai-msg.user .ai-bubble {
+    background: #fff; color: #1a1a1a;
+    border-bottom-right-radius: 4px;
+  }
+  .ai-msg.assistant .ai-bubble {
+    background: #2c2c2c; color: #e0e0e0;
+    border: 1px solid #3a3a3a;
+    border-bottom-left-radius: 4px;
+  }
+  .ai-msg-time { font-size: 10px; color: #555; padding: 0 4px; }
 
   /* Home tab — fixed, pinned, always visible */
   .topbar .case-tab.home-tab {
-    width: 120px;
+    width: 164px;
     flex-shrink: 0;
-    font-weight: 500;
+    font-weight: 600;
     color: #292929;
     border-left: none;
     background: transparent;
+    justify-content: flex-start;
+    padding: 0 10px 0 12px;
   }
+  .topbar .case-tab.home-tab .tab-label { flex: 1; text-align: left; }
   .topbar .case-tab.home-tab .tab-close { display: none !important; }
   .topbar .case-tab.home-tab.selected { background: #fff; }
+  .topbar .case-tab.home-tab.selected .material-symbols-outlined {
+    font-variation-settings: 'FILL' 1;
+  }
   .topbar .case-tab.home-tab:hover { background: #f0f0f0; }
+  .home-tab-shortcut {
+    margin-left: auto;
+    font-size: 11px; font-weight: 400; color: #a0a0a0;
+    white-space: nowrap; letter-spacing: 0;
+  }
 
   /* Overflow chevron */
   .tabs-overflow-wrap { position: relative; flex-shrink: 0; }
@@ -264,9 +396,40 @@
   .recent-btn .material-symbols-outlined { font-size: 16px; color: #0f172b; }
   .recent-btn .recent-label { font-size: 14px; color: #292929; }
   .recent-btn .recent-chevron { font-size: 14px; color: #292929; }
+  .recent-btn.menu-open { background: #d4d4d4; }
+
+  /* Recent dropdown */
+  .recent-dropdown {
+    position: fixed; z-index: 9999;
+    background: #fff; border: 1px solid var(--border); border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    min-width: 240px; max-width: 320px;
+    padding: 4px 0; overflow: hidden;
+  }
+  .recent-dropdown-header {
+    padding: 8px 12px 6px;
+    font-size: 11px; font-weight: 600; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border-light);
+    margin-bottom: 2px;
+  }
+  .recent-dropdown-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 12px; cursor: pointer;
+    font-size: 13px; color: var(--text-primary);
+    transition: background 0.1s;
+    white-space: nowrap; overflow: hidden;
+  }
+  .recent-dropdown-item:hover { background: var(--bg-light); }
+  .recent-dropdown-item .material-symbols-outlined { font-size: 15px; color: var(--text-muted); flex-shrink: 0; }
+  .recent-dropdown-item span.rd-label { overflow: hidden; text-overflow: ellipsis; }
+  .recent-dropdown-empty {
+    padding: 10px 12px;
+    font-size: 12px; color: var(--text-muted); text-align: center;
+  }
 
   /* ── Portal body ── */
-  .portal-body { flex: 1; overflow-y: auto; padding: 0; display: flex; flex-direction: column; gap: 0; }
+  .portal-body { flex: 1; min-width: 0; overflow-y: auto; padding: 0; display: flex; flex-direction: column; gap: 0; }
   .portal-content-area { display: flex; flex-direction: column; gap: 8px; flex: 1; min-height: 0; position: relative; }
 
   /* ── Header ── */
@@ -742,7 +905,6 @@
   .col-resize-handle.resizing { background: #bbb; }
   #col-resize-line {
     position: fixed;
-    top: 0; bottom: 0;
     width: 2px;
     background: #555;
     z-index: 1000;
@@ -876,94 +1038,119 @@
   }
   .case-header-main {
     display: flex; align-items: center;
-    padding: 0 20px; height: 52px; gap: 0;
+    padding: 0 20px; height: 64px; gap: 0;
     position: relative; z-index: 1;
     background: var(--bg-white);
     border-bottom: 1px solid var(--border);
   }
   /* Left: company + case# */
-  .case-header-left { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-  .case-header-id { display: flex; flex-direction: column; gap: 2px; line-height: 1; }
-  .case-company { font-size: 14px; font-weight: 700; color: var(--text-primary); font-family: inherit; }
-  .case-num { display: flex; align-items: center; gap: 3px; font-size: 11px; color: var(--text-muted); font-family: inherit; }
-  .case-num .material-symbols-outlined { font-size: 13px; }
+  /* Left: company + case# */
+  .case-header-left { display: flex; align-items: center; gap: 0; flex-shrink: 0; }
+  .case-header-id { display: flex; flex-direction: column; gap: 4px; line-height: 1; padding-right: 20px; }
+  .case-company { font-size: 18px; font-weight: 700; color: var(--text-primary); font-family: inherit; }
+  .case-num { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-muted); font-family: inherit; }
+  .case-num .material-symbols-outlined { font-size: 14px; }
   /* Meta strip */
-  .case-header-meta { display: flex; align-items: center; flex: 1; height: 100%; padding: 0 8px; }
-  .case-meta-sep { width: 1px; height: 28px; background: var(--border); flex-shrink: 0; margin: 0 14px; }
-  .case-meta-item { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
-  .case-meta-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; line-height: 1; font-family: inherit; font-weight: 500; }
+  .case-header-meta { display: flex; align-items: center; flex: 1; height: 100%; padding: 0; }
+  .case-meta-sep { width: 1px; height: 32px; background: var(--border); flex-shrink: 0; margin: 0 20px; }
+  .case-meta-item { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1; }
+  .case-meta-label { font-size: 11px; color: var(--text-muted); line-height: 1; font-family: inherit; font-weight: 400; }
   .case-stage { display: flex; align-items: center; gap: 6px; }
   .stage-badge {
     width: 20px; height: 20px; border-radius: 50%;
-    background: #615fff; color: #fff;
+    background: #1a1a1a; color: #fff;
     font-size: 10px; font-weight: 700;
     display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     font-family: inherit;
   }
   .case-stage span:last-child, .case-status-text, .case-meta-value {
-    font-size: 13px; color: var(--text-primary); font-weight: 600; font-family: inherit;
+    font-size: 13px; color: var(--text-primary); font-weight: 500; font-family: inherit;
   }
   /* Right: return + refresh */
-  .case-header-right { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+  .case-header-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; padding-left: 20px; border-left: 1px solid var(--border); }
   .case-return-btn {
-    display: flex; align-items: center; gap: 5px;
-    padding: 0 12px; height: 30px;
-    border: 1px solid var(--border); border-radius: 8px;
-    font-size: 12px; font-weight: 600; font-family: inherit;
-    cursor: pointer; background: var(--bg-white); color: var(--text-primary); transition: background 0.15s;
+    display: flex; align-items: center; gap: 6px;
+    padding: 0; height: auto;
+    border: none; border-radius: 0;
+    font-size: 14px; font-weight: 700; font-family: inherit;
+    cursor: pointer; background: none; color: var(--text-primary);
+    transition: opacity 0.15s;
   }
-  .case-return-btn:hover { background: var(--bg-light); }
-  .case-return-btn .material-symbols-outlined { font-size: 14px; color: #1a73e8; }
+  .case-return-btn:hover { opacity: 0.7; }
+  .case-return-btn .material-symbols-outlined { font-size: 16px; color: var(--text-primary); }
   /* ── Case Header Footer (hover-reveal tab bar) ── */
   .case-header-footer {
-    display: flex; align-items: center; gap: 10px;
-    padding: 0 16px; height: 0; overflow: hidden; flex-shrink: 0;
+    display: flex; align-items: center; gap: 0;
+    padding: 0 20px; height: 0; overflow: hidden; flex-shrink: 0;
     background: var(--bg-white);
-    transition: height 0.18s ease, border-color 0.18s;
     border-bottom: 1px solid transparent;
+    transition: height 0.15s ease, border-color 0.15s;
   }
-  /* Show footer on header hover OR when progress is open */
-  .case-header:hover .case-header-footer,
-  .case-header.progress-open .case-header-footer {
-    height: 40px;
+  .case-header:hover .case-header-footer {
+    height: 52px;
     border-bottom-color: var(--border);
+    transition: height 0.15s ease 0.28s, border-color 0.15s ease 0.28s;
   }
-  .chf-goto { font-size: 12px; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; font-family: inherit; }
-  /* Segmented control — connected block, no gaps */
+  .case-header.progress-open .case-header-footer {
+    height: 52px;
+    border-bottom-color: var(--border);
+    transition: height 0.15s ease, border-color 0.15s;
+  }
+  .case-header-footer .chf-right { margin-left: auto; }
+  .chf-goto { display: none; } /* removed per design */
+  /* Segmented nav — container with per-tab border dividers */
   .chf-tabs {
     display: flex; align-items: stretch;
-    background: #e1e1e1; border-radius: 8px;
-    overflow: hidden; height: 30px; flex: none;
+    height: 34px; flex: none;
+    background: #e4e4e4; border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #d4d4d4;
   }
   .chf-tab {
     display: flex; align-items: center;
-    padding: 0 14px; height: 100%; white-space: nowrap;
-    font-size: 12px; font-family: inherit; color: var(--text-secondary);
-    border: none; background: none; cursor: pointer;
-    transition: background 0.12s, color 0.12s;
-  }
-  .chf-tab:hover { background: #d0d0d0; color: var(--text-primary); }
-  .chf-tab.active { background: var(--bg-dark); color: #fff; font-weight: 600; }
-  .chf-tab-badge { display: none; } /* hidden in segmented mode */
-  .chf-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-  .chf-info-btn {
-    display: flex; align-items: center; gap: 4px;
-    padding: 0 12px; height: 30px;
-    font-size: 12px; font-family: inherit; color: var(--text-secondary);
-    border: 1px solid var(--border); border-radius: 8px;
+    padding: 0 16px; white-space: nowrap;
+    font-size: 13px; font-family: inherit; color: var(--text-secondary);
+    border: none; border-right: 1px solid #d0d0d0;
     background: none; cursor: pointer;
+    transition: background 0.12s, color 0.12s;
+    font-weight: 400;
+  }
+  .chf-tab:last-child { border-right: none; }
+  .chf-tab:hover { background: #d8d8d8; color: var(--text-primary); }
+  .chf-tab.active {
+    background: var(--bg-dark); color: #fff; font-weight: 600;
+    border-radius: 8px; border-right: none; margin: 2px; height: calc(100% - 4px);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  /* hide the divider on the tab immediately before an active tab */
+  .chf-tab.active + .chf-tab { border-left: none; }
+  .chf-tab-badge { display: none; }
+  .chf-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .chf-info-btn {
+    display: flex; align-items: center; gap: 5px;
+    padding: 0 14px; height: 34px;
+    font-size: 13px; font-family: inherit; color: var(--text-secondary);
+    border: 1px solid #d4d4d4; border-radius: 8px;
+    background: #e4e4e4; cursor: pointer;
     transition: background 0.15s, color 0.15s, border-color 0.15s;
   }
-  .chf-info-btn:hover { background: var(--bg-light); color: var(--text-primary); }
+  .chf-info-btn:hover { background: #d8d8d8; color: var(--text-primary); }
   .chf-info-btn.active { background: var(--bg-dark); color: #fff; border-color: var(--bg-dark); }
-  .chf-info-btn .material-symbols-outlined { font-size: 14px; transition: transform 0.2s; }
+  .chf-info-btn .material-symbols-outlined { font-size: 15px; transition: transform 0.2s; }
   .chf-info-btn.active .chf-info-chevron { transform: rotate(180deg); }
+  /* Extra meta fields — hidden on narrow screens */
+  @media (max-width: 1200px) { .meta-wide { display: none !important; } }
 
   /* ── Progress Section ── */
   .case-progress-section {
-    height: 0; overflow: hidden; flex-shrink: 0;
+    position: absolute; left: 0; right: 0;
+    top: 100%; /* sits flush below the sticky header */
+    height: 0; overflow: hidden;
     display: flex; flex-direction: row; gap: 0;
     background: var(--bg-light);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    z-index: 99;
     transition: height 0.22s ease;
   }
   .case-progress-section.open { height: 337px; }
@@ -1047,33 +1234,104 @@
   /* Case Body */
   .case-body { display: flex; flex: 1; overflow: hidden; }
   .case-form-area { flex: 1; overflow-y: auto; padding: 16px 24px 24px; }
-  /* Section accordion */
-  .case-section { margin-bottom: 8px; }
-  .case-section-header {
-    display: flex; align-items: flex-start; gap: 8px;
-    padding: 14px 0 6px; cursor: pointer; user-select: none;
-    border-bottom: 1px solid var(--border);
+  /* Section accordion card */
+  .case-section {
+    background: #fcfcfc; border: 1px solid #f0f0f0;
+    border-radius: 8px; padding: 14px 16px 16px;
+    margin-bottom: 12px;
   }
-  .case-section-arrow { font-size: 18px; color: var(--text-secondary); margin-top: 1px; transition: transform 0.2s; }
-  .case-section-arrow.collapsed { transform: rotate(-90deg); }
-  .case-section-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
-  .case-section-desc { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+  .case-section.minimized { padding-bottom: 14px; }
+  .case-section-header {
+    display: flex; align-items: center; gap: 8px;
+    cursor: pointer; user-select: none;
+  }
+  .case-section-toggle {
+    width: 24px; height: 24px; flex-shrink: 0;
+    border: 1px solid #e8e8e8; border-radius: 6px;
+    background: #fff; display: flex; align-items: center; justify-content: center;
+    transition: background 0.1s;
+  }
+  .case-section-toggle .material-symbols-outlined { font-size: 15px; color: var(--text-secondary); transition: transform 0.2s; }
+  .case-section-toggle.collapsed .material-symbols-outlined { transform: rotate(-90deg); }
+  .case-section-header:hover .case-section-toggle { background: #f0f0f0; }
+  .case-section-labels { display: flex; flex-direction: column; gap: 1px; }
+  .case-section-title { font-size: 13px; font-weight: 600; color: var(--text-primary); line-height: 1.3; }
+  .case-section-desc { font-size: 11px; color: var(--text-muted); }
+  .case-section-divider { height: 1px; background: #e8eef4; margin: 10px 0 0; }
+  .case-fields.hidden { display: none; }
+  .case-section-divider.hidden { display: none; }
+  /* Editable table field — styled to match portal table */
+  .field-table-wrap { border: 1px solid var(--border-light); border-radius: 8px; overflow: hidden; }
+  .field-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  .field-table thead { position: sticky; top: 0; z-index: 2; }
+  .field-table thead th {
+    background: var(--bg-white); padding: 10px 12px; text-align: left;
+    font-size: 12px; font-weight: 500; color: var(--text-muted);
+    border-bottom: 1px solid var(--border); white-space: nowrap;
+    overflow: hidden; cursor: pointer; user-select: none;
+    transition: background 0.1s; position: relative;
+  }
+  .field-table thead th:hover { background: #e1e1e1; }
+  .field-table thead th.ft-sorted { color: var(--text-primary); }
+  .field-table thead th.align-right { text-align: right; }
+  .ft-th-inner { display: flex; align-items: center; gap: 6px; }
+  .ft-th-inner.align-right { justify-content: flex-end; }
+  .ft-sort-icon { font-size: 14px; color: var(--text-muted); opacity: 0; transition: opacity 0.1s; }
+  .field-table thead th:hover .ft-sort-icon,
+  .field-table thead th.ft-sorted .ft-sort-icon { opacity: 1; }
+  /* del-cell header: no hover, no sort */
+  .ft-del-th { width: 40px; cursor: default !important; }
+  .ft-del-th:hover { background: var(--bg-white) !important; }
+  .field-table tbody tr { border-bottom: 1px solid var(--border-light); transition: background 0.1s; cursor: default; }
+  .field-table tbody tr:last-child { border-bottom: none; }
+  .field-table tbody tr:hover { background: var(--hover-row); }
+  .field-table-cell { padding: 0; vertical-align: middle; }
+  .field-table-cell input {
+    display: block; width: 100%; height: 44px; padding: 0 12px;
+    border: none; background: transparent;
+    font-size: 13px; font-family: inherit; color: var(--text-primary); outline: none;
+  }
+  .field-table-cell input:focus { background: #fff; box-shadow: inset 0 0 0 1.5px var(--text-secondary); border-radius: 3px; }
+  .field-table-cell.computed input { color: var(--text-secondary); font-weight: 500; pointer-events: none; }
+  .field-table-cell.align-right input { text-align: right; }
+  .field-table-del-cell { width: 40px; padding: 0 6px; text-align: center; vertical-align: middle; }
+  .field-table-del-btn {
+    width: 26px; height: 26px; border: none; background: none; cursor: pointer;
+    border-radius: 4px; display: inline-flex; align-items: center; justify-content: center;
+    color: #c0c0c0; opacity: 0; transition: opacity 0.1s, color 0.1s, background 0.1s;
+  }
+  .field-table tbody tr:hover .field-table-del-btn { opacity: 1; }
+  .field-table-del-btn:hover { color: #e53935; background: #fce4e4; }
+  .field-table-del-btn .material-symbols-outlined { font-size: 15px; }
+  .field-table-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 12px; border-top: 1px solid var(--border-light); background: var(--bg-white);
+  }
+  .field-table-add-btn {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 12px; font-weight: 500; color: var(--text-secondary);
+    border: 1px solid var(--border); background: none; cursor: pointer;
+    padding: 5px 12px; border-radius: 6px; transition: background 0.1s, border-color 0.1s;
+  }
+  .field-table-add-btn:hover { background: var(--bg-light); border-color: #ccc; }
+  .field-table-add-btn .material-symbols-outlined { font-size: 15px; }
+  .field-table-total { font-size: 13px; font-weight: 600; color: var(--text-primary); }
   /* Form fields grid */
-  .case-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 28px; padding: 16px 0 8px 4px; }
+  .case-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; padding: 14px 0 2px; }
   .case-field { display: flex; flex-direction: column; gap: 4px; }
   .case-field.full-width { grid-column: 1 / -1; }
-  .case-field label { font-size: 12px; font-weight: 500; color: var(--text-secondary); }
+  .case-field label { font-size: 11px; font-weight: 500; color: var(--text-secondary); letter-spacing: 0.1px; }
   .case-field input, .case-field select, .case-field textarea {
-    height: 36px; padding: 0 10px;
+    height: 34px; padding: 0 10px;
     border: 1px solid var(--border); border-radius: 6px;
     font-size: 13px; font-family: inherit; color: var(--text-primary);
     background: #fff; outline: none; transition: border-color 0.15s;
   }
   .case-field textarea { height: auto; padding: 8px 10px; resize: vertical; }
   .case-field select { cursor: pointer; }
-  .case-field input:focus, .case-field select:focus, .case-field textarea:focus { border-color: #1a73e8; }
+  .case-field input:focus, .case-field select:focus, .case-field textarea:focus { border-color: #474747; }
   .case-field.readonly input { background: #f5f5f5; color: var(--text-secondary); cursor: default; }
-  .field-helper { font-size: 11px; color: var(--text-secondary); }
+  .field-helper { font-size: 11px; color: var(--text-muted); }
   /* ── Utility Sidebar ── */
   .utility-sidebar {
     display: flex; flex-direction: row;
@@ -1123,10 +1381,10 @@
   .util-strip-btn .material-symbols-outlined { font-size: 18px; }
   /* ── Conversations Panel ── */
   .conv-toolbar {
-    display: flex; align-items: center; gap: 6px;
-    padding: 10px 12px 8px;
-    background: #f6f7f8;
-    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+    padding: 12px 14px;
+    background: #fff;
+    border-bottom: 1px solid #e1e1e1;
     flex-shrink: 0;
   }
   .conv-compose-btn {
@@ -1175,12 +1433,12 @@
   .pop-new-btn.primary .material-symbols-outlined { color: #fff; }
   .conv-search {
     flex: 1; height: 32px; min-width: 0;
-    border: 1px solid var(--border); border-radius: 8px;
-    background: var(--bg-light); padding: 0 10px;
-    font-size: 12px; font-family: inherit; color: var(--text-primary);
-    outline: none;
+    border: 1px solid #f6f6f6; border-radius: 8px;
+    background: #f6f6f6; padding: 0 10px;
+    font-size: 13px; font-family: inherit; color: var(--text-primary);
+    outline: none; transition: border-color 0.15s, background 0.15s;
   }
-  .conv-search:focus { border-color: #615fff; }
+  .conv-search:focus { border-color: #474747; background: #fff; }
   .conv-action-btn {
     width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0;
     background: none; border: none; cursor: pointer; color: var(--text-muted);
@@ -1190,15 +1448,19 @@
   .conv-action-btn:hover { background: var(--border); color: var(--text-primary); }
   .conv-action-btn .material-symbols-outlined { font-size: 17px; }
   .conv-title-row {
-    display: flex; align-items: center; gap: 8px;
+    display: flex; align-items: center; gap: 6px;
     padding: 10px 14px 6px; flex-shrink: 0;
   }
-  .conv-title { font-size: 13px; font-weight: 600; color: #62748e; }
+  .conv-title {
+    font-size: 20px; font-weight: 400; color: #62748e;
+    font-family: 'Roboto', sans-serif; letter-spacing: 0.25px; line-height: 1;
+  }
   .conv-count-badge {
-    min-width: 20px; height: 18px; padding: 0 6px;
-    background: var(--text-muted); color: #fff;
-    font-size: 11px; font-weight: 600; border-radius: 9px;
-    display: flex; align-items: center; justify-content: center;
+    display: inline-flex; align-items: center; justify-content: center;
+    height: 17px; min-width: 22px; padding: 0 6px;
+    background: #626262; color: #fff;
+    font-size: 12px; font-weight: 500; font-family: inherit;
+    border-radius: 1000px; line-height: 1;
   }
   .conv-list { display: flex; flex-direction: column; overflow-y: auto; flex: 1; }
   .conv-item {
@@ -1235,11 +1497,11 @@
 
   /* ── Conversation Read Mode ── */
   .conv-read-header {
-    display: flex; align-items: center; gap: 6px;
-    padding: 8px 10px;
-    background: #f6f7f8;
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0; min-height: 44px;
+    display: flex; align-items: center; gap: 8px;
+    padding: 12px 14px;
+    background: #fff;
+    border-bottom: 1px solid #e1e1e1;
+    flex-shrink: 0; min-height: 56px;
   }
   .conv-read-back {
     width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0;
@@ -1294,9 +1556,9 @@
   .conv-msg-attach-size { font-size: 10px; color: var(--text-muted); flex-shrink: 0; }
   .conv-read-footer {
     display: flex; align-items: center; gap: 6px;
-    padding: 10px 12px;
-    border-top: 1px solid var(--border);
-    background: #f6f7f8; flex-shrink: 0;
+    padding: 10px 14px;
+    border-top: 1px solid #e1e1e1;
+    background: #fff; flex-shrink: 0;
   }
   .conv-footer-primary {
     display: flex; align-items: center; gap: 4px;
@@ -1333,7 +1595,7 @@
     display: flex; align-items: center; justify-content: center;
   }
   .conv-popout-modal {
-    width: 860px; height: 640px; border-radius: 12px;
+    width: 70vw; height: 640px; border-radius: 12px;
     background: var(--bg-white);
     box-shadow: 0 24px 64px rgba(0,0,0,0.22);
     display: flex; flex-direction: column; overflow: hidden;
@@ -1343,12 +1605,14 @@
   .pop-title-row {
     display: flex; align-items: center; gap: 8px;
     padding: 14px 16px 10px;
-    flex-shrink: 0;
+    flex-shrink: 0; width: 100%; box-sizing: border-box;
   }
   .pop-title-text {
+    flex: 1;
     font-size: 20px; font-weight: 400; color: #62748e;
     font-family: 'Roboto', sans-serif; letter-spacing: 0.25px;
     line-height: 1;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .pop-count-badge {
     display: inline-flex; align-items: center; justify-content: center;
@@ -1456,6 +1720,238 @@
   }
   .util-empty .material-symbols-outlined { font-size: 32px; color: var(--border); }
   .util-empty p { font-size: 12px; font-family: inherit; }
+
+  /* ── Attachments Panel ── */
+  .att-panel {
+    display: flex; flex-direction: column; flex: 1; min-height: 0;
+  }
+  .att-toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 14px; border-bottom: 1px solid #e1e1e1;
+    flex-shrink: 0; gap: 8px;
+  }
+  .att-toolbar-left { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+  .att-toolbar-right { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+  .att-upload-btn {
+    display: flex; align-items: center; gap: 4px; flex-shrink: 0;
+    height: 32px; padding: 0 12px; border-radius: 8px;
+    background: #474747; color: #fff; border: none; cursor: pointer;
+    font-size: 13px; font-weight: 600; font-family: inherit;
+    white-space: nowrap; transition: background 0.15s;
+  }
+  .att-upload-btn:hover { background: #292929; }
+  .att-upload-btn .material-symbols-outlined { font-size: 15px; }
+  .att-sort-btn {
+    width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
+    border: 1px solid #e2e8f0; background: #fff; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+  .att-sort-btn:hover { background: #f6f6f6; }
+  .att-sort-btn .material-symbols-outlined { font-size: 16px; color: #cad5e2; }
+  .att-search {
+    flex: 1; height: 32px; min-width: 0;
+    border: 1px solid #f6f6f6; border-radius: 8px;
+    background: #f6f6f6; padding: 0 10px;
+    font-size: 13px; font-family: inherit; color: var(--text-primary);
+    outline: none; transition: border-color 0.15s;
+  }
+  .att-search:focus { border-color: #474747; background: #fff; }
+  /* Title row */
+  .att-title-row {
+    display: flex; align-items: center; gap: 6px;
+    padding: 10px 14px 6px; flex-shrink: 0;
+  }
+  .att-title-text {
+    font-size: 20px; font-weight: 400; color: #62748e;
+    font-family: 'Roboto', sans-serif; letter-spacing: 0.25px; line-height: 1;
+  }
+  .att-count-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    height: 17px; min-width: 22px; padding: 0 6px;
+    background: #626262; color: #fff;
+    font-size: 12px; font-weight: 500; font-family: inherit;
+    border-radius: 1000px; line-height: 1;
+  }
+  /* Table */
+  .att-table-wrap {
+    flex: 1; min-height: 0; overflow-y: auto;
+    border: 1px solid #e2e8f0; margin: 0 14px 14px;
+    border-radius: 6px;
+  }
+  .att-row {
+    display: flex; align-items: center; height: 64px;
+    border-bottom: 1px solid #e1e1e1; cursor: pointer;
+    transition: background 0.1s; position: relative;
+  }
+  .att-row:last-child { border-bottom: none; }
+  .att-row:hover { background: #fafafa; }
+  .att-cell {
+    display: flex; align-items: center;
+    height: 100%; background: #f6f6f6;
+    border-right: 1px solid #e1e1e1;
+    flex-shrink: 0;
+  }
+  .att-row:hover .att-cell { background: #f0f0f0; }
+  .att-cell:last-child { border-right: none; }
+  /* Extension badge cell */
+  .att-cell-ext {
+    width: 68px; justify-content: center; padding: 0 10px;
+  }
+  .att-ext-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    height: 20px; padding: 0 7px; border-radius: 1000px;
+    background: #474747; color: #fff;
+    font-size: 10px; font-weight: 600; font-family: inherit;
+    white-space: nowrap;
+  }
+  /* Filename + tag cell (stacked) */
+  .att-cell-name {
+    flex: 1; min-width: 0; overflow: hidden; padding: 0 14px; background: #f6f6f6;
+    flex-direction: column; align-items: flex-start; gap: 4px; justify-content: center;
+  }
+  .att-row:hover .att-cell-name { background: #f0f0f0; }
+  .att-cell-name .att-file-name {
+    display: block; font-size: 13px; font-weight: 400; color: #626262;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    width: 100%; max-width: 100%;
+  }
+  .att-cell-name .att-file-tag {
+    display: inline-flex; align-items: center; justify-content: center;
+    height: 18px; padding: 0 7px; border-radius: 1000px;
+    border: 1px solid #474747;
+    font-size: 10px; font-weight: 500; color: #0f172b;
+    font-family: inherit; white-space: nowrap;
+  }
+  /* ── Attachment File Preview ── */
+  .att-preview-wrap { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+  .att-preview-header {
+    display: flex; align-items: center; gap: 8px;
+    padding: 12px 14px; border-bottom: 1px solid #e1e1e1;
+    background: #fff; flex-shrink: 0;
+  }
+  .att-preview-back {
+    width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
+    background: none; border: none; cursor: pointer; color: #62748e;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+  .att-preview-back:hover { background: #f0f0f0; }
+  .att-preview-back .material-symbols-outlined { font-size: 20px; }
+  .att-preview-title-wrap {
+    display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0;
+  }
+  .att-preview-title {
+    font-size: 14px; font-weight: 400; color: #62748e;
+    font-family: 'Roboto', sans-serif; letter-spacing: 0.25px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    flex: 1; min-width: 0;
+  }
+  .att-preview-body {
+    flex: 1; min-height: 0; display: flex; flex-direction: column;
+    padding: 12px 14px; gap: 8px;
+  }
+  .att-preview-area {
+    flex: 1; min-height: 0; border: 1px solid #e1e1e1; border-radius: 4px;
+    background: #fff; display: flex; align-items: center; justify-content: center;
+  }
+  .att-preview-placeholder {
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    color: #cad5e2;
+  }
+  .att-preview-placeholder .material-symbols-outlined { font-size: 48px; }
+  .att-preview-placeholder span { font-size: 12px; color: #bdbdbd; font-family: inherit; }
+  .att-preview-meta {
+    font-size: 11px; color: #7a7a7a; text-align: center; flex-shrink: 0; font-family: inherit;
+  }
+  .att-preview-nav-row {
+    display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+  }
+  .att-nav-arrow {
+    width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
+    border: 1px solid #e2e8f0; background: #fff; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: #62748e; transition: background 0.15s;
+  }
+  .att-nav-arrow:hover:not(:disabled) { background: #f0f0f0; }
+  .att-nav-arrow:disabled { opacity: 0.3; cursor: not-allowed; }
+  .att-nav-arrow .material-symbols-outlined { font-size: 18px; }
+  .att-nav-counter { font-size: 12px; color: #62748e; font-family: inherit; }
+  .att-preview-footer {
+    display: flex; align-items: center; gap: 4px;
+    padding: 8px 14px; border-top: 1px solid #e1e1e1;
+    background: #fff; flex-shrink: 0;
+  }
+  .att-preview-action {
+    width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
+    border: 1px solid #e2e8f0; background: #fff; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: #474747; transition: background 0.15s;
+  }
+  .att-preview-action.active { background: #474747; color: #fff; border-color: #474747; }
+  .att-preview-action:hover:not(.active) { background: #f0f0f0; }
+  .att-preview-action .material-symbols-outlined { font-size: 16px; }
+  /* Modal preview — side-by-side layout */
+  .att-pop-preview-body {
+    display: flex; flex-direction: row; flex: 1; min-height: 0;
+    padding: 0 16px 16px; gap: 12px;
+  }
+  .att-pop-preview-left {
+    flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px;
+  }
+  .att-pop-preview-footer {
+    display: flex; align-items: center; gap: 4px; flex-shrink: 0;
+  }
+  .att-pop-nav-list {
+    width: 184px; flex-shrink: 0;
+    border-left: 1px solid #bdbdbd; padding-left: 12px;
+    overflow-y: auto; display: flex; flex-direction: column; gap: 8px;
+  }
+  .att-nav-item {
+    display: flex; align-items: center; gap: 10px;
+    cursor: pointer; transition: opacity 0.15s; flex-shrink: 0;
+  }
+  .att-nav-item:hover { opacity: 0.7; }
+  .att-nav-thumb {
+    width: 40px; height: 40px; border-radius: 4px; flex-shrink: 0;
+    background: #e1e1e1; border: 1px solid #e1e1e1;
+  }
+  .att-nav-item.active .att-nav-thumb { border-color: #626262; }
+  .att-nav-name {
+    font-size: 12px; color: #bdbdbd; line-height: 1.4;
+    overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical; font-family: inherit;
+  }
+  .att-nav-item.active .att-nav-name { color: #626262; }
+
+  /* Actions overlay (absolutely positioned on hover) */
+  .att-cell-actions {
+    position: absolute; right: 0; top: 0; bottom: 0;
+    display: flex; align-items: center; gap: 2px; padding: 0 10px;
+    background: linear-gradient(to right, transparent, #f0f0f0 28%);
+    opacity: 0; transition: opacity 0.15s; pointer-events: none;
+  }
+  .att-row:hover .att-cell-actions { opacity: 1; pointer-events: auto; }
+  .att-action-btn {
+    width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0;
+    background: none; border: none; cursor: pointer; color: #474747;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.1s, color 0.1s;
+  }
+  .att-action-btn:hover { background: #e1e1e1; color: var(--text-primary); }
+  .att-action-btn .material-symbols-outlined { font-size: 15px; }
+
+  /* ── History panel ── */
+  .hist-item { display:flex; align-items:stretch; height:64px; border-bottom:1px solid #e1e1e1; cursor:default; }
+  .hist-item:nth-child(even) { background:#f6f6f6; }
+  .hist-item:nth-child(odd)  { background:#ffffff; }
+  .hist-cell-left { flex:1; min-width:0; padding:0 16px; display:flex; flex-direction:column; justify-content:center; gap:3px; border-right:1px solid #e1e1e1; }
+  .hist-cell-right { width:128px; flex-shrink:0; padding:0 16px; display:flex; flex-direction:column; justify-content:center; gap:3px; }
+  .hist-actor { font-size:12px; font-weight:600; color:#292929; }
+  .hist-action { font-size:12px; font-weight:400; color:#474747; }
+  .hist-desc { font-size:11px; color:#7a7a7a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .hist-date-label { font-size:11px; font-weight:500; color:#474747; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .hist-time-val  { font-size:11px; color:#7a7a7a; }
 
   /* ── Notification drawer ── */
   .notif-drawer {
@@ -1871,8 +2367,7 @@
 <nav class="sidebar">
   <div class="nav-group">
     <button class="icon-btn solution-btn" title="Switch Solution" onclick="toggleSolutionMenu(event)">
-      <span class="material-symbols-outlined logo-icon">view_comfy_alt</span>
-      <span class="material-symbols-outlined solution-chevron">unfold_more</span>
+      <span class="solution-avatar" id="solution-avatar">C</span>
     </button>
   </div>
   <div class="divider"></div>
@@ -2043,9 +2538,15 @@
         <span class="recent-label">recent</span>
         <span class="material-symbols-outlined recent-chevron">expand_more</span>
       </button>
+      <button class="ai-btn" id="ai-btn" title="AI Assistant" onclick="toggleAiDrawer()">
+        <span class="material-symbols-outlined">auto_awesome</span>
+        AI
+      </button>
     </div>
   </div>
 
+  <!-- Main body (below topbar — portal + AI drawer side by side) -->
+  <div class="main-body">
   <!-- Portal body -->
   <div class="portal-body">
 
@@ -2088,10 +2589,9 @@
 
     <!-- Header -->
     <div class="header">
-      <button class="solution-name-btn" onclick="toggleSolutionMenu(event)" id="solution-name-btn">
+      <span class="solution-name-btn" id="solution-name-btn">
         <span id="solution-name-text">Cora Orchestration</span>
-        <span class="material-symbols-outlined">expand_more</span>
-      </button>
+      </span>
       <div class="segmented-btn" id="solution-filters"></div>
       <div class="header-actions">
         <button class="header-icon" id="toggle-metrics" title="Analytics" onclick="toggleMetrics()">
@@ -2143,8 +2643,8 @@
               <span class="view-name">Default view</span>
               <span class="material-symbols-outlined view-btn-chevron-icon">expand_more</span>
             </button>
-            <button class="view-settings-btn" id="view-settings-btn" onclick="toggleViewSettings(event)">
-              <span class="material-symbols-outlined">grid_view</span>
+            <button class="view-settings-btn" id="view-settings-btn" onclick="toggleViewSettings(event)" title="View settings">
+              <span class="material-symbols-outlined">settings</span>
             </button>
           </div>
           <div class="view-picker hidden" id="view-picker">
@@ -2156,9 +2656,6 @@
           </div>
           <div class="view-context-menu hidden" id="view-context-menu"></div>
         </div>
-        <button class="grid-toggle" title="Grid view">
-          <span class="material-symbols-outlined">grid_view</span>
-        </button>
         <div class="tb-wrap">
           <button class="toolbar-btn" id="filter-btn" onclick="toggleDropdown('filter')">
             <span class="material-symbols-outlined">filter_list</span>
@@ -2300,13 +2797,10 @@
       <!-- Row 1: always visible -->
       <div class="case-header-main">
         <div class="case-header-left">
-          <button class="header-icon case-menu-icon" title="Navigation">
-            <span class="material-symbols-outlined">menu</span>
-          </button>
           <div class="case-header-id">
             <span class="case-company">Wallmart</span>
             <span class="case-num">
-              <span class="material-symbols-outlined">folder_open</span>
+              <span class="material-symbols-outlined">bookmark</span>
               <span id="case-num-text">—</span>
             </span>
           </div>
@@ -2336,7 +2830,16 @@
             <span class="case-meta-label">Updated at</span>
             <span class="case-meta-value" id="case-updated-at">—</span>
           </div>
-          <div class="case-meta-sep"></div>
+          <div class="case-meta-sep meta-wide"></div>
+          <div class="case-meta-item meta-wide">
+            <span class="case-meta-label">Category</span>
+            <span class="case-meta-value" id="case-category">—</span>
+          </div>
+          <div class="case-meta-sep meta-wide"></div>
+          <div class="case-meta-item meta-wide">
+            <span class="case-meta-label">Vendor No.</span>
+            <span class="case-meta-value" id="case-vendor-num">—</span>
+          </div>
         </div>
 
         <div class="case-header-right">
@@ -2384,64 +2887,8 @@
 
     <!-- Case Body: form + info panel + utility bar -->
     <div class="case-body">
-      <!-- Scrollable form -->
-      <div class="case-form-area">
-        <div class="case-section">
-          <div class="case-section-header" onclick="toggleCaseSection('general')">
-            <span class="material-symbols-outlined case-section-arrow" id="case-arrow-general">expand_more</span>
-            <div>
-              <div class="case-section-title">General Details</div>
-              <div class="case-section-desc">Core case information and assignment</div>
-            </div>
-          </div>
-          <div class="case-fields" id="case-fields-general">
-            <div class="case-field readonly">
-              <label>Case ID</label>
-              <input type="text" id="field-case-id" readonly>
-              <span class="field-helper">This is an error/helper text</span>
-            </div>
-            <div class="case-field">
-              <label>Case Title</label>
-              <input type="text" id="field-case-title" placeholder="Value">
-              <span class="field-helper">This is an error/helper text</span>
-            </div>
-            <div class="case-field">
-              <label>Case Type</label>
-              <select id="field-case-type"><option>Value</option><option>Dispute</option><option>Claim</option><option>Inquiry</option></select>
-              <span class="field-helper">This is an error/helper text</span>
-            </div>
-            <div class="case-field">
-              <label>Priority</label>
-              <select id="field-priority"><option>Value</option><option>High</option><option>Medium</option><option>Low</option></select>
-              <span class="field-helper">This is an error/helper text</span>
-            </div>
-            <div class="case-field">
-              <label>Date Filed</label>
-              <input type="text" id="field-date-filed" placeholder="Value">
-              <span class="field-helper">This is an error/helper text</span>
-            </div>
-            <div class="case-field">
-              <label>Status</label>
-              <select id="field-status"><option>Value</option><option>Active</option><option>Pending</option><option>Resolved</option><option>Closed</option></select>
-              <span class="field-helper">This is an error/helper text</span>
-            </div>
-            <div class="case-field">
-              <label>Department</label>
-              <select id="field-department"><option>Value</option><option>Finance</option><option>Operations</option><option>Legal</option><option>Support</option></select>
-              <span class="field-helper">This is an error/helper text</span>
-            </div>
-            <div class="case-field">
-              <label>Assigned To</label>
-              <input type="text" id="field-assigned-to" placeholder="Value">
-              <span class="field-helper">This is an error/helper text</span>
-            </div>
-            <div class="case-field full-width">
-              <label>Case Description</label>
-              <textarea id="field-description" rows="4" placeholder="Value"></textarea>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- Scrollable form — rendered by renderCaseSections() -->
+      <div class="case-form-area" id="case-form-area"></div>
 
       <!-- Utility Sidebar: icon strip + slide-in panel -->
       <div class="utility-sidebar" id="utility-sidebar">
@@ -2474,6 +2921,9 @@
             <button class="conv-action-btn" title="Pop out" onclick="popOutConversations()">
               <span class="material-symbols-outlined">open_in_new</span>
             </button>
+            <button class="conv-action-btn" title="Minimize panel" onclick="closeUtility()">
+              <span class="material-symbols-outlined">chevron_right</span>
+            </button>
           </div>
           <!-- Title row (shown for conversations) -->
           <div class="conv-title-row" id="conv-title-row" style="display:none">
@@ -2488,9 +2938,6 @@
             <span class="conv-read-title" id="conv-read-title">Subject</span>
             <button class="conv-action-btn" title="Attachments">
               <span class="material-symbols-outlined">attach_file</span>
-            </button>
-            <button class="conv-action-btn" title="Pop out" onclick="popOutConversations()">
-              <span class="material-symbols-outlined">open_in_new</span>
             </button>
           </div>
           <div class="utility-panel-body" id="utility-panel-body">
@@ -2511,7 +2958,7 @@
         </div>
 
         <!-- Icon strip (always visible) -->
-        <div class="utility-strip">
+        <div class="utility-strip" onclick="if(activeUtil && !event.target.closest('.util-strip-btn')) closeUtility()">
           <button class="util-strip-btn" id="util-btn-conversations" data-util="conversations" title="Conversations" onclick="toggleUtility('conversations')">
             <span class="material-symbols-outlined">chat</span>
           </button>
@@ -2528,8 +2975,39 @@
 
   <!-- Column header context menu -->
   <div class="col-ctx-menu hidden" id="col-ctx-menu"></div>
-  </div>
-</div>
+  </div><!-- /portal-body -->
+
+  <!-- AI Drawer (inline, pushes content) -->
+  <div class="ai-drawer" id="ai-drawer">
+    <div class="ai-drawer-inner">
+      <div class="ai-drawer-header">
+        <div class="ai-drawer-icon">
+          <span class="material-symbols-outlined">auto_awesome</span>
+        </div>
+        <span class="ai-drawer-title">AI Assistant</span>
+        <button class="ai-drawer-close" onclick="toggleAiDrawer()" title="Close">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="ai-drawer-body" id="ai-drawer-body">
+        <div class="ai-empty" id="ai-empty">
+          <span class="material-symbols-outlined">auto_awesome</span>
+          <div class="ai-empty-title">How can I help?</div>
+          <div class="ai-empty-sub">Ask me anything about this case or workspace.</div>
+        </div>
+      </div>
+      <div class="ai-drawer-footer">
+        <input class="ai-input" id="ai-input" type="text" placeholder="Ask anything…"
+          onkeydown="if(event.key==='Enter') sendAiMessage()" />
+        <button class="ai-send-btn" onclick="sendAiMessage()" title="Send">
+          <span class="material-symbols-outlined">send</span>
+        </button>
+      </div>
+    </div>
+  </div><!-- /ai-drawer -->
+
+  </div><!-- /main-body -->
+</div><!-- /main -->
 
 <script>
 const assignedData = [
@@ -3880,10 +4358,18 @@ function switchSolutionFilter(key) {
   applyAndRender();
 }
 
+function _updateSolutionAvatar() {
+  const sol = SOLUTIONS[activeSolution];
+  const letter = (sol?.label || activeSolution).trim().charAt(0).toUpperCase();
+  const el = document.getElementById('solution-avatar');
+  if (el) el.textContent = letter;
+}
+
 function selectSolution(id) {
   activeSolution = id;
   currentTab = SOLUTIONS[id].filters[0].key;
   closeSolutionMenu();
+  _updateSolutionAvatar();
   renderSolutionHeader();
   applyAndRender();
 }
@@ -3929,6 +4415,7 @@ const sectionTabs = {
 const sectionActiveTab = { mywork: 'home', analytics: 'home', archive: 'home' };
 
 let activeSection = 'mywork';
+let recentTabs = [];
 
 function renderTopbarTabs() {
   const scroll = document.getElementById('tabs-scroll');
@@ -3938,7 +4425,7 @@ function renderTopbarTabs() {
   const home = tabs.find(t => t.home);
   const cases = tabs.filter(t => !t.home);
 
-  const HOME_W = 120;
+  const HOME_W = 164;
   const MIN_TAB = 92;
   const MAX_TAB = 160;
   const CHEVRON_W = 48;
@@ -3971,8 +4458,10 @@ function renderTopbarTabs() {
     }
   }
 
+  const isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+  const shortcutLabel = isMac ? 'Cmd+K' : 'Ctrl+K';
   const homeHtml = home ? `<button class="case-tab home-tab ${home.id === activeId ? 'selected' : ''}" onclick="selectTab('${home.id}')" data-tab-id="${home.id}">
-    <span class="material-symbols-outlined">${home.icon}</span><span class="tab-label">${home.label}</span>
+    <span class="material-symbols-outlined">${home.icon}</span><span class="tab-label">${home.label}</span><span class="home-tab-shortcut">${shortcutLabel}</span>
   </button>` : '';
 
   const casesHtml = visibleCases.map(t => `<button class="case-tab ${t.id === activeId ? 'selected' : ''}" onclick="selectTab('${t.id}')" data-tab-id="${t.id}" style="width:${tabW}px">
@@ -4023,9 +4512,9 @@ function selectTab(id) {
     document.getElementById('portal-content').classList.remove('hidden');
     document.getElementById('case-page').classList.add('hidden');
   } else {
-    // case tab: render the case
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    // case tab: render the case — keep the section nav-btn active
     renderCasePage(id);
+    _syncNavActive();
   }
   closeSearchIfOpen();
 }
@@ -4035,6 +4524,12 @@ function closeTab(e, id) {
   const tabs = sectionTabs[activeSection];
   const idx = tabs.findIndex(t => t.id === id);
   if (idx < 0) return;
+  // Remember closed tab for recent menu
+  const ct = tabs[idx];
+  if (!ct.home) {
+    recentTabs.unshift({ id: ct.id, label: ct.label, icon: ct.icon || 'folder' });
+    if (recentTabs.length > 10) recentTabs.pop();
+  }
   tabs.splice(idx, 1);
   // if closed tab was active, go to home
   if (sectionActiveTab[activeSection] === id) {
@@ -4046,9 +4541,18 @@ function closeTab(e, id) {
 }
 
 function navSidebar(el, section) {
-  activeSection = section || 'mywork';
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
+  const target = section || 'mywork';
+  // If already in this section and on a case → go home
+  if (activeSection === target && sectionActiveTab[target] !== 'home') {
+    sectionActiveTab[target] = 'home';
+    document.getElementById('case-page').classList.add('hidden');
+    document.getElementById('portal-content').classList.remove('hidden');
+    renderTopbarTabs();
+    closeSearchIfOpen();
+    return;
+  }
+  activeSection = target;
+  _syncNavActive();
   renderTopbarTabs();
   document.getElementById('case-page').classList.add('hidden');
   // If active tab for this section is home → show portal content
@@ -4056,6 +4560,13 @@ function navSidebar(el, section) {
   document.getElementById('empty-state').classList.toggle('visible', !isHome);
   document.getElementById('portal-content').classList.toggle('hidden', !isHome);
   closeSearchIfOpen();
+}
+
+function _syncNavActive() {
+  const navId = { mywork: 'nav-mywork', analytics: 'nav-analytics', archive: 'nav-archive' };
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById(navId[activeSection]);
+  if (btn) btn.classList.add('active');
 }
 
 function closeSearchIfOpen() {
@@ -4069,7 +4580,58 @@ function closeSearchIfOpen() {
   }
 }
 
-function toggleRecentMenu() { /* placeholder for recent dropdown */ }
+function toggleRecentMenu() {
+  const existing = document.getElementById('recent-dropdown');
+  const btn = document.querySelector('.recent-btn');
+  if (existing) {
+    existing.remove();
+    btn && btn.classList.remove('menu-open');
+    return;
+  }
+  btn && btn.classList.add('menu-open');
+
+  const rect = btn ? btn.getBoundingClientRect() : { bottom: 40, right: window.innerWidth };
+  const dropdown = document.createElement('div');
+  dropdown.id = 'recent-dropdown';
+  dropdown.className = 'recent-dropdown';
+  dropdown.style.top   = (rect.bottom + 4) + 'px';
+  dropdown.style.right = (window.innerWidth - rect.right) + 'px';
+
+  if (recentTabs.length === 0) {
+    dropdown.innerHTML = '<div class="recent-dropdown-header">Recently Closed</div><div class="recent-dropdown-empty">No recently closed tabs</div>';
+  } else {
+    const items = recentTabs.map(t =>
+      `<div class="recent-dropdown-item" onclick="closeRecentMenu(); openCaseTab('${t.id}')">
+        <span class="material-symbols-outlined">${t.icon || 'folder_open'}</span>
+        <span class="rd-label">${t.label}</span>
+      </div>`
+    ).join('');
+    dropdown.innerHTML = '<div class="recent-dropdown-header">Recently Closed</div>' + items;
+  }
+
+  document.body.appendChild(dropdown);
+
+  // Close on outside click
+  setTimeout(() => {
+    document.addEventListener('click', _recentOutsideHandler);
+  }, 0);
+}
+
+function closeRecentMenu() {
+  const d = document.getElementById('recent-dropdown');
+  if (d) d.remove();
+  const btn = document.querySelector('.recent-btn');
+  if (btn) btn.classList.remove('menu-open');
+  document.removeEventListener('click', _recentOutsideHandler);
+}
+
+function _recentOutsideHandler(e) {
+  const d = document.getElementById('recent-dropdown');
+  const btn = document.querySelector('.recent-btn');
+  if (d && !d.contains(e.target) && btn && !btn.contains(e.target)) {
+    closeRecentMenu();
+  }
+}
 
 // ── Column header context menu ──
 let colCtxKey = null;
@@ -4170,7 +4732,13 @@ function startColResize(e, key) {
   _resizeState = { key, startX: e.clientX, startWidth: th.offsetWidth };
   e.currentTarget.classList.add('resizing');
   document.body.classList.add('col-resizing');
-  document.getElementById('col-resize-line').classList.add('visible');
+  const table = document.getElementById('table-body').closest('table');
+  const tableRect = table ? table.getBoundingClientRect() : { top: 0, height: window.innerHeight };
+  const line = document.getElementById('col-resize-line');
+  line.style.top    = tableRect.top + 'px';
+  line.style.height = tableRect.height + 'px';
+  line.style.left   = e.clientX + 'px'; // set initial position immediately
+  line.classList.add('visible');
   document.addEventListener('mousemove', _onColResize);
   document.addEventListener('mouseup', _endColResize);
 }
@@ -4180,12 +4748,8 @@ function _onColResize(e) {
   const newWidth = Math.max(50, _resizeState.startWidth + (e.clientX - _resizeState.startX));
   colWidths[_resizeState.key] = newWidth;
   applyColWidths();
-  const table = document.getElementById('table-body').closest('table');
-  const th = table.querySelector(`thead th[data-col="${_resizeState.key}"]`);
-  if (th) {
-    const rect = th.getBoundingClientRect();
-    document.getElementById('col-resize-line').style.left = rect.right + 'px';
-  }
+  // Track mouse position directly — avoids jumps caused by post-reflow getBoundingClientRect
+  document.getElementById('col-resize-line').style.left = e.clientX + 'px';
 }
 
 function _endColResize() {
@@ -4300,7 +4864,17 @@ document.addEventListener('click', (e) => {
 applyAndRender();
 renderTopbarTabs();
 renderSolutionHeader();
+_updateSolutionAvatar();
 selectView('default'); // initialise view state + render btn
+
+// Cmd+K / Ctrl+K → navigate home
+document.addEventListener('keydown', e => {
+  const isMeta = e.metaKey || e.ctrlKey;
+  if (isMeta && e.key === 'k') {
+    e.preventDefault();
+    selectTab('home');
+  }
+});
 
 // Row checkbox → bulk bar (event delegation)
 document.getElementById('table-body').addEventListener('change', e => {
@@ -4338,27 +4912,315 @@ function openCaseTab(caseId) {
   selectTab(id);
 }
 
+// ── Case form section definitions ── (order matches header nav tabs)
+const CASE_SECTIONS = [
+  {
+    key: 'history', title: 'History', subtitle: 'Related cases and historical context',
+    fields: [
+      { id: 'field-hist-prev',    label: 'Previous Case ID',    type: 'text' },
+      { id: 'field-hist-related', label: 'Related Cases',       type: 'text' },
+      { id: 'field-hist-contact', label: 'Prior Contact Count', type: 'text', readonly: true },
+      { id: 'field-hist-outcome', label: 'Prior Outcome',       type: 'select', options: ['None','Resolved','Declined','Escalated'] },
+      { id: 'field-hist-notes',   label: 'Historical Notes',    type: 'textarea', rows: 3, fullWidth: true },
+    ]
+  },
+  {
+    key: 'details', title: 'Details', subtitle: 'Core case information and assignment',
+    fields: [
+      { id: 'field-case-id',    label: 'Case ID',          type: 'text',   readonly: true },
+      { id: 'field-case-title', label: 'Case Title',        type: 'text' },
+      { id: 'field-case-type',  label: 'Case Type',         type: 'select', options: ['Dispute','Claim','Inquiry','Escalation'] },
+      { id: 'field-priority',   label: 'Priority',          type: 'select', options: ['High','Medium','Low'] },
+      { id: 'field-date-filed', label: 'Date Filed',        type: 'text' },
+      { id: 'field-status',     label: 'Status',            type: 'select', options: ['Active','Pending Review','In Progress','Resolved','Closed'] },
+      { id: 'field-department', label: 'Department',        type: 'select', options: ['Finance','Operations','Legal','Support'] },
+      { id: 'field-assigned-to',label: 'Assigned To',       type: 'text' },
+      { id: 'field-description',label: 'Case Description',  type: 'textarea', rows: 4, fullWidth: true },
+    ]
+  },
+  {
+    key: 'host', title: 'Host', subtitle: 'Host and customer information',
+    fields: [
+      { id: 'field-host-name',    label: 'Host Name',       type: 'text' },
+      { id: 'field-host-id',      label: 'Host ID',         type: 'text', readonly: true },
+      { id: 'field-host-email',   label: 'Email Address',   type: 'text' },
+      { id: 'field-host-phone',   label: 'Phone Number',    type: 'text' },
+      { id: 'field-host-country', label: 'Country',         type: 'select', options: ['United States','United Kingdom','Canada','Australia','Other'] },
+      { id: 'field-host-account', label: 'Account Status',  type: 'select', options: ['Active','Suspended','Pending','Closed'] },
+    ]
+  },
+  {
+    key: 'general', title: 'General', subtitle: 'General case information',
+    fields: [
+      { id: 'field-gen-channel',  label: 'Channel',           type: 'select', options: ['Email','Phone','Portal','Chat'] },
+      { id: 'field-gen-source',   label: 'Source',             type: 'text' },
+      { id: 'field-gen-category', label: 'Category',           type: 'select', options: ['Billing','Technical','Account','Compliance'] },
+      { id: 'field-gen-region',   label: 'Region',             type: 'select', options: ['APAC','EMEA','AMER','LATAM'] },
+      { id: 'field-gen-target',   label: 'Resolution Target',  type: 'text' },
+      { id: 'field-gen-notes',    label: 'General Notes',      type: 'textarea', rows: 3, fullWidth: true },
+    ]
+  },
+  {
+    key: 'payment', title: 'Payment', subtitle: 'Receipt items and transaction breakdown',
+    fields: [
+      {
+        id: 'table-receipt', label: 'Receipt Items', type: 'table',
+        columns: [
+          { key: 'item',  label: 'Item Description', width: '45%' },
+          { key: 'qty',   label: 'Qty',        align: 'right', width: '10%' },
+          { key: 'price', label: 'Unit Price',  align: 'right', prefix: '$', width: '20%' },
+          { key: 'total', label: 'Total',       align: 'right', prefix: '$', computed: true, width: '20%' },
+        ],
+        rows: [
+          { item: 'Service Fee',    qty: '1', price: '250.00' },
+          { item: 'Processing Fee', qty: '2', price: '15.00'  },
+          { item: 'Tax (8%)',       qty: '1', price: '22.40'  },
+        ]
+      },
+    ]
+  },
+  {
+    key: 'research', title: 'Research', subtitle: 'Investigation and research notes',
+    fields: [
+      { id: 'field-res-findings', label: 'Initial Findings',      type: 'textarea', rows: 3, fullWidth: true },
+      { id: 'field-res-risk',     label: 'Risk Level',            type: 'select', options: ['Low','Medium','High','Critical'] },
+      { id: 'field-res-reviewer', label: 'Reviewer',              type: 'text' },
+      { id: 'field-res-reviewed', label: 'Review Date',           type: 'text' },
+      { id: 'field-res-outcome',  label: 'Recommended Outcome',   type: 'select', options: ['Approve','Decline','Escalate','Further Review'] },
+      { id: 'field-res-notes',    label: 'Additional Notes',      type: 'textarea', rows: 3, fullWidth: true },
+    ]
+  },
+  {
+    key: 'scmt', title: 'SCMT', subtitle: 'SCMT-specific fields and data',
+    fields: [
+      { id: 'field-scmt-id',    label: 'SCMT Reference',   type: 'text' },
+      { id: 'field-scmt-team',  label: 'SCMT Team',        type: 'select', options: ['Alpha','Beta','Gamma','Delta'] },
+      { id: 'field-scmt-level', label: 'Escalation Level', type: 'select', options: ['L1','L2','L3','L4'] },
+      { id: 'field-scmt-owner', label: 'Case Owner',       type: 'text' },
+      { id: 'field-scmt-sla',   label: 'SLA Target',       type: 'text' },
+      { id: 'field-scmt-flag',  label: 'Flag',             type: 'select', options: ['None','VIP','Regulatory','Legal Hold'] },
+    ]
+  },
+  {
+    key: 'tracking', title: 'Tracking', subtitle: 'Status tracking and milestones',
+    fields: [
+      { id: 'field-trk-stage',     label: 'Current Stage',  type: 'select', options: ['Intake','Review','Investigation','Resolution','Closed'] },
+      { id: 'field-trk-opened',    label: 'Opened Date',    type: 'text', readonly: true },
+      { id: 'field-trk-updated',   label: 'Last Updated',   type: 'text', readonly: true },
+      { id: 'field-trk-due',       label: 'Due Date',       type: 'text' },
+      { id: 'field-trk-days',      label: 'Days Open',      type: 'text', readonly: true },
+      { id: 'field-trk-milestone', label: 'Next Milestone', type: 'text' },
+    ]
+  },
+];
+
+// ── Editable table field ──
+const _TABLES = {};
+
+function _buildTableHTML(tid) {
+  const { columns, rows, sortKey, sortDir } = _TABLES[tid];
+
+  // Sort rows (copy to avoid mutating original order index)
+  let sorted = rows.map((r, i) => ({ ...r, _origIdx: i }));
+  if (sortKey) {
+    sorted.sort((a, b) => {
+      const av = parseFloat(a[sortKey]) || a[sortKey] || '';
+      const bv = parseFloat(b[sortKey]) || b[sortKey] || '';
+      return av < bv ? -sortDir : av > bv ? sortDir : 0;
+    });
+  }
+
+  const headers = columns.map(c => {
+    const isSorted = sortKey === c.key;
+    const icon = sortDir === 1 ? 'arrow_upward' : 'arrow_downward';
+    const innerCls = c.align === 'right' ? 'ft-th-inner align-right' : 'ft-th-inner';
+    const wStyle = c.width ? ` style="width:${c.width}"` : '';
+    return `<th class="${c.align==='right'?'align-right':''} ${isSorted?'ft-sorted':''}"
+              onclick="_tSort('${tid}','${c.key}')"${wStyle}>
+      <div class="${innerCls}">
+        ${c.align === 'right' && isSorted
+          ? `<span class="material-symbols-outlined ft-sort-icon">${icon}</span>` : ''}
+        ${c.label}
+        ${c.align !== 'right' && isSorted
+          ? `<span class="material-symbols-outlined ft-sort-icon">${icon}</span>` : ''}
+        ${!isSorted
+          ? `<span class="material-symbols-outlined ft-sort-icon">unfold_more</span>` : ''}
+      </div>
+    </th>`;
+  }).join('') + '<th class="ft-del-th" style="width:40px"></th>';
+
+  const bodyRows = sorted.map((row) => {
+    const ri = row._origIdx;
+    const cells = columns.map(c => {
+      const raw  = c.computed ? _tCompute(row, c) : (row[c.key] ?? '');
+      const disp = (c.prefix||'') + raw;
+      return `<td class="field-table-cell${c.computed?' computed':''}${c.align==='right'?' align-right':''}">
+        <input value="${disp}"
+          ${c.computed
+            ? 'readonly tabindex="-1"'
+            : `oninput="_tInput('${tid}',${ri},'${c.key}',this.value,this)"`}/>
+      </td>`;
+    }).join('');
+    return `<tr>${cells}
+      <td class="field-table-del-cell">
+        <button class="field-table-del-btn" onclick="_tDelRow('${tid}',${ri})" title="Remove row">
+          <span class="material-symbols-outlined">delete</span>
+        </button>
+      </td></tr>`;
+  }).join('');
+
+  const grand = _tGrandTotal(tid);
+  return `<table class="field-table">
+    <thead><tr>${headers}</tr></thead>
+    <tbody>${bodyRows}</tbody>
+  </table>
+  <div class="field-table-footer">
+    <button class="field-table-add-btn" onclick="_tAddRow('${tid}')">
+      <span class="material-symbols-outlined">add</span> Add item
+    </button>
+    ${grand !== null ? `<span class="field-table-total" id="${tid}-grand">Total: $${grand}</span>` : ''}
+  </div>`;
+}
+
+function _tSort(tid, key) {
+  if (!_TABLES[tid]) return;
+  if (_TABLES[tid].sortKey === key) {
+    _TABLES[tid].sortDir = (_TABLES[tid].sortDir || 1) * -1;
+  } else {
+    _TABLES[tid].sortKey = key;
+    _TABLES[tid].sortDir = 1;
+  }
+  const wrap = document.getElementById(tid + '-wrap');
+  if (wrap) wrap.innerHTML = _buildTableHTML(tid);
+}
+
+function _tCompute(row, col) {
+  if (col.key === 'total') {
+    const q = parseFloat(row.qty) || 0;
+    const p = parseFloat(String(row.price||'').replace(/[^0-9.]/g,'')) || 0;
+    return (q * p).toFixed(2);
+  }
+  return '';
+}
+
+function _tGrandTotal(tid) {
+  const { columns, rows } = _TABLES[tid];
+  if (!columns.find(c => c.computed && c.key === 'total')) return null;
+  return rows.reduce((s, r) => {
+    const q = parseFloat(r.qty) || 0;
+    const p = parseFloat(String(r.price||'').replace(/[^0-9.]/g,'')) || 0;
+    return s + q * p;
+  }, 0).toFixed(2);
+}
+
+function _tInput(tid, ri, key, val, inputEl) {
+  if (!_TABLES[tid]) return;
+  _TABLES[tid].rows[ri][key] = val.replace(/^\$/, '');
+  // update computed cells in same row without full re-render (preserves focus)
+  const tr = inputEl.closest('tr');
+  if (tr) {
+    _TABLES[tid].columns.forEach((c, ci) => {
+      if (!c.computed) return;
+      const cell = tr.cells[ci];
+      if (cell) cell.querySelector('input').value = (c.prefix||'') + _tCompute(_TABLES[tid].rows[ri], c);
+    });
+  }
+  const grand = _tGrandTotal(tid);
+  const el = document.getElementById(tid + '-grand');
+  if (el && grand !== null) el.textContent = `Total: $${grand}`;
+}
+
+function _tAddRow(tid) {
+  if (!_TABLES[tid]) return;
+  const empty = {};
+  _TABLES[tid].columns.forEach(c => { if (!c.computed) empty[c.key] = ''; });
+  _TABLES[tid].rows.push(empty);
+  const wrap = document.getElementById(tid + '-wrap');
+  if (wrap) {
+    wrap.innerHTML = _buildTableHTML(tid);
+    const trs = wrap.querySelectorAll('tbody tr');
+    const last = trs[trs.length - 1];
+    if (last) last.querySelector('input:not([readonly])')?.focus();
+  }
+}
+
+function _tDelRow(tid, ri) {
+  if (!_TABLES[tid]) return;
+  _TABLES[tid].rows.splice(ri, 1);
+  const wrap = document.getElementById(tid + '-wrap');
+  if (wrap) wrap.innerHTML = _buildTableHTML(tid);
+}
+
+function _renderField(f) {
+  if (f.type === 'table') {
+    _TABLES[f.id] = { columns: f.columns, rows: (f.rows||[]).map(r => ({...r})), sortKey: null, sortDir: 1 };
+    return `<div class="case-field full-width">
+      <label>${f.label}</label>
+      <div class="field-table-wrap" id="${f.id}-wrap">${_buildTableHTML(f.id)}</div>
+    </div>`;
+  }
+  const cls = `case-field${f.readonly ? ' readonly' : ''}${f.fullWidth ? ' full-width' : ''}`;
+  let input;
+  if (f.type === 'select') {
+    input = `<select id="${f.id}"><option value="">—</option>${(f.options||[]).map(o=>`<option>${o}</option>`).join('')}</select>`;
+  } else if (f.type === 'textarea') {
+    input = `<textarea id="${f.id}" rows="${f.rows||3}" placeholder="Value"></textarea>`;
+  } else {
+    input = `<input type="text" id="${f.id}" placeholder="Value"${f.readonly?' readonly':''}>`;
+  }
+  return `<div class="${cls}"><label>${f.label}</label>${input}</div>`;
+}
+
+function renderCaseSections(sections) {
+  const area = document.getElementById('case-form-area');
+  if (!area) return;
+  area.innerHTML = sections.map(s => `
+    <div class="case-section" id="case-section-${s.key}">
+      <div class="case-section-header" onclick="toggleCaseSection('${s.key}')">
+        <div class="case-section-toggle" id="case-toggle-${s.key}">
+          <span class="material-symbols-outlined">expand_more</span>
+        </div>
+        <div class="case-section-labels">
+          <div class="case-section-title">${s.title}</div>
+          <div class="case-section-desc">${s.subtitle}</div>
+        </div>
+      </div>
+      <div class="case-section-divider"></div>
+      <div class="case-fields" id="case-fields-${s.key}">
+        ${s.fields.map(_renderField).join('')}
+      </div>
+    </div>`).join('');
+}
+
 function renderCasePage(caseId) {
   const id = String(caseId);
   const allData = [...(assignedData || []), ...(queueData || [])];
   const row = allData.find(r => String(r.id).replace(/^#\s*/, '') === id.replace(/^#\s*/, ''));
-  // Header — new IDs
+  // Header
   document.getElementById('case-num-text').textContent = id;
-  document.getElementById('case-stage-text').textContent = row?.stage || 'In progress';
+  const stageNames = ['Intake','Review','Escalated','Pending Review','Resolved'];
+  const stageIdx = stageNames.indexOf(row?.stage) + 1 || 1;
+  const stageBadge = document.getElementById('case-stage-badge');
+  if (stageBadge) stageBadge.textContent = stageIdx;
+  const stageText = document.getElementById('case-stage-text');
+  if (stageText) stageText.textContent = row?.stage || 'In progress';
   document.getElementById('case-status-text').textContent = row?.status || 'Active';
   document.getElementById('case-updated-by').textContent = (row?.assignees && row.assignees[0]) || 'Unassigned';
   document.getElementById('case-updated-at').textContent = row?.created ? formatUpdatedAt(row.created) : '—';
-  // Form fields
-  document.getElementById('field-case-id').value = id;
-  document.getElementById('field-case-title').value = row?.name || '';
-  document.getElementById('field-assigned-to').value = (row?.assignees && row.assignees[0]) || '';
-  document.getElementById('field-date-filed').value = row?.created || '';
-  // Make sure section is expanded
-  const fields = document.getElementById('case-fields-general');
-  const arrow = document.getElementById('case-arrow-general');
-  if (fields) fields.classList.remove('hidden');
-  if (arrow) arrow.classList.remove('collapsed');
-  // Reset utility + progress panels when a new case opens
+  document.getElementById('case-category').textContent = row?.category || 'General';
+  document.getElementById('case-vendor-num').textContent = row?.vendorNum || 'V-' + (caseId || '00000').toString().slice(-5);
+  // Render sections (default: all 8)
+  renderCaseSections(CASE_SECTIONS);
+  // Populate known fields from row data
+  const set = (elId, val) => { const el = document.getElementById(elId); if (el) el.value = val || ''; };
+  set('field-case-id', id);
+  set('field-case-title', row?.name || '');
+  set('field-assigned-to', (row?.assignees && row.assignees[0]) || '');
+  set('field-date-filed', row?.created || '');
+  set('field-trk-opened', row?.created || '');
+  set('field-trk-updated', row?.created || '');
+  // Reset nav tab to first section, reset utility + progress
+  document.querySelectorAll('.chf-tab').forEach((t,i) => t.classList.toggle('active', i===0));
   closeUtility();
   closeProgress();
 }
@@ -4420,7 +5282,10 @@ function closeUtility() {
     document.getElementById('conv-title-row').style.display = 'none';
   }
   const panel = document.getElementById('utility-panel');
-  if (panel) panel.classList.remove('open');
+  if (panel) {
+    panel.classList.remove('open');
+    panel.style.width = ''; // clear any inline resize width
+  }
   document.querySelectorAll('.util-strip-btn').forEach(b => b.classList.remove('active'));
 }
 
@@ -4607,7 +5472,7 @@ function renderConversationsPanel(container) {
   const badge = document.getElementById('conv-count-badge');
   if (badge) badge.textContent = items.length;
 
-  container.innerHTML = `<div class="conv-list">${items.map(c => { const idx = CONV_ITEMS.indexOf(c); const hasAttach = c.messages.some(m => m.attachments.length > 0); return `
+  container.innerHTML = `<div class="att-table-wrap" style="margin:0 14px 14px;">${items.map(c => { const idx = CONV_ITEMS.indexOf(c); const hasAttach = c.messages.some(m => m.attachments.length > 0); return `
     <div class="conv-item" onclick="openConversation(${idx})">
       <div class="conv-avatar-col">
         <div class="conv-avatar-chip">${c.initials}</div>
@@ -4771,6 +5636,65 @@ function closePopOut() {
   if (el) el.remove();
 }
 
+function popOutAttachments() {
+  const existing = document.getElementById('att-popout-overlay');
+  if (existing) { existing.remove(); return; }
+  const overlay = document.createElement('div');
+  overlay.id = 'att-popout-overlay';
+  overlay.className = 'conv-popout-overlay';
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeAttachPopOut(); });
+  overlay.innerHTML = `
+    <div class="conv-popout-modal" style="height:680px;">
+      <div id="att-modal-content" style="display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;"></div>
+    </div>`;
+  document.body.appendChild(overlay);
+  _attPopRender();
+}
+
+function closeAttachPopOut() {
+  const el = document.getElementById('att-popout-overlay');
+  if (el) el.remove();
+}
+
+function _attPopRender() {
+  const el = document.getElementById('att-modal-content');
+  if (!el) return;
+  const items = _attachFilter
+    ? ATTACH_ITEMS.filter(f => f.name.toLowerCase().includes(_attachFilter) || f.ext.toLowerCase().includes(_attachFilter) || f.type.toLowerCase().includes(_attachFilter))
+    : ATTACH_ITEMS;
+  el.innerHTML = `
+    <div class="pop-title-row">
+      <span class="pop-title-text">Attachments</span>
+      <span class="pop-count-badge">${items.length}</span>
+      <div style="flex:1"></div>
+      <button class="conv-popout-close" onclick="closeAttachPopOut()" title="Close">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <div class="conv-popout-topbar">
+      <button class="att-upload-btn" title="Upload file">
+        <span class="material-symbols-outlined">upload</span>
+      </button>
+      <button class="att-sort-btn" title="Sort">
+        <span class="material-symbols-outlined">expand_more</span>
+      </button>
+      <input class="conv-search" type="text" placeholder="Search files…"
+        value="${_attachFilter}"
+        oninput="_attPopFilter(this.value)" style="flex:1;min-width:0" />
+      <button class="conv-action-btn" title="Refresh">
+        <span class="material-symbols-outlined">refresh</span>
+      </button>
+    </div>
+    <div class="att-table-wrap" style="margin:0 16px 16px;flex:1;min-height:0;">
+      ${items.map(f => _attRowHtml(f, ATTACH_ITEMS.indexOf(f), '_attPopPreview')).join('')}
+    </div>`;
+}
+
+function _attPopFilter(val) {
+  _attachFilter = val.toLowerCase().trim();
+  _attPopRender();
+}
+
 function _popRenderList() {
   const el = document.getElementById('pop-modal-content');
   if (!el) return;
@@ -4889,20 +5813,314 @@ function _popRenderConv(index) {
     </div>`;
 }
 
+function _attRowHtml(f, idx, clickFn) {
+  return `<div class="att-row" onclick="${clickFn}(${idx})">
+    <div class="att-cell att-cell-ext">
+      <span class="att-ext-badge">${f.ext}</span>
+    </div>
+    <div class="att-cell att-cell-name">
+      <span class="att-file-name" title="${f.name}">${f.name}</span>
+      <span class="att-file-tag">${f.type}</span>
+    </div>
+    <div class="att-cell-actions" onclick="event.stopPropagation()">
+      <button class="att-action-btn" title="Download"><span class="material-symbols-outlined">download</span></button>
+      <button class="att-action-btn" title="Preview"><span class="material-symbols-outlined">visibility</span></button>
+      <button class="att-action-btn" title="Copy link"><span class="material-symbols-outlined">link</span></button>
+      <button class="att-action-btn" title="Delete"><span class="material-symbols-outlined">delete</span></button>
+    </div>
+  </div>`;
+}
+
+const ATTACH_ITEMS = [
+  { name: 'KPMG Sequence Co-Termed Renewal 05-27-2022 to 05-06-2023v2.pdf', ext: 'PDF', size: '2.4 MB', date: 'Mar 12, 2026', uploader: 'Ahmed Arah', type: 'Contract' },
+  { name: 'Project Proposal 06-01-2023 to 06-30-2023.docx', ext: 'DOCX', size: '1.1 MB', date: 'Mar 10, 2026', uploader: 'Ben Septer', type: 'Proposal' },
+  { name: 'Sales Data Q2 2023.xlsx', ext: 'XLSX', size: '890 KB', date: 'Mar 8, 2026', uploader: 'Emily Foster', type: 'Report' },
+  { name: 'Marketing Strategy 2023.pptx', ext: 'PPTX', size: '3.2 MB', date: 'Mar 5, 2026', uploader: 'Cara D\'Angelo', type: 'Strategy' },
+  { name: 'Contract Agreement v3.pdf', ext: 'PDF', size: '540 KB', date: 'Feb 28, 2026', uploader: 'David Ellis', type: 'Contract' },
+  { name: 'Customer Data Export Q1-Q2.csv', ext: 'CSV', size: '1.8 MB', date: 'Feb 25, 2026', uploader: 'Ahmed Arah', type: 'Data' },
+  { name: 'System Architecture Diagram Final.png', ext: 'PNG', size: '4.1 MB', date: 'Feb 20, 2026', uploader: 'Ben Septer', type: 'Technical' },
+  { name: 'Meeting Notes Q1 2026.docx', ext: 'DOCX', size: '220 KB', date: 'Feb 15, 2026', uploader: 'Emily Foster', type: 'Notes' },
+  { name: 'Budget Forecast 2026 Revised.xlsx', ext: 'XLSX', size: '1.3 MB', date: 'Feb 10, 2026', uploader: 'Cara D\'Angelo', type: 'Finance' },
+  { name: 'Legal Review Summary Final.pdf', ext: 'PDF', size: '670 KB', date: 'Feb 5, 2026', uploader: 'David Ellis', type: 'Legal' },
+  { name: 'Product Roadmap Q2 2026.pptx', ext: 'PPTX', size: '5.8 MB', date: 'Jan 30, 2026', uploader: 'Ahmed Arah', type: 'Roadmap' },
+];
+
+let _attachFilter = '';
+
 function renderAttachmentsPanel(container) {
+  const items = _attachFilter
+    ? ATTACH_ITEMS.filter(f => f.name.toLowerCase().includes(_attachFilter) || f.ext.toLowerCase().includes(_attachFilter) || f.type.toLowerCase().includes(_attachFilter))
+    : ATTACH_ITEMS;
+
   container.innerHTML = `
-    <div class="util-empty">
-      <span class="material-symbols-outlined">attach_file</span>
-      <p>No attachments yet</p>
+    <div class="att-panel">
+      <div class="att-toolbar">
+        <div class="att-toolbar-left">
+          <button class="att-upload-btn" title="Upload file">
+            <span class="material-symbols-outlined">upload</span>
+          </button>
+          <button class="att-sort-btn" title="Sort">
+            <span class="material-symbols-outlined">expand_more</span>
+          </button>
+          <input class="att-search" type="text" placeholder="Search files…"
+            value="${_attachFilter}"
+            oninput="filterAttachments(this.value)" />
+        </div>
+        <div class="att-toolbar-right">
+          <button class="conv-action-btn" title="Refresh">
+            <span class="material-symbols-outlined">refresh</span>
+          </button>
+          <button class="conv-action-btn" title="Pop out" onclick="popOutAttachments()">
+            <span class="material-symbols-outlined">open_in_new</span>
+          </button>
+          <button class="conv-action-btn" title="Minimize panel" onclick="closeUtility()">
+            <span class="material-symbols-outlined">chevron_right</span>
+          </button>
+        </div>
+      </div>
+      <div class="att-title-row">
+        <span class="att-title-text">Attachments</span>
+        <span class="att-count-badge">${items.length}</span>
+      </div>
+      <div class="att-table-wrap">
+        ${items.map(f => _attRowHtml(f, ATTACH_ITEMS.indexOf(f), 'openAttachPreview')).join('')}
+      </div>
     </div>`;
 }
 
-function renderActivityPanel(container) {
+function filterAttachments(val) {
+  _attachFilter = val.toLowerCase().trim();
+  const body = document.getElementById('utility-panel-body');
+  if (body) renderAttachmentsPanel(body);
+}
+
+/* ── Attachment Preview (drawer) ── */
+let _attachPreviewIndex = null;
+
+function openAttachPreview(idx) {
+  _attachPreviewIndex = idx;
+  const body = document.getElementById('utility-panel-body');
+  if (body) _renderAttachPreviewDrawer(body, idx);
+}
+
+function closeAttachPreview() {
+  _attachPreviewIndex = null;
+  const body = document.getElementById('utility-panel-body');
+  if (body) renderAttachmentsPanel(body);
+}
+
+function prevAttachPreview() {
+  const i = (_attachPreviewIndex - 1 + ATTACH_ITEMS.length) % ATTACH_ITEMS.length;
+  openAttachPreview(i);
+}
+
+function nextAttachPreview() {
+  const i = (_attachPreviewIndex + 1) % ATTACH_ITEMS.length;
+  openAttachPreview(i);
+}
+
+function _renderAttachPreviewDrawer(container, idx) {
+  const f = ATTACH_ITEMS[idx];
+  const total = ATTACH_ITEMS.length;
   container.innerHTML = `
-    <div class="util-empty">
-      <span class="material-symbols-outlined">history</span>
-      <p>No activity recorded</p>
+    <div class="att-preview-wrap">
+      <div class="att-preview-header">
+        <button class="att-preview-back" onclick="closeAttachPreview()" title="Back to list">
+          <span class="material-symbols-outlined">chevron_left</span>
+        </button>
+        <div class="att-preview-title-wrap">
+          <span class="att-preview-title" title="${f.name}">${f.name}</span>
+          <span class="att-ext-badge">${f.ext}</span>
+        </div>
+        <button class="conv-action-btn" title="Refresh">
+          <span class="material-symbols-outlined">refresh</span>
+        </button>
+        <button class="conv-action-btn" title="Pop out" onclick="popOutAttachments()">
+          <span class="material-symbols-outlined">open_in_new</span>
+        </button>
+      </div>
+      <div class="att-preview-body">
+        <div class="att-preview-area">
+          <div class="att-preview-placeholder">
+            <span class="material-symbols-outlined">description</span>
+            <span>${f.ext} · ${f.size}</span>
+          </div>
+        </div>
+        <div class="att-preview-meta">${f.date} · ${f.uploader}</div>
+        <div class="att-preview-nav-row">
+          <button class="att-nav-arrow" onclick="prevAttachPreview()" title="Previous" ${idx === 0 ? 'disabled' : ''}>
+            <span class="material-symbols-outlined">chevron_left</span>
+          </button>
+          <span class="att-nav-counter">${idx + 1} / ${total}</span>
+          <button class="att-nav-arrow" onclick="nextAttachPreview()" title="Next" ${idx === total - 1 ? 'disabled' : ''}>
+            <span class="material-symbols-outlined">chevron_right</span>
+          </button>
+        </div>
+      </div>
+      <div class="att-preview-footer">
+        <button class="att-preview-action active" title="Search">
+          <span class="material-symbols-outlined">search</span>
+        </button>
+        <button class="att-preview-action" title="Info">
+          <span class="material-symbols-outlined">info</span>
+        </button>
+        <button class="att-preview-action" title="Checklist">
+          <span class="material-symbols-outlined">check_box_outline_blank</span>
+        </button>
+      </div>
     </div>`;
+}
+
+/* ── Attachment Preview (modal) ── */
+function _attPopPreview(idx) {
+  _attachPreviewIndex = idx;
+  const el = document.getElementById('att-modal-content');
+  if (!el) return;
+  const f = ATTACH_ITEMS[idx];
+  const total = ATTACH_ITEMS.length;
+  el.innerHTML = `
+    <div class="pop-title-row">
+      <button class="att-preview-back" onclick="_attPopBackToList()" title="Back">
+        <span class="material-symbols-outlined">chevron_left</span>
+      </button>
+      <div class="att-preview-title-wrap" style="flex:1;min-width:0;display:flex;align-items:center;gap:8px;overflow:hidden;">
+        <span class="pop-title-text" title="${f.name}" style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${f.name}</span>
+        <span class="att-ext-badge" style="flex-shrink:0;">${f.ext}</span>
+      </div>
+      <button class="conv-popout-close" onclick="closeAttachPopOut()" title="Close">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <div class="att-pop-preview-body">
+      <div class="att-pop-preview-left">
+        <div class="att-preview-area" style="flex:1;min-height:0;">
+          <div class="att-preview-placeholder">
+            <span class="material-symbols-outlined">description</span>
+            <span>${f.ext} · ${f.size}</span>
+          </div>
+        </div>
+        <div class="att-pop-preview-footer">
+          <button class="att-preview-action active" title="Search">
+            <span class="material-symbols-outlined">search</span>
+          </button>
+          <button class="att-preview-action" title="Info">
+            <span class="material-symbols-outlined">info</span>
+          </button>
+          <button class="att-preview-action" title="Checklist">
+            <span class="material-symbols-outlined">check_box_outline_blank</span>
+          </button>
+          <div style="flex:1"></div>
+          <button class="att-nav-arrow" onclick="_attPopPreview(${(idx - 1 + total) % total})" ${idx === 0 ? 'disabled' : ''}>
+            <span class="material-symbols-outlined">chevron_left</span>
+          </button>
+          <span class="att-nav-counter" style="padding:0 8px;">${idx + 1} / ${total}</span>
+          <button class="att-nav-arrow" onclick="_attPopPreview(${(idx + 1) % total})" ${idx === total - 1 ? 'disabled' : ''}>
+            <span class="material-symbols-outlined">chevron_right</span>
+          </button>
+        </div>
+      </div>
+      <div class="att-pop-nav-list">
+        ${ATTACH_ITEMS.map((item, i) => `
+        <div class="att-nav-item${i === idx ? ' active' : ''}" onclick="_attPopPreview(${i})">
+          <div class="att-nav-thumb"></div>
+          <span class="att-nav-name" title="${item.name}">${item.name}</span>
+        </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+function _attPopBackToList() {
+  _attachPreviewIndex = null;
+  _attPopRender();
+}
+
+const HISTORY_ITEMS = [
+  // Today
+  { initials:'AH', actor:'Ahmed Arah',    action:'changed status',  desc:'Pending Review → In Progress',      tag:'Status',     time:'14:06', date:'Today' },
+  { initials:'ME', actor:'Me',            action:'added note',       desc:'Followed up with client on invoice', tag:'Note',       time:'13:45', date:'Today' },
+  { initials:'EF', actor:'Emily Foster',  action:'uploaded file',    desc:'Contract Agreement v3.pdf',          tag:'Attachment', time:'11:20', date:'Today' },
+  { initials:'BS', actor:'Ben Septer',    action:'changed priority', desc:'Medium → High',                      tag:'Priority',   time:'09:30', date:'Today' },
+  // Yesterday
+  { initials:'CD', actor:"Cara D'Angelo", action:'reassigned to',    desc:'Emily Foster',                       tag:'Assignment', time:'17:02', date:'Yesterday' },
+  { initials:'EF', actor:'Emily Foster',  action:'changed stage',    desc:'Intake → Pending Review',            tag:'Stage',      time:'15:44', date:'Yesterday' },
+  { initials:'AH', actor:'Ahmed Arah',    action:'added comment',    desc:'Invoice confirmed, processing now',  tag:'Comment',    time:'10:15', date:'Yesterday' },
+  // Mar 19
+  { initials:'DE', actor:'David Ellis',   action:'changed field',    desc:'Department: Legal → Finance',        tag:'Field',      time:'16:30', date:'Mar 19' },
+  { initials:'BS', actor:'Ben Septer',    action:'uploaded file',    desc:'Budget Forecast 2026 Revised.xlsx',  tag:'Attachment', time:'14:00', date:'Mar 19' },
+  { initials:'ME', actor:'Me',            action:'changed status',   desc:'Open → Pending Review',              tag:'Status',     time:'11:05', date:'Mar 19' },
+  // Mar 18
+  { initials:'AH', actor:'Ahmed Arah',    action:'opened case',      desc:'Case #100002 created',               tag:'Case',       time:'09:00', date:'Mar 18' },
+  { initials:'ME', actor:'Me',            action:'assigned to',      desc:'Assignee #1',                        tag:'Assignment', time:'09:00', date:'Mar 18' },
+];
+
+function renderActivityPanel(container) {
+  const q = window._histFilter || '';
+  const items = q ? HISTORY_ITEMS.filter(h =>
+    h.actor.toLowerCase().includes(q) ||
+    h.action.toLowerCase().includes(q) ||
+    h.desc.toLowerCase().includes(q) ||
+    h.tag.toLowerCase().includes(q)
+  ) : HISTORY_ITEMS;
+
+  const rows = items.map(h => `
+    <div class="hist-item">
+      <div class="hist-cell-left">
+        <div><span class="hist-actor">${h.actor}</span> <span class="hist-action">${h.action}</span></div>
+        <div class="hist-desc">${h.desc}</div>
+      </div>
+      <div class="hist-cell-right">
+        <div class="hist-date-label">${h.date}</div>
+        <div class="hist-time-val">${h.time}</div>
+      </div>
+    </div>`).join('');
+
+  container.innerHTML = `
+    <div class="att-panel">
+      <div class="att-toolbar">
+        <div class="att-toolbar-left">
+          <input class="att-search" type="text" placeholder="Search history…"
+            value="${q}" oninput="filterHistory(this.value)" />
+        </div>
+        <div class="att-toolbar-right">
+          <button class="conv-action-btn" title="Refresh" onclick="filterHistory('')">
+            <span class="material-symbols-outlined">refresh</span>
+          </button>
+          <button class="conv-action-btn" title="Pop out" onclick="popOutHistory()">
+            <span class="material-symbols-outlined">open_in_new</span>
+          </button>
+          <button class="conv-action-btn" title="Minimize panel" onclick="closeUtility()">
+            <span class="material-symbols-outlined">chevron_right</span>
+          </button>
+        </div>
+      </div>
+      <div class="att-title-row">
+        <span class="att-title-text">Case history</span>
+        <span class="att-count-badge">${items.length}</span>
+      </div>
+      <div class="att-table-wrap">${rows || '<div class="util-empty"><p>No history found</p></div>'}</div>
+    </div>`;
+}
+
+function filterHistory(val) {
+  window._histFilter = val.toLowerCase().trim() || '';
+  const body = document.getElementById('utility-panel-body');
+  if (body) renderActivityPanel(body);
+}
+
+function popOutHistory() {
+  const existing = document.getElementById('hist-popout-overlay');
+  if (existing) { existing.remove(); return; }
+
+  const overlay = document.createElement('div');
+  overlay.id = 'hist-popout-overlay';
+  overlay.className = 'conv-popout-overlay';
+  overlay.innerHTML = `
+    <div class="conv-popout-modal" style="height:640px;">
+      <div id="hist-pop-body" style="flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;"></div>
+    </div>`;
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+  renderActivityPanel(document.getElementById('hist-pop-body'));
 }
 
 function formatUpdatedAt(dateStr) {
@@ -4913,11 +6131,15 @@ function formatUpdatedAt(dateStr) {
 }
 
 function toggleCaseSection(key) {
-  const fields = document.getElementById('case-fields-' + key);
-  const arrow  = document.getElementById('case-arrow-' + key);
+  const section  = document.getElementById('case-section-' + key);
+  const fields   = document.getElementById('case-fields-' + key);
+  const divider  = section?.querySelector('.case-section-divider');
+  const toggle   = document.getElementById('case-toggle-' + key);
   if (!fields) return;
-  fields.classList.toggle('hidden');
-  arrow.classList.toggle('collapsed');
+  const isHidden = fields.classList.toggle('hidden');
+  if (toggle)   toggle.classList.toggle('collapsed', isHidden);
+  if (divider)  divider.classList.toggle('hidden', isHidden);
+  if (section)  section.classList.toggle('minimized', isHidden);
 }
 
 function returnCase() {
@@ -4925,13 +6147,68 @@ function returnCase() {
   if (id && id !== 'home') closeTab(null, id);
 }
 
-// Nav tab click — active state
+// Nav tab click — scroll to section + set active
 document.addEventListener('click', e => {
   const tab = e.target.closest('.chf-tab');
   if (!tab) return;
   document.querySelectorAll('.chf-tab').forEach(t => t.classList.remove('active'));
   tab.classList.add('active');
+  const key = tab.dataset.tab;
+  const section = document.getElementById('case-section-' + key);
+  if (section) {
+    // Expand if collapsed
+    const fields = document.getElementById('case-fields-' + key);
+    if (fields && fields.classList.contains('hidden')) toggleCaseSection(key);
+    // Scroll into view
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 });
+
+// ── AI Drawer ──────────────────────────────────────────────────────────────
+const _aiMessages = [];
+
+function toggleAiDrawer() {
+  const drawer = document.getElementById('ai-drawer');
+  const btn    = document.getElementById('ai-btn');
+  const isOpen = drawer.classList.toggle('open');
+  btn.classList.toggle('active', isOpen);
+  if (isOpen) {
+    setTimeout(() => document.getElementById('ai-input').focus(), 220);
+  }
+}
+
+function sendAiMessage() {
+  const input = document.getElementById('ai-input');
+  const text  = input.value.trim();
+  if (!text) return;
+  input.value = '';
+
+  _aiMessages.push({ role: 'user', text });
+  _renderAiMessages();
+
+  // Placeholder response
+  setTimeout(() => {
+    _aiMessages.push({ role: 'assistant', text: 'Got it! This is a placeholder response. Connect an AI backend to make this live.' });
+    _renderAiMessages();
+  }, 600);
+}
+
+function _renderAiMessages() {
+  const body = document.getElementById('ai-drawer-body');
+  const empty = document.getElementById('ai-empty');
+  if (empty) empty.style.display = 'none';
+
+  const now = new Date();
+  const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+
+  body.innerHTML = _aiMessages.map(m => `
+    <div class="ai-msg ${m.role}">
+      <div class="ai-bubble">${m.text}</div>
+      <span class="ai-msg-time">${time}</span>
+    </div>`).join('');
+
+  body.scrollTop = body.scrollHeight;
+}
 </script>
 <div id="col-resize-line"></div>
 </body>
