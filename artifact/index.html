@@ -575,6 +575,34 @@
     transition: background 0.15s;
   }
   .chips-save-changes:hover { background: #f0f0f0; }
+  /* Display dropdown options */
+  .dp-section-label {
+    padding: 8px 12px 4px; font-size: 11px; font-weight: 600;
+    color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .display-density-opt {
+    display: flex; align-items: center; gap: 8px;
+    width: 100%; padding: 8px 12px;
+    border: none; background: none; cursor: pointer; font-family: inherit;
+    font-size: 13px; color: var(--text-secondary);
+    transition: background 0.1s;
+  }
+  .display-density-opt:hover { background: var(--bg-light); }
+  .display-density-opt .material-symbols-outlined { font-size: 16px; }
+  .display-opt-check { margin-left: auto; opacity: 0; color: var(--text-primary); }
+  .display-density-opt.active { color: var(--text-primary); font-weight: 500; }
+  .display-density-opt.active .display-opt-check { opacity: 1; }
+  .display-view-opt {
+    display: flex; align-items: center; gap: 8px;
+    width: 100%; padding: 8px 12px;
+    border: none; background: none; cursor: pointer; font-family: inherit;
+    font-size: 13px; color: var(--text-secondary);
+    transition: background 0.1s;
+  }
+  .display-view-opt:hover { background: var(--bg-light); }
+  .display-view-opt .material-symbols-outlined { font-size: 16px; }
+  .display-view-opt.active { color: var(--text-primary); font-weight: 500; }
+  .display-view-opt.active .display-opt-check { opacity: 1; }
   /* View context menu */
   .view-btn-wrap { display: flex; align-items: center; }
   .view-btn-main {
@@ -961,6 +989,45 @@
 
   tbody tr { border-bottom: 1px solid var(--border-light); transition: background 0.1s; cursor: pointer; height: 64px; }
   tbody tr:hover { background: var(--hover-row); }
+  /* Row density */
+  .table-wrapper.density-compact tbody tr { height: 36px; }
+  .table-wrapper.density-compact td { font-size: 12px; }
+  /* Split view: transforms only the table area */
+  .split-container { display: none; flex: 1; min-height: 0; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+  .portal-body.split-mode .split-container { display: flex; }
+  .portal-body.split-mode .table-wrapper { display: none; }
+  .portal-body.split-mode .pagination-bar { display: none; }
+  .portal-body.split-mode .bulk-action-bar { display: none !important; }
+  .split-list { width: 260px; flex-shrink: 0; overflow-y: auto; border-right: 1px solid var(--border); background: var(--bg-white); }
+  .split-container #case-page { display: flex; flex: 1; min-width: 0; height: auto; position: relative; }
+  .split-container #case-page.hidden { display: none; }
+  /* Split-mode case header: keep only first 3 metadata items (Current stage, Status, Updated by) */
+  .split-container #case-page .case-header-meta > *:nth-child(n+7) { display: none !important; }
+  .split-container #case-page .case-header-right { margin-left: auto; }
+  .split-open-new-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; margin-left: 8px;
+    border: 1px solid var(--border); border-radius: 6px;
+    background: var(--bg-white); cursor: pointer; color: var(--text-secondary);
+    transition: background 0.1s, color 0.1s;
+  }
+  .split-open-new-btn:hover { background: var(--bg-light); color: var(--text-primary); }
+  .split-open-new-btn .material-symbols-outlined { font-size: 16px; }
+  /* Only show the "open in new tab" button when we're inside split mode */
+  #case-page .split-open-new-btn { display: none; }
+  .split-container #case-page .split-open-new-btn { display: inline-flex; }
+  .split-card {
+    padding: 10px 12px; cursor: pointer;
+    border-bottom: 1px solid var(--border-light);
+    border-left: 3px solid transparent;
+    transition: background 0.1s, border-color 0.1s;
+  }
+  .split-card:hover { background: var(--hover-row); }
+  .split-card.active { background: #f0f0f0; border-left-color: #1a1a1a; }
+  .split-card-top { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .split-card-id { font-size: 11px; color: var(--text-muted); flex: 1; min-width: 0; }
+  .split-card-name { font-size: 13px; font-weight: 500; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .split-card .status-badge { font-size: 11px; padding: 2px 8px; }
   tbody td { padding: 12px 12px; font-size: 13px; vertical-align: middle; overflow: hidden; text-overflow: ellipsis; }
   tbody td:first-child { text-align: center; }
 
@@ -2684,6 +2751,37 @@
           <div class="dropdown-panel hidden" id="group-panel" style="min-width:260px;padding:0"></div>
         </div>
         <div class="tb-wrap">
+          <button class="toolbar-btn" id="display-btn" onclick="toggleDropdown('display')">
+            <span class="material-symbols-outlined">table_rows</span>
+            Display
+          </button>
+          <div class="dropdown-panel hidden" id="display-panel" style="min-width:200px">
+            <div class="dp-section-label">Row height</div>
+            <button class="display-density-opt active" id="display-opt-default" onclick="setDensity('default')">
+              <span class="material-symbols-outlined">table_rows</span>
+              <span>Default</span>
+              <span class="material-symbols-outlined display-opt-check">check</span>
+            </button>
+            <button class="display-density-opt" id="display-opt-compact" onclick="setDensity('compact')">
+              <span class="material-symbols-outlined">density_small</span>
+              <span>Compact</span>
+              <span class="material-symbols-outlined display-opt-check">check</span>
+            </button>
+            <div class="dp-divider"></div>
+            <div class="dp-section-label">View type</div>
+            <button class="display-view-opt active" id="display-view-table" onclick="setViewMode('table')">
+              <span class="material-symbols-outlined">table</span>
+              <span>Table</span>
+              <span class="material-symbols-outlined display-opt-check">check</span>
+            </button>
+            <button class="display-view-opt" id="display-view-split" onclick="setViewMode('split')">
+              <span class="material-symbols-outlined">vertical_split</span>
+              <span>Split</span>
+              <span class="material-symbols-outlined display-opt-check">check</span>
+            </button>
+          </div>
+        </div>
+        <div class="tb-wrap">
           <button class="toolbar-btn" id="columns-btn" onclick="toggleDropdown('columns')">
             <span class="material-symbols-outlined">view_column</span>
             Columns
@@ -2786,6 +2884,11 @@
       </div>
     </div>
 
+    <!-- Split view container (visible only in split mode): holds split-list + #case-page (moved here via JS) -->
+    <div id="split-container" class="split-container">
+      <div id="split-list" class="split-list"></div>
+    </div>
+
     </div><!-- /portal-content-area -->
     </div><!-- /portal-content -->
 
@@ -2804,6 +2907,9 @@
               <span id="case-num-text">—</span>
             </span>
           </div>
+          <button class="split-open-new-btn" title="Open case in new tab" onclick="openSplitCaseInTab()">
+            <span class="material-symbols-outlined">open_in_new</span>
+          </button>
         </div>
 
         <div class="case-header-meta">
@@ -3089,6 +3195,7 @@ function statusClass(status) {
 }
 
 // ── Feature state ──
+let rowDensity     = 'default'; // 'default' | 'compact'
 let filterFields   = []; // [{field, value}]
 let sortRules      = []; // [{field, dir}]
 let groupField     = null;
@@ -3108,7 +3215,7 @@ let lastTotalPages = 1;
 
 // ── Dropdown toggle (mutual close) ──
 function toggleDropdown(name) {
-  const ids = {filter:'filter-panel', sort:'sort-panel', group:'group-panel', columns:'columns-panel'};
+  const ids = {filter:'filter-panel', sort:'sort-panel', group:'group-panel', display:'display-panel', columns:'columns-panel'};
   const panel = document.getElementById(ids[name]);
   const opening = panel.classList.contains('hidden');
   Object.values(ids).forEach(id => document.getElementById(id).classList.add('hidden'));
@@ -3121,7 +3228,7 @@ function toggleDropdown(name) {
   }
 }
 function closeAllDropdowns() {
-  ['filter-panel','sort-panel','group-panel','columns-panel'].forEach(id =>
+  ['filter-panel','sort-panel','group-panel','display-panel','columns-panel'].forEach(id =>
     document.getElementById(id).classList.add('hidden'));
 }
 document.addEventListener('click', e => { if (!e.target.closest('.tb-wrap')) closeAllDropdowns(); });
@@ -3646,6 +3753,8 @@ function applyAndRender() {
   document.getElementById('bulk-action-bar').classList.remove('visible');
   // Apply freeze after DOM is painted so offsetWidths are accurate
   requestAnimationFrame(applyFreezeStyles);
+  // Update split list if active
+  if (viewMode === 'split') renderSplitList();
 }
 
 function renderFlat(data, tbody) {
@@ -4061,6 +4170,81 @@ function selectView(id) {
   renderActiveBar();
   renderTableHeader();
   applyAndRender();
+}
+
+function setDensity(d) {
+  rowDensity = d;
+  document.querySelectorAll('.table-wrapper').forEach(tw => tw.classList.toggle('density-compact', d === 'compact'));
+  document.querySelectorAll('.display-density-opt').forEach(b => b.classList.remove('active'));
+  const opt = document.getElementById('display-opt-' + d);
+  if (opt) opt.classList.add('active');
+  _syncDisplayBtn();
+  const panel = document.getElementById('display-panel');
+  if (panel) panel.classList.add('hidden');
+}
+
+let viewMode = 'table'; // 'table' | 'split'
+let splitActiveCaseId = null;
+
+function _syncDisplayBtn() {
+  const btn = document.getElementById('display-btn');
+  if (btn) btn.classList.toggle('active', rowDensity !== 'default' || viewMode !== 'table');
+}
+
+function setViewMode(mode) {
+  viewMode = mode;
+  const portalBody = document.querySelector('.portal-body');
+  const splitContainer = document.getElementById('split-container');
+  const casePage = document.getElementById('case-page');
+  document.querySelectorAll('.display-view-opt').forEach(b => b.classList.remove('active'));
+  document.getElementById('display-view-' + mode)?.classList.add('active');
+  _syncDisplayBtn();
+  document.getElementById('display-panel')?.classList.add('hidden');
+  if (mode === 'split') {
+    portalBody.classList.add('split-mode');
+    // Move #case-page inside the split container so only the table area transforms
+    if (casePage.parentElement !== splitContainer) splitContainer.appendChild(casePage);
+    renderSplitList();
+    const data = currentTab === 'assigned' ? assignedData : queueData;
+    if (data.length > 0) openSplitCase(String(data[0].id).replace(/^#\s*/, ''));
+  } else {
+    portalBody.classList.remove('split-mode');
+    // Move #case-page back to .portal-body (as a sibling of #portal-content)
+    if (casePage.parentElement !== portalBody) portalBody.appendChild(casePage);
+    casePage.classList.add('hidden');
+    splitActiveCaseId = null;
+  }
+}
+
+function renderSplitList() {
+  const data = currentTab === 'assigned' ? assignedData : queueData;
+  const list = document.getElementById('split-list');
+  if (!list) return;
+  list.innerHTML = data.map(row => {
+    const id = String(row.id).replace(/^#\s*/, '');
+    const isActive = splitActiveCaseId === id;
+    return `<div class="split-card${isActive ? ' active' : ''}" onclick="openSplitCase('${id}')">
+      <div class="split-card-top">
+        <div class="split-card-id"># ${id}</div>
+        <span class="status-badge ${statusClass(row.status)}">${row.status || '—'}</span>
+      </div>
+      <div class="split-card-name">${row.name || '—'}</div>
+    </div>`;
+  }).join('');
+}
+
+function openSplitCase(caseId) {
+  splitActiveCaseId = String(caseId).replace(/^#\s*/, '');
+  const casePage = document.getElementById('case-page');
+  casePage.classList.remove('hidden');
+  renderCasePage(splitActiveCaseId);
+  renderSplitList();
+}
+
+function openSplitCaseInTab() {
+  if (!splitActiveCaseId) return;
+  // selectTab will exit split mode (moves #case-page back to .portal-body) and render the case full-page
+  openCaseTab(splitActiveCaseId);
 }
 
 function toggleViewPicker(e) {
@@ -4504,6 +4688,8 @@ function selectTab(id) {
   sectionActiveTab[activeSection] = id;
   renderTopbarTabs();
   const isHome = id === 'home';
+  // Leaving home into a case tab while in split mode → exit split so case-page is a sibling of portal-content
+  if (!isHome && viewMode === 'split') setViewMode('table');
   document.getElementById('empty-state').classList.toggle('visible', false);
   document.getElementById('portal-content').classList.toggle('hidden', !isHome);
   document.getElementById('case-page').classList.toggle('hidden', isHome);
