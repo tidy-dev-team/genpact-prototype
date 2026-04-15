@@ -1337,7 +1337,7 @@
   .case-section {
     background: #fcfcfc; border: 1px solid #f0f0f0;
     border-radius: 8px; padding: 14px 16px 16px;
-    margin-bottom: 12px;
+    margin-bottom: 20px;
   }
   .case-section.minimized { padding-bottom: 14px; }
   .case-section-header {
@@ -1405,8 +1405,8 @@
   .case-fields.hidden { display: none; }
   .case-section-divider.hidden { display: none; }
   /* Editable table field — styled to match portal table */
-  .field-table-wrap { border: 1px solid var(--border-light); border-radius: 8px; overflow: hidden; }
-  .field-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  .field-table-wrap { border: 1px solid var(--border-light); border-radius: 8px; overflow-x: auto; overflow-y: hidden; max-width: 100%; }
+  .field-table { min-width: 480px; width: 100%; border-collapse: collapse; table-layout: fixed; }
   .field-table thead { position: sticky; top: 0; z-index: 2; }
   .field-table thead th {
     background: var(--bg-white); padding: 10px 12px; text-align: left;
@@ -1460,6 +1460,29 @@
   .field-table-add-btn:hover { background: var(--bg-light); border-color: #ccc; }
   .field-table-add-btn .material-symbols-outlined { font-size: 15px; }
   .field-table-total { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+  /* Image-investigation field */
+  .img-inv-wrap { position: relative; width: 100%; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; cursor: pointer; background: #f0f0f0; }
+  .img-inv-ratio { width: 100%; position: relative; }
+  .img-inv-placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; background: #ebebeb; color: #b0b0b0; }
+  .img-inv-placeholder .material-symbols-outlined { font-size: 40px; }
+  .img-inv-placeholder-text { font-size: 12px; font-weight: 500; }
+  .img-inv-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .img-inv-instructions { padding: 10px 12px; font-size: 13px; color: var(--text-muted); font-style: italic; border-top: 1px solid var(--border-light); background: var(--bg-white); line-height: 1.5; }
+  /* Side-by-side layout: image + input fields */
+  .img-inv-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
+  .img-inv-inputs { display: flex; flex-direction: column; gap: 10px; }
+  @container caseform (max-width: 560px) { .img-inv-layout { grid-template-columns: 1fr; } }
+  .case-form-area.narrow .img-inv-layout { grid-template-columns: 1fr; }
+  /* Lightbox */
+  .img-lightbox-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.72); z-index: 600; display: flex; align-items: center; justify-content: center; }
+  .img-lightbox-overlay.hidden { display: none; }
+  .img-lightbox-box { position: relative; max-width: 90vw; max-height: 90vh; border-radius: 10px; overflow: hidden; box-shadow: 0 16px 48px rgba(0,0,0,0.45); display: flex; flex-direction: column; background: #000; }
+  .img-lightbox-box img { width: 100%; max-height: 80vh; object-fit: contain; display: block; }
+  .img-lightbox-caption { padding: 10px 16px; font-size: 13px; color: #ccc; font-style: italic; background: #111; line-height: 1.5; }
+  .img-lightbox-caption.hidden { display: none; }
+  .img-lightbox-close { position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; border: none; border-radius: 50%; background: rgba(0,0,0,0.55); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s; z-index: 1; }
+  .img-lightbox-close:hover { background: rgba(0,0,0,0.85); }
+  .img-lightbox-close .material-symbols-outlined { font-size: 18px; }
   /* Form fields grid */
   .case-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; padding: 14px 0 2px; }
   /* Narrow: collapse to single column (must come after the base .case-fields rule for equal-specificity override) */
@@ -2599,6 +2622,17 @@
       <button class="modal-btn secondary" onclick="closeSaveViewModal()">Cancel</button>
       <button class="modal-btn primary" onclick="confirmSaveView()">Save</button>
     </div>
+  </div>
+</div>
+
+<!-- Image investigation lightbox -->
+<div class="img-lightbox-overlay hidden" id="img-lightbox-overlay" onclick="closeImgLightbox()">
+  <div class="img-lightbox-box" onclick="event.stopPropagation()">
+    <button class="img-lightbox-close" onclick="closeImgLightbox()">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+    <img id="img-lightbox-img" src="" alt="Evidence image">
+    <div class="img-lightbox-caption hidden" id="img-lightbox-caption"></div>
   </div>
 </div>
 
@@ -5249,6 +5283,17 @@ const CASE_SECTIONS = [
       { id: 'field-res-reviewed', label: 'Review Date',           type: 'text' },
       { id: 'field-res-outcome',  label: 'Recommended Outcome',   type: 'select', options: ['Approve','Decline','Escalate','Further Review'] },
       { id: 'field-res-notes',    label: 'Additional Notes',      type: 'textarea', rows: 3, fullWidth: true },
+      { id: 'img-evidence', label: 'Evidence Photo', type: 'image-investigation',
+        src: 'https://placehold.co/800x450/e8e8e8/999?text=Evidence+Photo',
+        instructions: 'Review the attached evidence photo. Verify that the damage is consistent with the claim description. Note any discrepancies in the condition, date stamps, or identifying markers.',
+        aspectRatio: '16/9', fullWidth: true,
+        inputs: [
+          { id: 'img-ev-damage-type', label: 'Damage Type',     type: 'select',   options: ['Physical','Water','Fire','Theft','Other'] },
+          { id: 'img-ev-severity',    label: 'Severity',        type: 'select',   options: ['Minor','Moderate','Severe','Total Loss'] },
+          { id: 'img-ev-photo-date',  label: 'Photo Date',      type: 'text',     placeholder: 'e.g. Mar 19, 2026' },
+          { id: 'img-ev-discrepancy', label: 'Discrepancies',   type: 'textarea', rows: 3 },
+          { id: 'img-ev-verified-by', label: 'Verified By',     type: 'text' },
+        ] },
     ]
   },
   {
@@ -5453,7 +5498,62 @@ function _tDelRow(tid, ri) {
   if (wrap) wrap.innerHTML = _buildTableHTML(tid);
 }
 
+function _imgInvClick(el) {
+  openImgLightbox(el.dataset.imgSrc, el.dataset.imgCaption);
+}
+function openImgLightbox(src, caption) {
+  if (!src) return;
+  const overlay = document.getElementById('img-lightbox-overlay');
+  const img     = document.getElementById('img-lightbox-img');
+  const cap     = document.getElementById('img-lightbox-caption');
+  if (!overlay || !img) return;
+  img.src = src;
+  if (caption) { cap.textContent = caption; cap.classList.remove('hidden'); }
+  else         { cap.textContent = '';       cap.classList.add('hidden');    }
+  overlay.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+function closeImgLightbox() {
+  document.getElementById('img-lightbox-overlay')?.classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
 function _renderField(f) {
+  if (f.type === 'image-investigation') {
+    const ar = f.aspectRatio || '16/9';
+    const safeSrc     = (f.src || '').replace(/"/g, '&quot;');
+    const safeCaption = (f.instructions || '').replace(/"/g, '&quot;');
+    const imgContent  = f.src
+      ? `<img class="img-inv-img" src="${safeSrc}" alt="${f.label}">`
+      : `<div class="img-inv-placeholder">
+           <span class="material-symbols-outlined">image</span>
+           <span class="img-inv-placeholder-text">No image</span>
+         </div>`;
+    const instrHTML = f.instructions
+      ? `<div class="img-inv-instructions">${f.instructions}</div>` : '';
+    const inputsHTML = (f.inputs || []).map(inp => {
+      let inputEl;
+      if (inp.type === 'select') {
+        inputEl = `<select id="${inp.id}"><option value="">—</option>${(inp.options||[]).map(o=>`<option>${o}</option>`).join('')}</select>`;
+      } else if (inp.type === 'textarea') {
+        inputEl = `<textarea id="${inp.id}" rows="${inp.rows||3}" placeholder="${inp.placeholder||'Value'}"></textarea>`;
+      } else {
+        inputEl = `<input type="text" id="${inp.id}" placeholder="${inp.placeholder||'Value'}">`;
+      }
+      return `<div class="case-field"><label>${inp.label}</label>${inputEl}</div>`;
+    }).join('');
+    const imgCol = `<div class="img-inv-wrap" data-img-src="${safeSrc}" data-img-caption="${safeCaption}" onclick="_imgInvClick(this)">
+        <div class="img-inv-ratio" style="aspect-ratio:${ar}">${imgContent}</div>
+        ${instrHTML}
+      </div>`;
+    const inner = inputsHTML
+      ? `<div class="img-inv-layout">${imgCol}<div class="img-inv-inputs">${inputsHTML}</div></div>`
+      : imgCol;
+    return `<div class="case-field full-width">
+      <label>${f.label}</label>
+      ${inner}
+    </div>`;
+  }
   if (f.type === 'table') {
     _TABLES[f.id] = { columns: f.columns, rows: (f.rows||[]).map(r => ({...r})), sortKey: null, sortDir: 1 };
     return `<div class="case-field full-width">
