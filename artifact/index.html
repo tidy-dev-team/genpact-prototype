@@ -1001,8 +1001,6 @@
   .split-list { width: 260px; flex-shrink: 0; overflow-y: auto; border-right: 1px solid var(--border); background: var(--bg-white); }
   .split-container #case-page { display: flex; flex: 1; min-width: 0; height: auto; position: relative; }
   .split-container #case-page.hidden { display: none; }
-  /* Split-mode case header: keep only first 3 metadata items (Current stage, Status, Updated by) */
-  .split-container #case-page .case-header-meta > *:nth-child(n+7) { display: none !important; }
   .split-container #case-page .case-header-right { margin-left: auto; }
   .split-open-new-btn {
     display: inline-flex; align-items: center; justify-content: center;
@@ -1089,6 +1087,26 @@
   .empty-state.visible { display: flex; }
   .empty-state .material-symbols-outlined { font-size: 48px; color: #ccc; }
   .empty-state p { font-size: 14px; }
+  /* Out-of-scope placeholder for Analytics / Archive */
+  .oos-state {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: var(--text-muted);
+  }
+  .oos-state.visible { display: flex; }
+  .oos-state-icon {
+    width: 64px; height: 64px;
+    background: var(--bg-light);
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .oos-state-icon .material-symbols-outlined { font-size: 32px; color: #bbb; }
+  .oos-state h3 { font-size: 15px; font-weight: 600; color: var(--text-secondary); margin: 0; }
+  .oos-state p { font-size: 13px; color: var(--text-muted); margin: 0; }
   .portal-content { display: flex; flex-direction: column; gap: 16px; flex: 1; min-height: 0; padding: 16px 20px; }
   .portal-content.hidden { display: none; }
 
@@ -1192,6 +1210,19 @@
   /* hide the divider on the tab immediately before an active tab */
   .chf-tab.active + .chf-tab { border-left: none; }
   .chf-tab-badge { display: none; }
+  /* Warning dot on nav tabs whose section has missingFields */
+  .chf-tab.has-warning { position: relative; }
+  .chf-tab.has-warning::after {
+    content: '';
+    position: absolute;
+    top: 8px; right: 8px;
+    width: 7px; height: 7px;
+    background: #d97706;
+    border: 1.5px solid #fff;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .chf-tab.active.has-warning::after { border-color: var(--bg-dark); }
   .chf-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
   .chf-info-btn {
     display: flex; align-items: center; gap: 5px;
@@ -1205,8 +1236,17 @@
   .chf-info-btn.active { background: var(--bg-dark); color: #fff; border-color: var(--bg-dark); }
   .chf-info-btn .material-symbols-outlined { font-size: 15px; transition: transform 0.2s; }
   .chf-info-btn.active .chf-info-chevron { transform: rotate(180deg); }
-  /* Extra meta fields — hidden on narrow screens */
-  @media (max-width: 1200px) { .meta-wide { display: none !important; } }
+  /* Case-page container — drives width-responsive header navigation & metadata */
+  #case-page { container-type: inline-size; container-name: casepage; }
+  /* Hide wide-only metadata (Category, Vendor No.) when the case panel is < 1200px */
+  @container casepage (max-width: 1200px) { .meta-wide { display: none !important; } }
+  /* Narrow case panel: keep only first 3 metadata items (Current stage, Status, Updated by) */
+  @container casepage (max-width: 900px) { .case-header-meta > *:nth-child(n+7) { display: none !important; } }
+  /* Narrow case panel: allow header nav tabs to scroll horizontally instead of clipping */
+  @container casepage (max-width: 800px) {
+    .case-header-footer { overflow-x: auto; overflow-y: hidden; }
+    .case-header-footer::-webkit-scrollbar { display: none; }
+  }
 
   /* ── Progress Section ── */
   .case-progress-section {
@@ -1321,10 +1361,55 @@
   .case-section-toggle .material-symbols-outlined { font-size: 15px; color: var(--text-secondary); transition: transform 0.2s; }
   .case-section-toggle.collapsed .material-symbols-outlined { transform: rotate(-90deg); }
   .case-section-header:hover .case-section-toggle { background: #f0f0f0; }
-  .case-section-labels { display: flex; flex-direction: column; gap: 1px; }
+  .case-section-labels { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; }
   .case-section-title { font-size: 13px; font-weight: 600; color: var(--text-primary); line-height: 1.3; }
   .case-section-desc { font-size: 11px; color: var(--text-muted); }
   .case-section-divider { height: 1px; background: #e8eef4; margin: 10px 0 0; }
+
+  /* Warning icon inline with title (required-fields indicator) */
+  .case-section-warn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 18px; height: 18px; margin-left: 6px; vertical-align: -3px;
+    border: none; background: none; cursor: help; color: #d97706;
+    padding: 0;
+  }
+  .case-section-warn .material-symbols-outlined { font-size: 16px; font-variation-settings: 'FILL' 1; }
+
+  /* Right-side action area + overflow menu */
+  .case-section-actions { position: relative; margin-left: auto; flex-shrink: 0; }
+  .case-section-menu-btn {
+    width: 28px; height: 28px; border: none; background: none; cursor: pointer;
+    border-radius: 6px; display: inline-flex; align-items: center; justify-content: center;
+    color: var(--text-muted); transition: background 0.1s, color 0.1s;
+  }
+  .case-section-menu-btn:hover { background: #f0f0f0; color: var(--text-primary); }
+  .case-section-menu-btn .material-symbols-outlined { font-size: 18px; }
+  .case-section-menu {
+    position: absolute; top: 32px; right: 0; z-index: 20;
+    min-width: 160px; padding: 4px;
+    background: var(--bg-white);
+    border: 1px solid var(--border); border-radius: 8px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  }
+  .case-section-menu.hidden { display: none; }
+  .csm-item {
+    display: flex; align-items: center; gap: 8px; width: 100%;
+    padding: 7px 10px; border: none; background: none;
+    font-family: inherit; font-size: 13px; color: var(--text-secondary);
+    cursor: pointer; border-radius: 6px; text-align: left;
+  }
+  .csm-item:hover { background: var(--bg-light); color: var(--text-primary); }
+  .csm-item .material-symbols-outlined { font-size: 16px; }
+
+  /* Narrow header variant — hides subtitle. Triggered by container query (auto) OR .narrow class (split mode).
+     Note: `.case-fields` single-column override lives after the base .case-fields rule below, to win the cascade. */
+  .case-form-area { container-type: inline-size; container-name: caseform; }
+  @container caseform (max-width: 560px) {
+    .case-section-desc { display: none; }
+    .case-section { padding: 12px 12px 14px; }
+  }
+  .case-form-area.narrow .case-section-desc { display: none; }
+  .case-form-area.narrow .case-section { padding: 12px 12px 14px; }
   .case-fields.hidden { display: none; }
   .case-section-divider.hidden { display: none; }
   /* Editable table field — styled to match portal table */
@@ -1385,6 +1470,11 @@
   .field-table-total { font-size: 13px; font-weight: 600; color: var(--text-primary); }
   /* Form fields grid */
   .case-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; padding: 14px 0 2px; }
+  /* Narrow: collapse to single column (must come after the base .case-fields rule for equal-specificity override) */
+  @container caseform (max-width: 560px) {
+    .case-fields { grid-template-columns: 1fr; }
+  }
+  .case-form-area.narrow .case-fields { grid-template-columns: 1fr; }
   .case-field { display: flex; flex-direction: column; gap: 4px; }
   .case-field.full-width { grid-column: 1 / -1; }
   .case-field label { font-size: 11px; font-weight: 500; color: var(--text-secondary); letter-spacing: 0.1px; }
@@ -2623,6 +2713,13 @@
       <p>Select a page from the sidebar to view content</p>
     </div>
 
+    <!-- Out-of-scope state (Analytics / Archive) -->
+    <div class="oos-state" id="oos-state">
+      <div class="oos-state-icon"><span class="material-symbols-outlined" id="oos-icon">bar_chart</span></div>
+      <h3 id="oos-title">Analytics</h3>
+      <p>This section is out of scope for the current prototype.</p>
+    </div>
+
     <!-- Search results view -->
     <div class="search-results-view hidden" id="search-view">
       <div class="search-empty" id="search-empty">
@@ -2661,7 +2758,7 @@
       </span>
       <div class="segmented-btn" id="solution-filters"></div>
       <div class="header-actions">
-        <button class="header-icon" id="toggle-metrics" title="Analytics" onclick="toggleMetrics()">
+        <button class="header-icon active" id="toggle-metrics" title="Analytics" onclick="toggleMetrics()">
           <span class="material-symbols-outlined">bar_chart</span>
         </button>
         <button class="header-icon" title="Refresh">
@@ -2671,7 +2768,7 @@
     </div>
 
     <!-- Metrics row -->
-    <div class="metrics-row hidden" id="metrics-row">
+    <div class="metrics-row" id="metrics-row">
       <div class="kpi-card main-kpi">
         <div class="kpi-value"><span id="kpi-total">0</span> <span class="kpi-label-inline" id="kpi-tab-label">Assigned Cases</span></div>
         <div class="progress-bar">
@@ -4027,6 +4124,7 @@ function toggleSearchDrawer() {
   document.getElementById('search-view').classList.toggle('hidden', !searchOpen);
   document.getElementById('portal-content').classList.toggle('hidden', searchOpen);
   document.getElementById('empty-state').classList.remove('visible');
+  _hideOosState();
   // close notif if open
   if (searchOpen && notifOpen) closeNotifDrawer();
   // deselect top bar tabs
@@ -4214,6 +4312,9 @@ function setViewMode(mode) {
     casePage.classList.add('hidden');
     splitActiveCaseId = null;
   }
+  // Narrow header/columns on form cards are driven by the @container query on .case-form-area,
+  // so split mode alone no longer forces narrow — when the split case panel is wide enough, 2 columns will apply.
+  document.querySelectorAll('.case-form-area').forEach(el => el.classList.remove('narrow'));
 }
 
 function renderSplitList() {
@@ -4691,6 +4792,7 @@ function selectTab(id) {
   // Leaving home into a case tab while in split mode → exit split so case-page is a sibling of portal-content
   if (!isHome && viewMode === 'split') setViewMode('table');
   document.getElementById('empty-state').classList.toggle('visible', false);
+  _hideOosState();
   document.getElementById('portal-content').classList.toggle('hidden', !isHome);
   document.getElementById('case-page').classList.toggle('hidden', isHome);
   if (isHome) {
@@ -4726,6 +4828,22 @@ function closeTab(e, id) {
   renderTopbarTabs();
 }
 
+const OOS_SECTIONS = { analytics: { icon: 'bar_chart', label: 'Analytics' }, archive: { icon: 'archive', label: 'Archive' } };
+
+function _showOosState(section) {
+  const meta = OOS_SECTIONS[section];
+  document.getElementById('oos-icon').textContent  = meta.icon;
+  document.getElementById('oos-title').textContent = meta.label;
+  document.getElementById('oos-state').classList.add('visible');
+  document.getElementById('portal-content').classList.add('hidden');
+  document.getElementById('empty-state').classList.remove('visible');
+  document.getElementById('case-page').classList.add('hidden');
+}
+
+function _hideOosState() {
+  document.getElementById('oos-state').classList.remove('visible');
+}
+
 function navSidebar(el, section) {
   const target = section || 'mywork';
   // If already in this section and on a case → go home
@@ -4741,10 +4859,14 @@ function navSidebar(el, section) {
   _syncNavActive();
   renderTopbarTabs();
   document.getElementById('case-page').classList.add('hidden');
-  // If active tab for this section is home → show portal content
-  const isHome = sectionActiveTab[activeSection] === 'home';
-  document.getElementById('empty-state').classList.toggle('visible', !isHome);
-  document.getElementById('portal-content').classList.toggle('hidden', !isHome);
+  if (OOS_SECTIONS[activeSection]) {
+    _showOosState(activeSection);
+  } else {
+    _hideOosState();
+    const isHome = sectionActiveTab[activeSection] === 'home';
+    document.getElementById('empty-state').classList.toggle('visible', !isHome);
+    document.getElementById('portal-content').classList.toggle('hidden', !isHome);
+  }
   closeSearchIfOpen();
 }
 
@@ -5112,6 +5234,7 @@ const CASE_SECTIONS = [
   },
   {
     key: 'details', title: 'Details', subtitle: 'Core case information and assignment',
+    missingFields: ['Case Type', 'Priority'],
     fields: [
       { id: 'field-case-id',    label: 'Case ID',          type: 'text',   readonly: true },
       { id: 'field-case-title', label: 'Case Title',        type: 'text' },
@@ -5122,6 +5245,18 @@ const CASE_SECTIONS = [
       { id: 'field-department', label: 'Department',        type: 'select', options: ['Finance','Operations','Legal','Support'] },
       { id: 'field-assigned-to',label: 'Assigned To',       type: 'text' },
       { id: 'field-description',label: 'Case Description',  type: 'textarea', rows: 4, fullWidth: true },
+    ]
+  },
+  {
+    key: 'research', title: 'Research', subtitle: 'Investigation and research notes',
+    missingFields: ['Root Cause'],
+    fields: [
+      { id: 'field-res-findings', label: 'Initial Findings',      type: 'textarea', rows: 3, fullWidth: true },
+      { id: 'field-res-risk',     label: 'Risk Level',            type: 'select', options: ['Low','Medium','High','Critical'] },
+      { id: 'field-res-reviewer', label: 'Reviewer',              type: 'text' },
+      { id: 'field-res-reviewed', label: 'Review Date',           type: 'text' },
+      { id: 'field-res-outcome',  label: 'Recommended Outcome',   type: 'select', options: ['Approve','Decline','Escalate','Further Review'] },
+      { id: 'field-res-notes',    label: 'Additional Notes',      type: 'textarea', rows: 3, fullWidth: true },
     ]
   },
   {
@@ -5163,17 +5298,6 @@ const CASE_SECTIONS = [
           { item: 'Tax (8%)',       qty: '1', price: '22.40'  },
         ]
       },
-    ]
-  },
-  {
-    key: 'research', title: 'Research', subtitle: 'Investigation and research notes',
-    fields: [
-      { id: 'field-res-findings', label: 'Initial Findings',      type: 'textarea', rows: 3, fullWidth: true },
-      { id: 'field-res-risk',     label: 'Risk Level',            type: 'select', options: ['Low','Medium','High','Critical'] },
-      { id: 'field-res-reviewer', label: 'Reviewer',              type: 'text' },
-      { id: 'field-res-reviewed', label: 'Review Date',           type: 'text' },
-      { id: 'field-res-outcome',  label: 'Recommended Outcome',   type: 'select', options: ['Approve','Decline','Escalate','Further Review'] },
-      { id: 'field-res-notes',    label: 'Additional Notes',      type: 'textarea', rows: 3, fullWidth: true },
     ]
   },
   {
@@ -5360,22 +5484,55 @@ function _renderField(f) {
 function renderCaseSections(sections) {
   const area = document.getElementById('case-form-area');
   if (!area) return;
-  area.innerHTML = sections.map(s => `
+  area.innerHTML = sections.map(s => {
+    const missing = s.missingFields || [];
+    const warnTitle = missing.length
+      ? `${missing.length} required field${missing.length>1?'s':''} missing: ${missing.join(', ')}`
+      : '';
+    const warnHTML = missing.length ? `<button class="case-section-warn" title="${warnTitle}" onclick="event.stopPropagation()"><span class="material-symbols-outlined">error</span></button>` : '';
+    return `
     <div class="case-section" id="case-section-${s.key}">
       <div class="case-section-header" onclick="toggleCaseSection('${s.key}')">
         <div class="case-section-toggle" id="case-toggle-${s.key}">
           <span class="material-symbols-outlined">expand_more</span>
         </div>
         <div class="case-section-labels">
-          <div class="case-section-title">${s.title}</div>
+          <div class="case-section-title">${s.title}${warnHTML}</div>
           <div class="case-section-desc">${s.subtitle}</div>
+        </div>
+        <div class="case-section-actions">
+          <button class="case-section-menu-btn" onclick="event.stopPropagation(); toggleCaseSectionMenu('${s.key}', event)">
+            <span class="material-symbols-outlined">more_horiz</span>
+          </button>
+          <div class="case-section-menu hidden" id="case-section-menu-${s.key}">
+            <button class="csm-item" onclick="collapseCaseSection('${s.key}', event)"><span class="material-symbols-outlined">unfold_less</span> Collapse</button>
+            <button class="csm-item" onclick="copyCaseSection('${s.key}', event)"><span class="material-symbols-outlined">content_copy</span> Copy</button>
+            <button class="csm-item" onclick="resetCaseSection('${s.key}', event)"><span class="material-symbols-outlined">restart_alt</span> Reset fields</button>
+          </div>
         </div>
       </div>
       <div class="case-section-divider"></div>
       <div class="case-fields" id="case-fields-${s.key}">
         ${s.fields.map(_renderField).join('')}
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
+  _syncNavTabWarnings();
+}
+
+function _syncNavTabWarnings() {
+  CASE_SECTIONS.forEach(s => {
+    const tab = document.querySelector(`.chf-tab[data-tab="${s.key}"]`);
+    if (!tab) return;
+    const hasWarn = (s.missingFields || []).length > 0;
+    tab.classList.toggle('has-warning', hasWarn);
+    if (hasWarn) {
+      const n = s.missingFields.length;
+      tab.title = `${n} required field${n>1?'s':''} missing: ${s.missingFields.join(', ')}`;
+    } else {
+      tab.removeAttribute('title');
+    }
+  });
 }
 
 function renderCasePage(caseId) {
@@ -6327,6 +6484,24 @@ function toggleCaseSection(key) {
   if (divider)  divider.classList.toggle('hidden', isHidden);
   if (section)  section.classList.toggle('minimized', isHidden);
 }
+
+// ── Case section overflow menu ──
+function toggleCaseSectionMenu(key, ev) {
+  if (ev) ev.stopPropagation();
+  document.querySelectorAll('.case-section-menu').forEach(m => {
+    if (m.id !== 'case-section-menu-' + key) m.classList.add('hidden');
+  });
+  document.getElementById('case-section-menu-' + key)?.classList.toggle('hidden');
+}
+function _closeAllCaseSectionMenus() {
+  document.querySelectorAll('.case-section-menu').forEach(m => m.classList.add('hidden'));
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.case-section-actions')) _closeAllCaseSectionMenus();
+});
+function collapseCaseSection(key, ev) { if (ev) ev.stopPropagation(); toggleCaseSection(key); _closeAllCaseSectionMenus(); }
+function copyCaseSection(key, ev)     { if (ev) ev.stopPropagation(); _closeAllCaseSectionMenus(); /* prototype placeholder */ }
+function resetCaseSection(key, ev)    { if (ev) ev.stopPropagation(); _closeAllCaseSectionMenus(); /* prototype placeholder */ }
 
 function returnCase() {
   const id = sectionActiveTab[activeSection];
