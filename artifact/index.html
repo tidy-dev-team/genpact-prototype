@@ -124,16 +124,8 @@
     margin-left: auto; font-size: 16px !important; color: #292929;
   }
   /* Solution name in content header */
-  .solution-name-btn {
-    display: flex; align-items: center; gap: 3px;
-    background: none; border: none; cursor: pointer;
-    font-size: 18px; font-weight: 600; color: #292929;
-    font-family: inherit; padding: 2px 6px 2px 4px;
-    border-radius: 6px; margin: 0; line-height: 1.3;
-    transition: background 0.15s;
-  }
-  .solution-name-btn:hover { background: #ebebeb; }
-  .solution-name-btn .material-symbols-outlined { font-size: 18px; color: #474747; }
+  .portal-header-title { flex-shrink: 0; width: fit-content; }
+  .portal-header-title h2 { font-size: 18px; font-weight: 600; color: #292929; line-height: 1.3; }
 
   /* ── Main area ── */
   .main { display: flex; flex-direction: column; height: 100vh; overflow: hidden; position: relative; z-index: 1; }
@@ -663,7 +655,7 @@
   .modal-header {
     display: flex; align-items: center; justify-content: space-between;
   }
-  .modal-header h3 { font-size: 15px; font-weight: 600; color: #292929; margin: 0; }
+  .modal-header h3 { font-size: 15px; font-weight: 600; color: #292929; margin: 0; width: fit-content; }
   .modal-close {
     display: flex; align-items: center; justify-content: center;
     width: 28px; height: 28px; border: none; background: none;
@@ -1765,7 +1757,7 @@
     flex-shrink: 0; width: 100%; box-sizing: border-box;
   }
   .pop-title-text {
-    flex: 1;
+    flex: none;
     font-size: 20px; font-weight: 400; color: #62748e;
     font-family: 'Roboto', sans-serif; letter-spacing: 0.25px;
     line-height: 1;
@@ -1861,7 +1853,7 @@
     display: flex; align-items: center; color: #45556c;
   }
   .pop-attach-icon .material-symbols-outlined { font-size: 13px; }
-  .conv-popout-close {
+  .conv-popout-close { margin-left: auto;
     width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0;
     background: none; border: none; cursor: pointer; color: var(--text-muted);
     display: flex; align-items: center; justify-content: center;
@@ -2753,9 +2745,9 @@
 
     <!-- Header -->
     <div class="header">
-      <span class="solution-name-btn" id="solution-name-btn">
-        <span id="solution-name-text">Cora Orchestration</span>
-      </span>
+      <div class="portal-header-title">
+        <h2 id="portal-page-title">My Work</h2>
+      </div>
       <div class="segmented-btn" id="solution-filters"></div>
       <div class="header-actions">
         <button class="header-icon active" id="toggle-metrics" title="Analytics" onclick="toggleMetrics()">
@@ -4411,17 +4403,11 @@ function getViewSection(id) {
 
 function toggleViewSettings(e) {
   e.stopPropagation();
-  const isSystemView = getViewSection(activeViewId) === 'system';
-  if (isSystemView) {
-    // System views: settings button opens the picker
-    toggleViewPicker(e);
-  } else {
-    closeViewPicker();
-    const menu = document.getElementById('view-context-menu');
-    const isHidden = menu.classList.contains('hidden');
-    menu.classList.toggle('hidden');
-    if (isHidden) renderViewContextMenu();
-  }
+  closeViewPicker();
+  const menu = document.getElementById('view-context-menu');
+  const isHidden = menu.classList.contains('hidden');
+  menu.classList.toggle('hidden');
+  if (isHidden) renderViewContextMenu();
 }
 
 function closeViewContextMenu() {
@@ -4429,23 +4415,24 @@ function closeViewContextMenu() {
 }
 
 function renderViewContextMenu() {
-  const view = findView(activeViewId);
+  const isSystemView = getViewSection(activeViewId) === 'system';
   const isModified = isViewModified();
   const menu = document.getElementById('view-context-menu');
   menu.innerHTML = `
     ${isModified ? `<button class="vcm-item" onclick="saveViewChanges()">
       <span class="material-symbols-outlined">save</span> Save changes
-    </button>
-    <button class="vcm-item" onclick="openSaveViewModal('new')">
-      <span class="material-symbols-outlined">add_circle</span> Save New view
     </button>` : ''}
+    <button class="vcm-item" onclick="openSaveViewModal('new')">
+      <span class="material-symbols-outlined">add_circle</span> Save as new view
+    </button>
+    ${!isSystemView ? `
     <div class="vcm-divider"></div>
     <button class="vcm-item" onclick="openSaveViewModal('edit')">
       <span class="material-symbols-outlined">edit</span> Edit view
     </button>
     <button class="vcm-item danger" onclick="deleteActiveView()">
       <span class="material-symbols-outlined">delete</span> Delete view
-    </button>
+    </button>` : ''}
   `;
 }
 
@@ -4619,10 +4606,14 @@ const SOLUTIONS = {
 
 let activeSolution = 'cora-orchestration';
 
+function _updatePageTitle() {
+  const meta = SECTION_META[activeSection] || SECTION_META.mywork;
+  document.getElementById('portal-page-title').textContent = meta.label;
+}
+
 function renderSolutionHeader() {
   const sol = SOLUTIONS[activeSolution];
-  // Update name button
-  document.getElementById('solution-name-text').textContent = sol.name;
+  _updatePageTitle();
   // Render filter tabs
   const filtersEl = document.getElementById('solution-filters');
   filtersEl.innerHTML = sol.filters.map(f =>
@@ -4678,9 +4669,9 @@ document.addEventListener('click', function(e) {
 
 // ── Per-section tab state ──
 const SECTION_META = {
-  mywork:    { icon: 'home',      label: 'My Work'   },
-  analytics: { icon: 'bar_chart', label: 'Analytics' },
-  archive:   { icon: 'archive',   label: 'Archive'   },
+  mywork:    { icon: 'home',      label: 'My Work',   subtitle: 'Your assigned cases and queue' },
+  analytics: { icon: 'bar_chart', label: 'Analytics', subtitle: 'Performance metrics and reporting'     },
+  archive:   { icon: 'archive',   label: 'Archive',   subtitle: 'Closed and historical cases'           },
 };
 
 const sectionTabs = {
@@ -4857,6 +4848,7 @@ function navSidebar(el, section) {
   }
   activeSection = target;
   _syncNavActive();
+  _updatePageTitle();
   renderTopbarTabs();
   document.getElementById('case-page').classList.add('hidden');
   if (OOS_SECTIONS[activeSection]) {
