@@ -68,26 +68,38 @@
   .sidebar .spacer { flex: 1; }
 
   /* Solution switcher — logo button */
-  .solution-btn {
-    width: 42px !important;
-    gap: 2px !important;
-    padding: 0 3px !important;
-    justify-content: center;
-  }
+  .solution-btn { position: relative; }
+  .solution-btn-inner { position: relative; width: 28px; height: 28px; }
   .solution-avatar {
     width: 28px; height: 28px; border-radius: 8px;
     background: #fff; color: #1a1a1a;
-    font-size: 14px; font-weight: 700; font-family: inherit;
+    font-size: 11px; font-weight: 700; font-family: inherit;
     display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; line-height: 1; text-transform: uppercase;
-    letter-spacing: 0;
+    line-height: 1; text-transform: uppercase; letter-spacing: 0.02em;
   }
-  .solution-btn .solution-chevron {
-    font-size: 16px !important;
-    color: rgba(225,225,225,0.85);
+  .solution-chevron {
+    position: absolute; bottom: -4px; right: -5px;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: #555; color: #fff;
+    font-size: 11px !important; line-height: 1;
+    display: flex; align-items: center; justify-content: center;
     pointer-events: none;
-    flex-shrink: 0;
+    opacity: 0; transition: opacity 0.15s;
   }
+  .solution-btn:hover .solution-chevron,
+  .solution-btn.open .solution-chevron { opacity: 1; }
+  /* User avatar circle */
+  .user-avatar-btn { background: none !important; border: none !important; padding: 0 !important; cursor: pointer; }
+  .user-avatar-circle {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: #6366f1; color: #fff;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.02em;
+    display: flex; align-items: center; justify-content: center;
+    line-height: 1; flex-shrink: 0;
+    border: 1.5px solid rgba(255,255,255,0.25);
+    transition: background 0.15s;
+  }
+  .user-avatar-btn:hover .user-avatar-circle { background: #4f46e5; }
   /* Solution dropdown */
   .solution-dropdown {
     position: fixed;
@@ -467,6 +479,17 @@
   .toolbar { display: flex; align-items: center; flex-shrink: 0; padding-bottom: 4px; }
   .toolbar-left { display: flex; align-items: center; gap: 12px; }
   .toolbar-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+  .view-seg { display: flex; border: 1px solid var(--border); border-radius: 7px; overflow: hidden; }
+  .view-seg-btn {
+    display: flex; align-items: center; justify-content: center;
+    width: 32px; height: 28px; border: none; background: none;
+    cursor: pointer; color: var(--text-muted);
+    transition: background 0.1s, color 0.1s;
+  }
+  .view-seg-btn:not(:last-child) { border-right: 1px solid var(--border); }
+  .view-seg-btn:hover { background: var(--bg-light); color: var(--text-primary); }
+  .view-seg-btn.active { background: var(--text-primary); color: #fff; }
+  .view-seg-btn .material-symbols-outlined { font-size: 16px; }
 
   /* View picker button */
   .view-btn {
@@ -943,6 +966,38 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.12);
   }
   .col-ctx-menu.hidden { display: none; }
+  /* Quick View popover */
+  .qv-popover {
+    position: fixed; z-index: 500;
+    background: #fff; border: 1px solid #e1e1e1;
+    border-radius: 10px; width: 300px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.14);
+    overflow: hidden;
+  }
+  .qv-popover.hidden { display: none; }
+  .qv-header {
+    padding: 12px 14px 10px;
+    border-bottom: 1px solid var(--border-light);
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
+  }
+  .qv-header-id { font-size: 11px; color: var(--text-muted); font-weight: 500; margin-bottom: 2px; }
+  .qv-header-name { font-size: 14px; font-weight: 600; color: var(--text-primary); line-height: 1.3; }
+  .qv-close-btn { flex-shrink: 0; width: 24px; height: 24px; border-radius: 5px; background: none; border: none; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; transition: background 0.1s; }
+  .qv-close-btn:hover { background: var(--bg-light); color: var(--text-primary); }
+  .qv-close-btn .material-symbols-outlined { font-size: 16px; }
+  .qv-section { padding: 10px 14px; border-bottom: 1px solid var(--border-light); display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; }
+  .qv-field { display: flex; flex-direction: column; gap: 2px; }
+  .qv-field-full { grid-column: 1 / -1; }
+  .qv-label { font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .qv-value { font-size: 12px; color: var(--text-primary); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .qv-counts { padding: 10px 14px; display: flex; gap: 6px; }
+  .qv-count-chip {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 8px 6px; border-radius: 8px; background: var(--bg-light); border: 1px solid var(--border-light);
+  }
+  .qv-count-chip .material-symbols-outlined { font-size: 16px; color: var(--text-muted); }
+  .qv-count-num { font-size: 15px; font-weight: 700; color: var(--text-primary); line-height: 1; }
+  .qv-count-label { font-size: 10px; color: var(--text-muted); font-weight: 500; }
   .col-ctx-item {
     display: flex; align-items: center; gap: 10px;
     padding: 9px 16px; font-size: 13px; font-family: inherit;
@@ -981,6 +1036,29 @@
 
   tbody tr { border-bottom: 1px solid var(--border-light); transition: background 0.1s; cursor: pointer; height: 64px; }
   tbody tr:hover { background: var(--hover-row); }
+  /* Row hover action buttons — zero-width sticky overlay, no column space consumed */
+  .row-actions-cell {
+    position: sticky; right: 0;
+    width: 0 !important; min-width: 0 !important; max-width: 0 !important;
+    padding: 0 !important; border: none !important; overflow: visible;
+  }
+  .row-actions {
+    position: absolute; right: 0; top: 0; bottom: 0; width: 300px;
+    display: flex; align-items: center; justify-content: flex-end;
+    gap: 4px; padding: 0 12px;
+    background: linear-gradient(to right, transparent, var(--hover-row) 30%);
+    opacity: 0; transition: opacity 0.15s; pointer-events: none;
+  }
+  tbody tr:hover .row-actions { opacity: 1; pointer-events: auto; }
+  .row-action-btn {
+    height: 28px; padding: 0 8px; border-radius: 6px; flex-shrink: 0;
+    background: none; border: none; cursor: pointer; color: var(--text-secondary);
+    display: flex; align-items: center; gap: 4px;
+    transition: background 0.1s, color 0.1s; white-space: nowrap;
+  }
+  .row-action-btn:hover { background: #e1e1e1; color: var(--text-primary); }
+  .row-action-btn .material-symbols-outlined { font-size: 14px; }
+  .row-action-btn span:not(.material-symbols-outlined) { font-size: 12px; font-weight: 500; }
   /* Row density */
   .table-wrapper.density-compact tbody tr { height: 36px; }
   .table-wrapper.density-compact td { font-size: 12px; }
@@ -2222,6 +2300,70 @@
   }
   .search-input-field:focus { border-color: #474747; }
 
+  /* My Tasks drawer */
+  .tasks-drawer {
+    position: fixed; top: 0; left: var(--sidebar-width);
+    width: 320px; height: 100vh;
+    background: var(--bg-light);
+    z-index: 100;
+    display: flex; flex-direction: column;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+  }
+  .tasks-drawer.open { transform: translateX(0); }
+  .tasks-drawer-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 20px 14px;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .tasks-drawer-header-left { display: flex; align-items: center; gap: 10px; }
+  .tasks-drawer-header-left .material-symbols-outlined { font-size: 20px; color: var(--text-secondary); }
+  .tasks-drawer-header h2 { font-size: 15px; font-weight: 600; }
+  .tasks-drawer-count {
+    font-size: 11px; font-weight: 700; background: #6366f1; color: #fff;
+    border-radius: 10px; padding: 1px 7px; line-height: 18px;
+  }
+  .tasks-drawer-filters {
+    display: flex; gap: 0; padding: 10px 20px 0; flex-shrink: 0;
+  }
+  .tasks-filter-btn {
+    padding: 5px 12px; font-size: 13px; font-weight: 500;
+    border: none; background: none; cursor: pointer;
+    color: var(--text-muted); border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .tasks-filter-btn.active { color: var(--text-primary); border-bottom-color: var(--text-primary); }
+  .tasks-drawer-body { flex: 1; overflow-y: auto; padding: 8px 0; }
+  .task-group-label {
+    padding: 10px 20px 4px;
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--text-muted);
+  }
+  .task-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 10px 20px; cursor: pointer;
+    transition: background 0.15s; border-bottom: 1px solid var(--border-light);
+  }
+  .task-item:hover { background: #ececec; }
+  .task-item-icon {
+    width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+  }
+  .task-item-icon.review { background: #e0e7ff; color: #4f46e5; }
+  .task-item-icon.approval { background: #fef3c7; color: #d97706; }
+  .task-item-icon.escalation { background: #fee2e2; color: #dc2626; }
+  .task-item-icon.update { background: #d1fae5; color: #059669; }
+  .task-item-body { flex: 1; min-width: 0; }
+  .task-item-title { font-size: 13px; font-weight: 500; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .task-item-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; display: flex; align-items: center; gap: 6px; }
+  .task-item-due { margin-left: auto; font-size: 11px; font-weight: 500; flex-shrink: 0; }
+  .task-item-due.overdue { color: #dc2626; }
+  .task-item-due.soon { color: #d97706; }
+  .task-item-due.ok { color: var(--text-muted); }
+
   /* Search view in portal body */
   .search-results-view { display: flex; flex-direction: column; gap: 16px; flex: 1; min-height: 0; }
   .search-results-view.hidden { display: none; }
@@ -2247,7 +2389,7 @@
     min-width: 240px; background: #fff;
     border: 1px solid #e0e0e0; border-radius: 8px;
     box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-    z-index: 200; padding: 6px 0;
+    z-index: 400; padding: 6px 0;
     display: flex; flex-direction: column;
   }
   .dropdown-panel.hidden { display: none; }
@@ -2538,8 +2680,11 @@
 <!-- Sidebar -->
 <nav class="sidebar">
   <div class="nav-group">
-    <button class="icon-btn solution-btn" title="Switch Solution" onclick="toggleSolutionMenu(event)">
-      <span class="solution-avatar" id="solution-avatar">C</span>
+    <button class="icon-btn solution-btn" id="solution-btn" title="Switch Solution" onclick="toggleSolutionMenu(event)">
+      <div class="solution-btn-inner">
+        <span class="solution-avatar" id="solution-avatar">CO</span>
+        <span class="material-symbols-outlined solution-chevron" id="solution-chevron">expand_more</span>
+      </div>
     </button>
   </div>
   <div class="divider"></div>
@@ -2550,11 +2695,17 @@
     <button class="icon-btn nav-btn" id="search-btn" title="Search" onclick="toggleSearchDrawer()">
       <span class="material-symbols-outlined">search</span>
     </button>
+    <button class="icon-btn nav-btn" id="tasks-btn" title="My Tasks" onclick="toggleTasksDrawer()">
+      <span class="material-symbols-outlined">checklist</span>
+    </button>
   </div>
   <div class="divider"></div>
   <div class="nav-group">
     <button class="icon-btn nav-btn active" id="nav-mywork" title="My Work" onclick="navSidebar(this,'mywork')">
       <span class="material-symbols-outlined">home</span>
+    </button>
+    <button class="icon-btn nav-btn" id="nav-allwork" title="All Work" onclick="navSidebar(this,'allwork')">
+      <span class="material-symbols-outlined">grid_view</span>
     </button>
     <button class="icon-btn nav-btn" id="nav-analytics" title="Analytics" onclick="navSidebar(this,'analytics')">
       <span class="material-symbols-outlined">bar_chart</span>
@@ -2566,8 +2717,8 @@
   <div class="divider"></div>
   <div class="spacer"></div>
   <div class="nav-group">
-    <button class="icon-btn" title="Profile">
-      <span class="material-symbols-outlined">person</span>
+    <button class="icon-btn user-avatar-btn" title="Profile">
+      <div class="user-avatar-circle">AB</div>
     </button>
   </div>
 </nav>
@@ -2705,6 +2856,83 @@
   </div>
   <div class="search-drawer-body">
     <input type="text" class="search-input-field" id="search-input" placeholder="Search cases..." oninput="handleSearch(this.value)">
+  </div>
+</div>
+
+<!-- My Tasks drawer -->
+<div class="tasks-drawer" id="tasks-drawer">
+  <div class="tasks-drawer-header">
+    <div class="tasks-drawer-header-left">
+      <span class="material-symbols-outlined">checklist</span>
+      <h2>My Tasks</h2>
+    </div>
+    <span class="tasks-drawer-count">7</span>
+  </div>
+  <div class="tasks-drawer-filters">
+    <button class="tasks-filter-btn active" onclick="tasksFilterClick(this)">All</button>
+    <button class="tasks-filter-btn" onclick="tasksFilterClick(this)">Due Today</button>
+    <button class="tasks-filter-btn" onclick="tasksFilterClick(this)">Overdue</button>
+  </div>
+  <div class="tasks-drawer-body">
+    <div class="task-group-label">Overdue</div>
+    <div class="task-item" onclick="openCaseTab('# 100002')">
+      <div class="task-item-icon escalation"><span class="material-symbols-outlined" style="font-size:16px">priority_high</span></div>
+      <div class="task-item-body">
+        <div class="task-item-title">Review escalation — #100002</div>
+        <div class="task-item-sub"><span>#100002</span><span>·</span><span>Tier 1</span></div>
+      </div>
+      <span class="task-item-due overdue">2d ago</span>
+    </div>
+    <div class="task-item" onclick="openCaseTab('# 100005')">
+      <div class="task-item-icon approval"><span class="material-symbols-outlined" style="font-size:16px">approval</span></div>
+      <div class="task-item-body">
+        <div class="task-item-title">Approval needed — #100005</div>
+        <div class="task-item-sub"><span>#100005</span><span>·</span><span>Tier 2</span></div>
+      </div>
+      <span class="task-item-due overdue">1d ago</span>
+    </div>
+    <div class="task-group-label">Due Today</div>
+    <div class="task-item" onclick="openCaseTab('# 100003')">
+      <div class="task-item-icon review"><span class="material-symbols-outlined" style="font-size:16px">rate_review</span></div>
+      <div class="task-item-body">
+        <div class="task-item-title">Document review — #100003</div>
+        <div class="task-item-sub"><span>#100003</span><span>·</span><span>Client: Acme Corp</span></div>
+      </div>
+      <span class="task-item-due soon">Today</span>
+    </div>
+    <div class="task-item" onclick="openCaseTab('# 100007')">
+      <div class="task-item-icon update"><span class="material-symbols-outlined" style="font-size:16px">edit_note</span></div>
+      <div class="task-item-body">
+        <div class="task-item-title">Update case status — #100007</div>
+        <div class="task-item-sub"><span>#100007</span><span>·</span><span>Tier 2</span></div>
+      </div>
+      <span class="task-item-due soon">Today</span>
+    </div>
+    <div class="task-group-label">Upcoming</div>
+    <div class="task-item" onclick="openCaseTab('# 100004')">
+      <div class="task-item-icon review"><span class="material-symbols-outlined" style="font-size:16px">rate_review</span></div>
+      <div class="task-item-body">
+        <div class="task-item-title">Final review — #100004</div>
+        <div class="task-item-sub"><span>#100004</span><span>·</span><span>Tier 2</span></div>
+      </div>
+      <span class="task-item-due ok">Tomorrow</span>
+    </div>
+    <div class="task-item" onclick="openCaseTab('# 100006')">
+      <div class="task-item-icon approval"><span class="material-symbols-outlined" style="font-size:16px">approval</span></div>
+      <div class="task-item-body">
+        <div class="task-item-title">Manager sign-off — #100006</div>
+        <div class="task-item-sub"><span>#100006</span><span>·</span><span>Client: GlobalTech</span></div>
+      </div>
+      <span class="task-item-due ok">Apr 18</span>
+    </div>
+    <div class="task-item" onclick="openCaseTab('# 100008')">
+      <div class="task-item-icon update"><span class="material-symbols-outlined" style="font-size:16px">edit_note</span></div>
+      <div class="task-item-body">
+        <div class="task-item-title">Add supporting docs — #100008</div>
+        <div class="task-item-sub"><span>#100008</span><span>·</span><span>Tier 3</span></div>
+      </div>
+      <span class="task-item-due ok">Apr 19</span>
+    </div>
   </div>
 </div>
 
@@ -2890,18 +3118,6 @@
               <span>Compact</span>
               <span class="material-symbols-outlined display-opt-check">check</span>
             </button>
-            <div class="dp-divider"></div>
-            <div class="dp-section-label">View type</div>
-            <button class="display-view-opt active" id="display-view-table" onclick="setViewMode('table')">
-              <span class="material-symbols-outlined">table</span>
-              <span>Table</span>
-              <span class="material-symbols-outlined display-opt-check">check</span>
-            </button>
-            <button class="display-view-opt" id="display-view-split" onclick="setViewMode('split')">
-              <span class="material-symbols-outlined">vertical_split</span>
-              <span>Split</span>
-              <span class="material-symbols-outlined display-opt-check">check</span>
-            </button>
           </div>
         </div>
         <div class="tb-wrap">
@@ -2937,6 +3153,14 @@
           <span class="label">Status:</span>
           <span>Active cases</span>
           <span class="material-symbols-outlined">expand_more</span>
+        </div>
+        <div class="view-seg" id="view-seg">
+          <button class="view-seg-btn active" id="view-seg-table" title="Table view" onclick="setViewMode('table')">
+            <span class="material-symbols-outlined">table</span>
+          </button>
+          <button class="view-seg-btn" id="view-seg-split" title="Split view" onclick="setViewMode('split')">
+            <span class="material-symbols-outlined">vertical_split</span>
+          </button>
         </div>
         <button class="overflow-btn" title="More">...</button>
       </div>
@@ -3204,6 +3428,8 @@
 
   <!-- Column header context menu -->
   <div class="col-ctx-menu hidden" id="col-ctx-menu"></div>
+  <!-- Quick View popover -->
+  <div class="qv-popover hidden" id="qv-popover"></div>
   </div><!-- /portal-body -->
 
   <!-- AI Drawer (inline, pushes content) -->
@@ -3366,7 +3592,7 @@ function renderFilterPanel(search) {
   const active = filterFields.map(f => f.field);
   document.getElementById('filter-field-list').innerHTML = COLS
     .filter(c => !search || c.label.toLowerCase().includes(search.toLowerCase()))
-    .map(c => `<div class="dp-item" onclick="toggleFilterField('${c.key}')">
+    .map(c => `<div class="dp-item" onclick="event.stopPropagation();toggleFilterField('${c.key}')">
         <input type="checkbox" ${active.includes(c.key) ? 'checked' : ''} onclick="event.stopPropagation();toggleFilterField('${c.key}')">
         ${c.label}
       </div>`).join('');
@@ -3378,9 +3604,10 @@ function toggleFilterField(key) {
   const idx = filterFields.findIndex(f => f.field === key);
   if (idx >= 0) {
     filterFields.splice(idx, 1);
-    if (activeFilterPopover === key) activeFilterPopover = null;
+    activeFilterPopover = null;
   } else {
     filterFields.push({field: key, value: ''});
+    activeFilterPopover = key;
   }
   renderFilterPanel();
   renderActiveBar();
@@ -3437,16 +3664,24 @@ function renderSortPanel(search) {
 function sortDpSearch(q) { renderSortPanel(q); }
 
 function addSortRule(key) {
-  if (!key) {
-    const used = sortRules.map(r => r.field);
-    const next = COLS.find(c => !used.includes(c.key));
-    key = next ? next.key : COLS[0].key;
+  if (key) {
+    // Called from sort panel picker — add with specific field
+    sortRules.push({field: key, dir: 'asc'});
+    sortEditorOpen = true;
+    closeAllDropdowns();
+    renderActiveBar();
+    applyAndRender();
+  } else {
+    // "+ Add sort" button — add pending row, let user pick field
+    sortRules.push({field: '', dir: 'asc'});
+    sortEditorOpen = true;
+    closeAllDropdowns();
+    renderActiveBar();
+    // Focus the new row's field select
+    const selects = document.querySelectorAll('.sort-editor-row select:first-of-type');
+    const last = selects[selects.length - 1];
+    if (last) last.focus();
   }
-  sortRules.push({field: key, dir: 'asc'});
-  sortEditorOpen = true;
-  closeAllDropdowns();
-  renderActiveBar();
-  applyAndRender();
 }
 function removeSortRule(i) {
   sortRules.splice(i, 1);
@@ -3484,8 +3719,9 @@ function renderActiveBar() {
   const filterBtn = document.getElementById('filter-btn');
   const hasSorts = sortRules.length > 0;
   const hasFilters = filterFields.length > 0;
+  const isNamedView = getViewSection(activeViewId) !== 'system';
 
-  if (!hasSorts && !hasFilters) {
+  if (!hasSorts && !hasFilters || (isNamedView && !isViewModified())) {
     bar.classList.add('hidden');
     sortBtn.classList.remove('active');
     filterBtn.classList.remove('active');
@@ -3519,6 +3755,7 @@ function renderActiveBar() {
               ondrop="sortDrop(event,${i})">
             <span class="material-symbols-outlined" style="color:#ccc;font-size:16px;cursor:grab;flex-shrink:0">drag_indicator</span>
             <select onchange="setSortField(${i},this.value)">
+              ${!r.field ? `<option value="" disabled selected>Pick a field…</option>` : ''}
               ${COLS.map(c => `<option value="${c.key}" ${r.field===c.key?'selected':''}>${c.label}</option>`).join('')}
             </select>
             <select onchange="setSortDir(${i},this.value)">
@@ -3758,14 +3995,14 @@ function renderColumnsPanel(search) {
       const pinBadge = isPinned
         ? `<span class="material-symbols-outlined dp-pin-icon" title="Pinned">push_pin</span>`
         : '';
-      return `<div class="dp-col-item${isPinned ? ' dp-col-pinned' : ''}" draggable="true"
+      return `<div class="dp-col-item${isPinned ? ' dp-col-pinned' : ''}" draggable="true" onclick="event.stopPropagation()"
           ondragstart="colDragStart(event,${realIdx})"
           ondragover="colDragOver(event,${realIdx})"
           ondragleave="colDragLeave(event)"
           ondrop="colDrop(event,${realIdx})">
         <span class="material-symbols-outlined drag-handle">drag_indicator</span>
         ${pinBadge}<span class="col-name">${c.label}</span>
-        <button class="dp-eye-btn" onclick="toggleColVisibility('${c.key}')">
+        <button class="dp-eye-btn" onclick="event.stopPropagation();toggleColVisibility('${c.key}')">
           <span class="material-symbols-outlined">visibility</span>
         </button>
       </div>`;
@@ -3779,7 +4016,7 @@ function renderColumnsPanel(search) {
       .map(c => `<div class="dp-col-item">
         <span class="material-symbols-outlined drag-handle" style="opacity:0.3">drag_indicator</span>
         <span class="col-name" style="color:#aaa">${c.label}</span>
-        <button class="dp-eye-btn" onclick="toggleColVisibility('${c.key}')">
+        <button class="dp-eye-btn" onclick="event.stopPropagation();toggleColVisibility('${c.key}')">
           <span class="material-symbols-outlined" style="color:#aaa">visibility_off</span>
         </button>
       </div>`).join('');
@@ -3844,9 +4081,10 @@ function applyAndRender() {
     return getRowValue(row, f.field).toLowerCase().includes(f.value.toLowerCase());
   }));
   // 2. Sort
-  if (sortRules.length) {
+  const activeSortRules = sortRules.filter(r => r.field);
+  if (activeSortRules.length) {
     data = [...data].sort((a, b) => {
-      for (const r of sortRules) {
+      for (const r of activeSortRules) {
         const av = getRowValue(a, r.field).toLowerCase();
         const bv = getRowValue(b, r.field).toLowerCase();
         const cmp = av < bv ? -1 : av > bv ? 1 : 0;
@@ -3943,7 +4181,8 @@ function renderCellContent(row, key) {
 function renderRow(row) {
   const visibleCols = colOrder.filter(c => !hiddenCols.has(c.key));
   const cells = visibleCols.map(c => `<td data-col="${c.key}">${renderCellContent(row, c.key)}</td>`).join('');
-  return `<tr style="cursor:pointer" onclick="handleRowClick(event, '${row.id}')"><td onclick="event.stopPropagation()"><input type="checkbox"></td>${cells}</tr>`;
+  const actionsTd = `<td class="row-actions-cell" onclick="event.stopPropagation()"><div class="row-actions"><button class="row-action-btn" title="Quick View" onclick="openQuickView(event,'${row.id}')"><span class="material-symbols-outlined">preview</span><span>Quick View</span></button><button class="row-action-btn" title="Fetch Task"><span class="material-symbols-outlined">assignment_turned_in</span><span>Fetch</span></button><button class="row-action-btn" title="Return Task"><span class="material-symbols-outlined">assignment_return</span><span>Return</span></button><button class="row-action-btn" title="Assignee"><span class="material-symbols-outlined">person_add</span><span>Assign</span></button></div></td>`;
+  return `<tr style="cursor:pointer" onclick="handleRowClick(event, '${row.id}')"><td onclick="event.stopPropagation()"><input type="checkbox"></td>${cells}${actionsTd}</tr>`;
 }
 
 function handleRowClick(e, caseId) {
@@ -3991,6 +4230,10 @@ function renderTableHeader() {
     th.appendChild(handle);
     tr.appendChild(th);
   });
+  // Actions column header (zero-width, no label)
+  const actionsTh = document.createElement('th');
+  actionsTh.className = 'row-actions-cell';
+  tr.appendChild(actionsTh);
   applyColWidths();
 }
 
@@ -4142,6 +4385,7 @@ document.addEventListener('click', () => {
 
 let notifOpen = false;
 let searchOpen = false;
+let tasksOpen = false;
 
 function toggleSearchDrawer() {
   searchOpen = !searchOpen;
@@ -4151,8 +4395,9 @@ function toggleSearchDrawer() {
   document.getElementById('portal-content').classList.toggle('hidden', searchOpen);
   document.getElementById('empty-state').classList.remove('visible');
   _hideOosState();
-  // close notif if open
+  // close other drawers
   if (searchOpen && notifOpen) closeNotifDrawer();
+  if (searchOpen && tasksOpen) closeTasksDrawer();
   // deselect top bar tabs
   document.querySelectorAll('.case-tab').forEach(t => t.classList.remove('selected'));
   // deactivate other sidebar nav btns
@@ -4216,8 +4461,34 @@ function toggleNotifDrawer() {
   document.getElementById('notif-drawer').classList.toggle('open', notifOpen);
   document.getElementById('notif-overlay').classList.toggle('open', notifOpen);
   document.getElementById('notif-btn').classList.toggle('active', notifOpen);
-  // close search if open
+  // close other drawers
   if (notifOpen && searchOpen) {
+    searchOpen = false;
+    document.getElementById('search-drawer').classList.remove('open');
+    document.getElementById('search-btn').classList.remove('active');
+    document.getElementById('search-view').classList.add('hidden');
+    document.getElementById('portal-content').classList.remove('hidden');
+    document.getElementById('search-input').value = '';
+    document.getElementById('search-empty').classList.remove('hidden');
+    document.getElementById('search-results').classList.add('hidden');
+  }
+  if (notifOpen && tasksOpen) closeTasksDrawer();
+}
+
+function closeNotifDrawer() {
+  notifOpen = false;
+  document.getElementById('notif-drawer').classList.remove('open');
+  document.getElementById('notif-overlay').classList.remove('open');
+  document.getElementById('notif-btn').classList.remove('active');
+}
+
+function toggleTasksDrawer() {
+  tasksOpen = !tasksOpen;
+  document.getElementById('tasks-drawer').classList.toggle('open', tasksOpen);
+  document.getElementById('tasks-btn').classList.toggle('active', tasksOpen);
+  // close other drawers
+  if (tasksOpen && notifOpen) closeNotifDrawer();
+  if (tasksOpen && searchOpen) {
     searchOpen = false;
     document.getElementById('search-drawer').classList.remove('open');
     document.getElementById('search-btn').classList.remove('active');
@@ -4229,11 +4500,15 @@ function toggleNotifDrawer() {
   }
 }
 
-function closeNotifDrawer() {
-  notifOpen = false;
-  document.getElementById('notif-drawer').classList.remove('open');
-  document.getElementById('notif-overlay').classList.remove('open');
-  document.getElementById('notif-btn').classList.remove('active');
+function closeTasksDrawer() {
+  tasksOpen = false;
+  document.getElementById('tasks-drawer').classList.remove('open');
+  document.getElementById('tasks-btn').classList.remove('active');
+}
+
+function tasksFilterClick(btn) {
+  document.querySelectorAll('.tasks-filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
 }
 
 
@@ -4312,7 +4587,9 @@ let splitActiveCaseId = null;
 
 function _syncDisplayBtn() {
   const btn = document.getElementById('display-btn');
-  if (btn) btn.classList.toggle('active', rowDensity !== 'default' || viewMode !== 'table');
+  if (btn) btn.classList.toggle('active', rowDensity !== 'default');
+  document.getElementById('view-seg-table')?.classList.toggle('active', viewMode !== 'split');
+  document.getElementById('view-seg-split')?.classList.toggle('active', viewMode === 'split');
 }
 
 function setViewMode(mode) {
@@ -4567,7 +4844,8 @@ function renderViewChips() {
   const isSystemView = getViewSection(activeViewId) === 'system';
   const modified = isViewModified();
 
-  if (!hasFilters && !hasSorts) { bar.classList.add('hidden'); return; }
+  const isNamedView = activeViewId !== 'default' && isSystemView === false;
+  if (!hasFilters && !hasSorts || (isNamedView && !modified)) { bar.classList.add('hidden'); return; }
   bar.classList.remove('hidden');
 
   let html = filterFields.map(f => {
@@ -4668,11 +4946,31 @@ function switchSolutionFilter(key) {
   applyAndRender();
 }
 
+const _SOLUTION_INITIALS = {
+  'cora-orchestration': 'CO',
+  'deduction':          'DD',
+  'collections':        'CL',
+};
 function _updateSolutionAvatar() {
-  const sol = SOLUTIONS[activeSolution];
-  const letter = (sol?.label || activeSolution).trim().charAt(0).toUpperCase();
   const el = document.getElementById('solution-avatar');
-  if (el) el.textContent = letter;
+  if (el) el.textContent = _SOLUTION_INITIALS[activeSolution] || (SOLUTIONS[activeSolution]?.label || activeSolution).trim().slice(0,2).toUpperCase();
+}
+
+// Nav items that only exist in Cora Orchestration
+const _CORA_ONLY_NAV = ['tasks-btn', 'nav-allwork'];
+
+function _syncSolutionNav() {
+  const isCora = activeSolution === 'cora-orchestration';
+  _CORA_ONLY_NAV.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = isCora ? '' : 'none';
+  });
+  // If leaving cora while allwork is active, go back to mywork
+  if (!isCora && activeSection === 'allwork') {
+    navSidebar(document.getElementById('nav-mywork'), 'mywork');
+  }
+  // Close tasks drawer if switching away from cora
+  if (!isCora && tasksOpen) closeTasksDrawer();
 }
 
 function selectSolution(id) {
@@ -4680,17 +4978,27 @@ function selectSolution(id) {
   currentTab = SOLUTIONS[id].filters[0].key;
   closeSolutionMenu();
   _updateSolutionAvatar();
+  _syncSolutionNav();
   renderSolutionHeader();
   applyAndRender();
+}
+
+function _syncSolutionChevron() {
+  const isOpen = !document.getElementById('solution-dropdown').classList.contains('hidden');
+  document.getElementById('solution-btn')?.classList.toggle('open', isOpen);
+  const chev = document.getElementById('solution-chevron');
+  if (chev) chev.textContent = isOpen ? 'expand_less' : 'expand_more';
 }
 
 function toggleSolutionMenu(e) {
   if (e) e.stopPropagation();
   document.getElementById('solution-dropdown').classList.toggle('hidden');
+  _syncSolutionChevron();
 }
 
 function closeSolutionMenu() {
   document.getElementById('solution-dropdown').classList.add('hidden');
+  _syncSolutionChevron();
 }
 
 document.addEventListener('click', function(e) {
@@ -4704,6 +5012,7 @@ document.addEventListener('click', function(e) {
 // ── Per-section tab state ──
 const SECTION_META = {
   mywork:    { icon: 'home',      label: 'My Work',   subtitle: 'Your assigned cases and queue' },
+  allwork:   { icon: 'grid_view', label: 'All Work',  subtitle: 'All cases across the solution' },
   analytics: { icon: 'bar_chart', label: 'Analytics', subtitle: 'Performance metrics and reporting'     },
   archive:   { icon: 'archive',   label: 'Archive',   subtitle: 'Closed and historical cases'           },
 };
@@ -4717,12 +5026,13 @@ const sectionTabs = {
               { id: '100008', label: '100008', icon: 'folder_open', home: false },
               { id: '100009', label: '100009', icon: 'folder_open', home: false },
               { id: '100010', label: '100010', icon: 'folder_open', home: false }],
+  allwork:   [{ id: 'home', label: 'All Work',  icon: 'grid_view',  home: true  }],
   analytics: [{ id: 'home', label: 'Analytics', icon: 'bar_chart',  home: true  }],
   archive:   [{ id: 'home', label: 'Archive',   icon: 'archive',    home: true  }],
 };
 
 // Which tab is selected per section
-const sectionActiveTab = { mywork: 'home', analytics: 'home', archive: 'home' };
+const sectionActiveTab = { mywork: 'home', allwork: 'home', analytics: 'home', archive: 'home' };
 
 let activeSection = 'mywork';
 let recentTabs = [];
@@ -4810,6 +5120,12 @@ document.addEventListener('click', () => {
   if (menu) menu.style.display = 'none';
 });
 
+document.addEventListener('click', e => {
+  if (!e.target.closest('#qv-popover') && !e.target.closest('.row-action-btn[title="Quick View"]')) {
+    closeQuickView();
+  }
+});
+
 function selectTab(id) {
   sectionActiveTab[activeSection] = id;
   renderTopbarTabs();
@@ -4853,7 +5169,7 @@ function closeTab(e, id) {
   renderTopbarTabs();
 }
 
-const OOS_SECTIONS = { analytics: { icon: 'bar_chart', label: 'Analytics' }, archive: { icon: 'archive', label: 'Archive' } };
+const OOS_SECTIONS = { analytics: { icon: 'bar_chart', label: 'Analytics' }, archive: { icon: 'archive', label: 'Archive' }, allwork: { icon: 'grid_view', label: 'All Work' } };
 
 function _showOosState(section) {
   const meta = OOS_SECTIONS[section];
@@ -4897,7 +5213,7 @@ function navSidebar(el, section) {
 }
 
 function _syncNavActive() {
-  const navId = { mywork: 'nav-mywork', analytics: 'nav-analytics', archive: 'nav-archive' };
+  const navId = { mywork: 'nav-mywork', allwork: 'nav-allwork', analytics: 'nav-analytics', archive: 'nav-archive' };
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   const btn = document.getElementById(navId[activeSection]);
   if (btn) btn.classList.add('active');
@@ -5017,11 +5333,90 @@ function closeColMenu() {
   colCtxKey = null;
 }
 
+function openQuickView(e, rowId) {
+  e.stopPropagation();
+  const allRows = [...assignedData, ...queueData];
+  const row = allRows.find(r => r.id === rowId);
+  if (!row) return;
+  const pop = document.getElementById('qv-popover');
+  const statusCls = statusClass ? statusClass(row.status) : '';
+  pop.innerHTML = `
+    <div class="qv-header">
+      <div>
+        <div class="qv-header-id">${row.id}</div>
+        <div class="qv-header-name">${row.name}</div>
+      </div>
+      <button class="qv-close-btn" onclick="closeQuickView()"><span class="material-symbols-outlined">close</span></button>
+    </div>
+    <div class="qv-section">
+      <div class="qv-field">
+        <span class="qv-label">Status</span>
+        <span class="qv-value"><span class="status-badge ${statusCls}">${row.status || '—'}</span></span>
+      </div>
+      <div class="qv-field">
+        <span class="qv-label">Stage</span>
+        <span class="qv-value">${row.stage || '—'}</span>
+      </div>
+      <div class="qv-field">
+        <span class="qv-label">Tier</span>
+        <span class="qv-value">${row.tier || '—'}</span>
+      </div>
+      <div class="qv-field">
+        <span class="qv-label">Client</span>
+        <span class="qv-value">${row.client || '—'}</span>
+      </div>
+      <div class="qv-field">
+        <span class="qv-label">Created</span>
+        <span class="qv-value">${row.created || '—'}</span>
+      </div>
+      <div class="qv-field">
+        <span class="qv-label">Due Date</span>
+        <span class="qv-value">${row.due || '—'}</span>
+      </div>
+      <div class="qv-field qv-field-full">
+        <span class="qv-label">Assignees</span>
+        <span class="qv-value">${row.assignees.join(', ')}${row.overflow ? ' ' + row.overflow : ''}</span>
+      </div>
+    </div>
+    <div class="qv-counts">
+      <div class="qv-count-chip">
+        <span class="material-symbols-outlined">chat</span>
+        <span class="qv-count-num">${CONVERSATIONS.length}</span>
+        <span class="qv-count-label">Messages</span>
+      </div>
+      <div class="qv-count-chip">
+        <span class="material-symbols-outlined">attach_file</span>
+        <span class="qv-count-num">${ATTACH_ITEMS.length}</span>
+        <span class="qv-count-label">Files</span>
+      </div>
+      <div class="qv-count-chip">
+        <span class="material-symbols-outlined">history</span>
+        <span class="qv-count-num">7</span>
+        <span class="qv-count-label">Activity</span>
+      </div>
+    </div>`;
+  // Position below the button, anchored right
+  const rect = e.currentTarget.getBoundingClientRect();
+  const popW = 300;
+  let left = rect.right - popW;
+  let top  = rect.bottom + 6;
+  if (left < 8) left = 8;
+  if (top + 320 > window.innerHeight) top = rect.top - 320 - 6;
+  pop.style.left = left + 'px';
+  pop.style.top  = top  + 'px';
+  pop.classList.remove('hidden');
+}
+
+function closeQuickView() {
+  document.getElementById('qv-popover').classList.add('hidden');
+}
+
 function colCtxFilterBy() {
   const key = colCtxKey; closeColMenu();
   if (!filterFields.find(f => f.field === key)) {
     filterFields.push({ field: key, value: '' });
   }
+  setTimeout(() => { activeFilterPopover = key; renderActiveBar(); }, 0);
   renderFilterPanel(); renderActiveBar(); applyAndRender();
 }
 
@@ -5199,6 +5594,7 @@ applyAndRender();
 renderTopbarTabs();
 renderSolutionHeader();
 _updateSolutionAvatar();
+_syncSolutionNav();
 selectView('default'); // initialise view state + render btn
 
 // Cmd+K / Ctrl+K → navigate home
