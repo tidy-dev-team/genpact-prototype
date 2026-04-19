@@ -636,6 +636,39 @@
     padding: 0 0 6px; flex-wrap: wrap; flex-shrink: 0;
   }
   .view-chips-bar.hidden { display: none; }
+  /* "AI filtered" badge in active-bar when quick-wins filter is on */
+  .ai-filter-indicator {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; color: #7c3aed; font-weight: 500;
+    padding: 3px 8px; border-radius: 20px;
+    border: 1px solid #c4b5fd; background: #faf5ff;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .ai-filter-indicator .material-symbols-outlined { font-size: 13px !important; }
+  .ai-filter-indicator .ai-fi-close {
+    background: none; border: none; cursor: pointer;
+    color: #a855f7; font-size: 15px; line-height: 1;
+    padding: 0; margin-left: 2px; display: flex; align-items: center;
+  }
+  .ai-filter-indicator .ai-fi-close:hover { color: #6d28d9; }
+  /* Quick-wins pill variant inside AI drawer */
+  .ai-pill.ai-pill-qw {
+    background: #7c3aed; color: #fff;
+    border-color: #6d28d9; gap: 4px;
+  }
+  .ai-pill.ai-pill-qw:hover { background: #6d28d9; border-color: #5b21b6; }
+  .ai-pill.ai-pill-qw .material-symbols-outlined { font-size: 12px !important; }
+  /* Quick-wins case list in AI drawer response */
+  .ai-qw-list {
+    display: flex; flex-direction: column; gap: 6px; margin-top: 10px;
+  }
+  .ai-qw-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 10px; border-radius: 8px;
+    background: #242424; border: 1px solid #333;
+  }
+  .ai-qw-id { font-size: 11px; color: #a855f7; font-weight: 600; flex-shrink: 0; }
+  .ai-qw-name { font-size: 12px; color: #e8e8e8; }
   .view-chip {
     display: inline-flex; align-items: center; gap: 3px;
     background: #eaeaea; border: 1px solid #d4d4d4;
@@ -1461,7 +1494,7 @@
     display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     font-family: inherit;
   }
-  .case-stage span:last-child, .case-status-text, .case-meta-value {
+  .case-stage span:last-child:not(.stage-chevron), .case-status-text, .case-meta-value {
     font-size: 13px; color: var(--text-primary); font-weight: 500; font-family: inherit;
   }
   /* Right: return + refresh */
@@ -1537,18 +1570,61 @@
   }
   .chf-tab.active.has-warning::after { border-color: var(--bg-dark); }
   .chf-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-  .chf-info-btn {
-    display: flex; align-items: center; gap: 5px;
-    padding: 0 14px; height: 34px;
-    font-size: 13px; font-family: inherit; color: var(--text-secondary);
-    border: 1px solid #d4d4d4; border-radius: 8px;
-    background: #e4e4e4; cursor: pointer;
-    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  .chf-info-btn { display: none !important; } /* hidden per design — stepper moved to header popover */
+  /* ── Stage trigger (header meta-item) ── */
+  .case-stage-trigger {
+    position: relative;
+    cursor: pointer; user-select: none;
+    border-radius: 6px;
+    padding: 4px 6px; margin: -4px -6px; /* expand hit area without shifting layout */
+    transition: background 0.12s;
   }
-  .chf-info-btn:hover { background: #d8d8d8; color: var(--text-primary); }
-  .chf-info-btn.active { background: var(--bg-dark); color: #fff; border-color: var(--bg-dark); }
-  .chf-info-btn .material-symbols-outlined { font-size: 15px; transition: transform 0.2s; }
-  .chf-info-btn.active .chf-info-chevron { transform: rotate(180deg); }
+  .case-stage-trigger:hover { background: #f4f4f4; }
+  .stage-chevron {
+    font-size: 18px !important; color: #999;
+    transition: transform 0.2s; flex-shrink: 0;
+  }
+  .stage-chevron.open { transform: rotate(180deg); }
+  /* ── Stage popover ── */
+  .stage-popover {
+    position: absolute; top: calc(100% + 10px); left: -8px;
+    z-index: 300;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.13);
+    padding: 6px 0;
+    min-width: 248px;
+    overflow: hidden;
+  }
+  .stage-popover.hidden { display: none; }
+  .stage-pop-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 9px 16px; cursor: default;
+    transition: background 0.1s;
+  }
+  .stage-pop-item:hover { background: #f8f8f8; }
+  .stage-pop-badge {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 1.5px solid #ccc;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: #888;
+    flex-shrink: 0; margin-top: 1px; font-family: inherit;
+  }
+  .stage-pop-item.done .stage-pop-badge {
+    background: #f0f0f0; border-color: #c8c8c8; color: #aaa;
+  }
+  .stage-pop-item.done .stage-pop-badge .material-symbols-outlined { font-size: 12px !important; color: #888; }
+  .stage-pop-item.current .stage-pop-badge {
+    background: #1a1a1a; border-color: #1a1a1a; color: #fff;
+  }
+  .stage-pop-name {
+    font-size: 13px; font-weight: 500; color: var(--text-primary);
+    line-height: 1.3; font-family: inherit;
+  }
+  .stage-pop-item.done .stage-pop-name { color: #aaa; }
+  .stage-pop-item.current .stage-pop-name { font-weight: 600; }
+  .stage-pop-sub { font-size: 11px; color: #aaa; margin-top: 2px; font-family: inherit; }
   /* Case-page container — drives width-responsive header navigation & metadata */
   #case-page { container-type: inline-size; container-name: casepage; }
   /* Hide wide-only metadata (Category, Vendor No.) when the case panel is < 1200px */
@@ -3505,12 +3581,14 @@
 
         <div class="case-header-meta">
           <div class="case-meta-sep"></div>
-          <div class="case-meta-item">
+          <div class="case-meta-item case-stage-trigger" id="case-stage-item" onclick="toggleStagePopover(event)">
             <span class="case-meta-label">Current stage</span>
             <span class="case-stage">
-              <span class="stage-badge" id="case-stage-badge">4</span>
+              <span class="stage-badge" id="case-stage-badge">—</span>
               <span id="case-stage-text">—</span>
+              <span class="material-symbols-outlined stage-chevron" id="stage-chevron">expand_more</span>
             </span>
+            <div class="stage-popover hidden" id="stage-popover"></div>
           </div>
           <div class="case-meta-sep"></div>
           <div class="case-meta-item">
@@ -3563,7 +3641,8 @@
           <button class="chf-tab" data-tab="tracking">Tracking <span class="chf-tab-badge">81</span></button>
         </div>
         <div class="chf-right">
-          <button class="chf-info-btn" id="chf-info-btn" onclick="toggleProgress()">
+          <!-- info button hidden per design -->
+          <button class="chf-info-btn" id="chf-info-btn" style="display:none">
             <span class="material-symbols-outlined">info</span>
             info
             <span class="material-symbols-outlined chf-info-chevron">expand_more</span>
@@ -3723,10 +3802,10 @@ const assignedData = [
     ]
   },
   { id: '# 100002', name: '_doronELgraph',    created: 'Mar 19, 2026', due: 'Apr 19, 2026', tier: 'Tier 1', assignees: ['Assignee #1', 'Assignee #2'], overflow: '+4', status: 'pending',     stage: 'Intake',         fetchedBy: 'API',     client: 'Acme Corp' },
-  { id: '# 100003', name: '[Test] test',       created: 'Mar 19, 2026', due: 'Apr 19, 2026', tier: 'Tier 1', assignees: ['Ahmed Arah', 'Ben Septer'],    overflow: '',   status: 'On progress', stage: 'Review',         fetchedBy: 'Manual',  client: 'TechFlow Inc' },
+  { id: '# 100003', name: 'Missing Invoice',    created: 'Mar 19, 2026', due: 'Apr 19, 2026', tier: 'Tier 1', assignees: ['Ahmed Arah', 'Ben Septer'],    overflow: '',   status: 'On progress', stage: 'Review',         fetchedBy: 'Manual',  client: 'TechFlow Inc' },
   { id: '# 100004', name: '_WFmaster',         created: 'Mar 19, 2026', due: 'Mar 19, 2026', tier: 'Tier 2', assignees: ['Ben Septer', 'David Ellis'],   overflow: '+1', status: 'On progress', stage: 'Escalated',      fetchedBy: 'Webhook', client: 'DataSync Ltd' },
   { id: '# 100005', name: 'SN_message',        created: 'Mar 19, 2026', due: 'Apr 19, 2026', tier: 'Tier 1', assignees: ['Emily Foster'],                overflow: '',   status: 'Stuck',       stage: 'Pending Review', fetchedBy: 'Import',  client: 'GlobalBank' },
-  { id: '# 100006', name: 'SN_message',        created: 'Mar 19, 2026', due: 'Apr 19, 2026', tier: 'Tier 2', assignees: ['Ben Septer'],                  overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: 'API',     client: 'NovaTech' },
+  { id: '# 100006', name: 'Approval Pending',   created: 'Mar 19, 2026', due: 'Apr 19, 2026', tier: 'Tier 2', assignees: ['Ben Septer'],                  overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: 'API',     client: 'NovaTech' },
   { id: '# 100007', name: '# _WFmaster',       created: 'Mar 19, 2026', due: 'Apr 19, 2026', tier: 'Tier 2', assignees: ["Cara D'Angelo", 'Emily Foster'],overflow: '+2', status: 'pending',     stage: 'Review',         fetchedBy: 'Webhook', client: 'Acme Corp' },
   { id: '# 100008', name: '_WFmaster',         created: 'Mar 19, 2026', due: 'Apr 19, 2026', tier: 'Tier 3', assignees: ['Ben Septer', 'Ahmed Arah'],    overflow: '+4', status: 'pending',     stage: 'Resolved',       fetchedBy: 'Manual',  client: 'Meridian SA' },
   { id: '# 100009', name: '_doronELgraph',     created: 'Mar 19, 2026', due: 'Apr 19, 2026', tier: 'Tier 3', assignees: ['Assignee #1', 'Badge'],        overflow: '+4', status: 'completed',   stage: 'Closed',         fetchedBy: 'API',     client: 'TechFlow Inc' },
@@ -3801,6 +3880,8 @@ function statusClass(status) {
 
 // ── Feature state ──
 let rowDensity     = 'default'; // 'default' | 'compact'
+let _aiQuickWinActive = false;
+const _QUICK_WIN_IDS  = new Set(['# 2001448', '# 100003', '# 100006']);
 let filterFields   = []; // [{field, value}]
 let sortRules      = []; // [{field, dir}]
 let groupField     = null;
@@ -3837,6 +3918,11 @@ function closeAllDropdowns() {
     document.getElementById(id).classList.add('hidden'));
 }
 document.addEventListener('click', e => { if (!e.target.closest('.tb-wrap')) closeAllDropdowns(); });
+
+// Close stage popover on outside click
+document.addEventListener('click', e => {
+  if (_stagePopoverOpen && !e.target.closest('#case-stage-item')) _closeStagePopover();
+});
 
 // ── Filter ──
 let activeFilterPopover = null;
@@ -3977,7 +4063,7 @@ function renderActiveBar() {
   const hasFilters = filterFields.length > 0;
   const isNamedView = getViewSection(activeViewId) !== 'system';
 
-  if (!hasSorts && !hasFilters || (isNamedView && !isViewModified())) {
+  if (!hasSorts && !hasFilters && !_aiQuickWinActive || (isNamedView && !isViewModified())) {
     bar.classList.add('hidden');
     sortBtn.classList.remove('active');
     filterBtn.classList.remove('active');
@@ -3989,6 +4075,15 @@ function renderActiveBar() {
   filterBtn.classList.toggle('active', hasFilters);
 
   let html = '';
+
+  // AI quick-wins badge — shown at front of bar so user knows AI is filtering
+  if (_aiQuickWinActive) {
+    html += `<span class="ai-filter-indicator">
+      <span class="material-symbols-outlined">auto_awesome</span>AI filtered
+      <button class="ai-fi-close" onclick="clearAiQuickWin()" title="Remove AI filter">&times;</button>
+    </span>`;
+    if (hasSorts || hasFilters) html += `<div class="active-bar-section-divider"></div>`;
+  }
 
   // Sort pill
   if (hasSorts) {
@@ -4329,8 +4424,59 @@ function showAllCols() {
 }
 
 // ── Central render pipeline ──
+// ── AI Quick-wins filter ────────────────────────────────────────────────────
+function applyAiQuickWin() {
+  // Hide pills, show user message bubble
+  const pills = document.getElementById('ai-pills');
+  if (pills) pills.style.display = 'none';
+  const body  = document.getElementById('ai-drawer-body');
+  const empty = document.getElementById('ai-empty');
+  if (empty) empty.style.display = 'none';
+
+  const userBubble = `<div class="ai-msg user" style="margin-bottom:12px">
+    <div class="ai-bubble">Quick wins for today</div>
+  </div>`;
+
+  // Show analyzing spinner
+  body.innerHTML = userBubble + `
+    <div class="ai-analyzing">
+      <span class="material-symbols-outlined">autorenew</span>
+      <span class="ai-analyzing-text">Analyzing your workload…</span>
+    </div>`;
+
+  // After brief delay — apply filter + show AI response
+  setTimeout(() => {
+    _aiQuickWinActive = true;
+    applyAndRender(); // filters table to 3 cases
+    renderActiveBar(); // shows "AI filtered" badge in portal
+
+    body.innerHTML = userBubble + `
+      <div class="ai-response-msg">I've filtered your table to <strong>3 quick wins</strong> — cases that can be resolved quickly today:</div>
+      <div class="ai-qw-list">
+        <div class="ai-qw-item"><span class="ai-qw-id"># 2001448</span><span class="ai-qw-name">AMAZONFRESH</span></div>
+        <div class="ai-qw-item"><span class="ai-qw-id"># 100003</span><span class="ai-qw-name">Missing Invoice</span></div>
+        <div class="ai-qw-item"><span class="ai-qw-id"># 100006</span><span class="ai-qw-name">Approval Pending</span></div>
+      </div>
+      <div class="ai-response-msg" style="margin-top:8px;font-size:12px;color:#666">Click × on the <em>AI filtered</em> badge in the toolbar to restore all cases.</div>`;
+    body.scrollTop = body.scrollHeight;
+    _renderAiFooter();
+    _updateAiBadge();
+  }, 1400);
+}
+
+function clearAiQuickWin() {
+  _aiQuickWinActive = false;
+  applyAndRender();
+  renderActiveBar();
+}
+
 function applyAndRender() {
   let data = currentTab === 'assigned' ? assignedData : queueData;
+
+  // AI quick-wins pre-filter — show only the 3 AI-selected cases
+  if (_aiQuickWinActive) {
+    data = data.filter(row => _QUICK_WIN_IDS.has(row.id));
+  }
   // 1. Filter
   data = data.filter(row => filterFields.every(f => {
     if (!f.value) return true;
@@ -6285,6 +6431,9 @@ function renderCasePage(caseId) {
   const id = String(caseId);
   const allData = [...(assignedData || []), ...(queueData || [])];
   const row = allData.find(r => String(r.id).replace(/^#\s*/, '') === id.replace(/^#\s*/, ''));
+  // Close stage popover if open from a previous case
+  _closeStagePopover();
+
   // Header
   document.getElementById('case-num-text').textContent = id;
   const companyEl = document.getElementById('case-company-text');
@@ -6320,9 +6469,8 @@ function renderCasePage(caseId) {
     set('field-trk-opened', row?.created || '');
     set('field-trk-updated', row?.created || '');
   }
-  // Reset utility + progress (tabs already set to first-active by _setCaseTabs)
+  // Reset utility panel (tabs already set to first-active by _setCaseTabs)
   closeUtility();
-  closeProgress();
   // Update AI context to this case (if drawer is open)
   if (document.getElementById('ai-drawer')?.classList.contains('open')) {
     _setAiContext(caseId);
@@ -6398,122 +6546,63 @@ function closeUtility() {
   document.querySelectorAll('.util-strip-btn').forEach(b => b.classList.remove('active'));
 }
 
-/* ── Progress Section ── */
-let progressOpen = false;
+/* ── Stage Popover ── */
+let _stagePopoverOpen = false;
 
-function toggleProgress() {
-  progressOpen ? closeProgress() : openProgress();
+const _CASE_STAGES = [
+  { name: 'Intake',         sub: 'Case received & logged' },
+  { name: 'Review',         sub: 'Initial assessment' },
+  { name: 'Escalated',      sub: 'Requires senior review' },
+  { name: 'Pending Review', sub: 'Awaiting decision' },
+  { name: 'Resolved',       sub: 'Resolution confirmed' },
+];
+
+function toggleStagePopover(event) {
+  event.stopPropagation();
+  _stagePopoverOpen ? _closeStagePopover() : _openStagePopover();
 }
 
-function openProgress() {
-  progressOpen = true;
-  document.getElementById('case-progress-section').classList.add('open');
-  document.getElementById('case-header').classList.add('progress-open');
-  const btn = document.getElementById('chf-info-btn');
-  if (btn) btn.classList.add('active');
-  renderProgressSection();
+function _openStagePopover() {
+  _stagePopoverOpen = true;
+  _renderStagePopover();
+  document.getElementById('stage-popover')?.classList.remove('hidden');
+  document.getElementById('stage-chevron')?.classList.add('open');
 }
 
-function closeProgress() {
-  progressOpen = false;
-  document.getElementById('case-progress-section').classList.remove('open');
-  document.getElementById('case-header').classList.remove('progress-open');
-  const btn = document.getElementById('chf-info-btn');
-  if (btn) btn.classList.remove('active');
+function _closeStagePopover() {
+  _stagePopoverOpen = false;
+  document.getElementById('stage-popover')?.classList.add('hidden');
+  document.getElementById('stage-chevron')?.classList.remove('open');
 }
 
-function renderProgressSection() {
+function _renderStagePopover() {
+  const popover = document.getElementById('stage-popover');
+  if (!popover) return;
+
   const allData = [...(assignedData || []), ...(queueData || [])];
   const activeId = sectionActiveTab[activeSection];
   const row = allData.find(r => String(r.id).replace(/^#\s*/, '') === String(activeId).replace(/^#\s*/, ''));
   const currentStage = row?.stage || 'Review';
+  const currentIdx = _CASE_STAGES.findIndex(s => s.name === currentStage);
 
-  const stages = [
-    { name: 'Intake',         sub: 'Case received & logged' },
-    { name: 'Review',         sub: 'Initial assessment' },
-    { name: 'Escalated',      sub: 'Requires senior review' },
-    { name: 'Pending Review', sub: 'Awaiting decision' },
-    { name: 'Resolved',       sub: 'Resolution confirmed' },
-  ];
-  const currentIdx = stages.findIndex(s => s.name === currentStage);
-
-  // Stepper
-  const stepperEl = document.getElementById('cps-stepper');
-  if (stepperEl) {
-    stepperEl.innerHTML = stages.map((s, i) => {
-      const isDone   = i < currentIdx;
-      const isActive = i === currentIdx;
-      const badgeClass = isDone ? 'done' : (isActive ? 'active' : '');
-      const lineClass  = isDone ? 'done' : '';
-      const nameClass  = isActive ? 'active' : (isDone ? 'done' : '');
-      const num = isDone ? '' : (i + 1);
-      return `
-        <div class="cps-step">
-          <div class="cps-step-track">
-            <div class="cps-step-badge ${badgeClass}">${num}</div>
-            <div class="cps-step-line ${lineClass}"></div>
-          </div>
-          <div class="cps-step-body">
-            <div class="cps-step-name ${nameClass}">${s.name}</div>
-            <div class="cps-step-sub">${isDone ? 'Completed' : (isActive ? 'In progress' : s.sub)}</div>
-          </div>
-        </div>`;
-    }).join('');
-  }
-
-  // KPIs
-  const kpiEl = document.getElementById('cps-kpi-col');
-  if (!kpiEl) return;
-  kpiEl.innerHTML = `
-    <div class="cps-kpi-row">
-      <div class="cps-kpi">
-        <div class="cps-kpi-label">Overall sessions</div>
-        <div class="cps-kpi-value">64</div>
-        <div class="cps-kpi-mini-bar"><div class="cps-kpi-dot blue"></div><span class="cps-kpi-sub">Total interactions</span></div>
-      </div>
-      <div class="cps-kpi">
-        <div class="cps-kpi-label">Work time spent</div>
-        <div class="cps-kpi-value">101h</div>
-        <div class="cps-kpi-mini-bar"><div class="cps-kpi-dot orange"></div><span class="cps-kpi-sub">Across all agents</span></div>
-      </div>
-      <div class="cps-kpi">
-        <div class="cps-kpi-label">Current stage time</div>
-        <div class="cps-kpi-value">3h</div>
-        <div class="cps-kpi-mini-bar"><div class="cps-kpi-dot green"></div><span class="cps-kpi-sub">In this stage</span></div>
-      </div>
-    </div>
-    <div class="cps-kpi-row">
-      <div class="cps-kpi">
-        <div class="cps-kpi-label">Task completion</div>
-        <div class="cps-kpi-value">15</div>
-        <div class="cps-kpi-bar-wrap"><div class="cps-kpi-bar-fill" style="width:18%"></div></div>
-        <div class="cps-kpi-sub">18% of tasks done</div>
-      </div>
-      <div class="cps-kpi">
-        <div class="cps-kpi-label">Case completion</div>
-        <div class="cps-kpi-value">15</div>
-        <div class="cps-kpi-bar-wrap"><div class="cps-kpi-bar-fill" style="width:89%"></div></div>
-        <div class="cps-kpi-sub">89% complete</div>
-      </div>
-    </div>
-    <div class="cps-external-row">
-      <span class="cps-external-label">External pages</span>
-      <div class="cps-external-selects">
-        <select class="cps-select">
-          <option value="">Related cases…</option>
-          <option># 100003 — [Test] test</option>
-          <option># 100005 — SN_message</option>
-          <option># 100007 — # _WFmaster</option>
-        </select>
-        <select class="cps-select">
-          <option value="">Useful links…</option>
-          <option>Policy Handbook v3.2</option>
-          <option>Escalation Runbook</option>
-          <option>SLA Guidelines 2026</option>
-        </select>
+  popover.innerHTML = _CASE_STAGES.map((s, i) => {
+    const isDone    = i < currentIdx;
+    const isCurrent = i === currentIdx;
+    const cls = isCurrent ? 'current' : (isDone ? 'done' : '');
+    const badgeContent = isDone
+      ? `<span class="material-symbols-outlined" style="font-size:12px">check</span>`
+      : (i + 1);
+    return `<div class="stage-pop-item ${cls}">
+      <div class="stage-pop-badge">${badgeContent}</div>
+      <div>
+        <div class="stage-pop-name">${s.name}</div>
+        <div class="stage-pop-sub">${isCurrent ? 'In progress' : (isDone ? 'Completed' : s.sub)}</div>
       </div>
     </div>`;
+  }).join('');
 }
+
+// renderProgressSection removed — stepper moved to stage popover in header
 
 const CONV_ITEMS = [
   { type: 'email', initials: 'AH', name: 'Ahmed Arah', subject: 'Invoice follow-up',
@@ -7485,10 +7574,37 @@ function stopAiProcessing() {
 
 // States where AI is waiting for user input — badge shown on button + case tab
 const _AI_ATTENTION_STATES = ['response', 'planning', 'login-required', 'completed'];
+let _aiBadgePrevAttention = false; // tracks last value to detect rising edge
+
+// Synthesise a soft "blop" notification using Web Audio API (no asset needed)
+function _playBlopSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc  = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    // Pitch glide: 780 Hz → 520 Hz — feels like a soft notification pop
+    osc.frequency.setValueAtTime(780, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(520, ctx.currentTime + 0.12);
+    // Envelope: quick attack, smooth decay
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.28, ctx.currentTime + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.28);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.28);
+    osc.onended = () => ctx.close();
+  } catch (_) { /* audio not supported — silently ignore */ }
+}
 
 function _updateAiBadge() {
   const needsAttention = _AI_ATTENTION_STATES.includes(_aiFlowState);
   const drawerOpen = document.getElementById('ai-drawer')?.classList.contains('open');
+
+  // Play blop on the rising edge — only once per new attention event, drawer closed
+  if (needsAttention && !_aiBadgePrevAttention && !drawerOpen) _playBlopSound();
+  _aiBadgePrevAttention = needsAttention;
 
   // Update AI button badge (only when drawer is closed)
   const btnBadge = document.getElementById('ai-btn-badge');
@@ -7565,8 +7681,8 @@ function _renderAiDrawerContext() {
     banner.style.display = 'none';
   }
 
-  // Helping pills — hide whenever AI is in an active flow (any state except idle)
-  const _pillHideStates = ['response', 'planning', 'approved', 'login-required', 'success', 'completed', 'closing', 'case-done'];
+  // Helping pills — visible in idle/analyzing/response (frames 1-4); hidden only in planning/approved + terminal states
+  const _pillHideStates = ['planning', 'approved', 'login-required', 'success', 'completed', 'closing', 'case-done'];
   if (_aiMessages.length > 0 || _pillHideStates.includes(_aiFlowState)) { pills.style.display = 'none'; return; }
   pills.style.display = '';
 
@@ -7584,16 +7700,20 @@ function _renderAiDrawerContext() {
     { label: 'Similar cases',   msg: `Find cases similar to ${_aiCurrentCase?.id}` },
   ];
   const genericPills = [
-    { label: 'What can you do?', msg: 'What can you help me with?' },
-    { label: 'Search cases',     msg: 'Help me search for cases' },
-    { label: 'Help me write',    msg: 'Help me write a message' },
+    { label: 'Quick wins for today', quickWin: true },
+    { label: 'What can you do?',     msg: 'What can you help me with?' },
+    { label: 'Search cases',         msg: 'Help me search for cases' },
+    { label: 'Help me write',        msg: 'Help me write a message' },
   ];
   const activePills = isException ? exceptionPills : (hasContext ? contextPills : genericPills);
-  pills.innerHTML = activePills.map(p =>
-    p.flow
-      ? `<button class="ai-pill" onclick="_startAiFlow('${p.label.replace(/'/g,"&#39;")}')">${p.label}</button>`
-      : `<button class="ai-pill" onclick="sendAiPill('${p.msg.replace(/'/g,"&#39;")}')">${p.label}</button>`
-  ).join('');
+  pills.innerHTML = activePills.map(p => {
+    if (p.quickWin) return `
+      <button class="ai-pill ai-pill-qw" onclick="applyAiQuickWin()">
+        <span class="material-symbols-outlined">auto_awesome</span>${p.label}
+      </button>`;
+    if (p.flow) return `<button class="ai-pill" onclick="_startAiFlow('${p.label.replace(/'/g,"&#39;")}')">${p.label}</button>`;
+    return `<button class="ai-pill" onclick="sendAiPill('${p.msg.replace(/'/g,"&#39;")}')">${p.label}</button>`;
+  }).join('');
 }
 
 function sendAiPill(text) {
