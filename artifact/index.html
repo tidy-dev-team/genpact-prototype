@@ -1169,13 +1169,25 @@
   .status-badge.exception { background: #fee2e2; color: #dc2626; }
 
   /* Document Status table */
-  .doc-status-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .doc-status-table-wrap { overflow-x: auto; width: 100%; }
+  .doc-status-table {
+    width: 100%; min-width: 520px; border-collapse: collapse;
+    font-size: 13px; table-layout: fixed;
+  }
+  .doc-status-table col.col-type   { width: 120px; }
+  .doc-status-table col.col-name   { width: auto; }
+  .doc-status-table col.col-status { width: 130px; }
+  .doc-status-table col.col-eye    { width: 120px; }
+  .doc-status-table col.col-action { width: 44px; }
   .doc-status-table th {
-    text-align: left; padding: 8px 14px;
+    text-align: left; padding: 8px 14px; white-space: nowrap;
     font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
     color: var(--text-muted); border-bottom: 1px solid var(--border);
   }
-  .doc-status-table td { padding: 11px 14px; border-bottom: 1px solid var(--border-light); color: var(--text-primary); }
+  .doc-status-table td {
+    padding: 11px 14px; border-bottom: 1px solid var(--border-light);
+    color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
   .doc-status-table tr.doc-row-failed td { background: #fff5f5; }
   .doc-status-table tr.doc-row-failed td:first-child { border-left: 3px solid #dc2626; padding-left: 11px; }
   .doc-status-val { font-weight: 500; }
@@ -7229,13 +7241,19 @@ function _renderDocumentStatusTable(docs) {
       <td style="text-align:right">${failed ? `<button class="doc-upload-btn" title="Upload document"><span class="material-symbols-outlined">upload</span></button>` : ''}</td>
     </tr>`;
   }).join('');
-  return `<table class="doc-status-table">
-    <thead><tr>
-      <th>Document Type</th><th>Document Name</th>
-      <th>Document Status</th><th>Eyeball status</th><th></th>
-    </tr></thead>
-    <tbody>${rows}</tbody>
-  </table>`;
+  return `<div class="doc-status-table-wrap">
+    <table class="doc-status-table">
+      <colgroup>
+        <col class="col-type"><col class="col-name">
+        <col class="col-status"><col class="col-eye"><col class="col-action">
+      </colgroup>
+      <thead><tr>
+        <th>Document Type</th><th>Document Name</th>
+        <th>Document Status</th><th>Eyeball status</th><th></th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
 }
 
 // ── AI Drawer ──────────────────────────────────────────────────────────────
