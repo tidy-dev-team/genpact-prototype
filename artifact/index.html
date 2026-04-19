@@ -4514,6 +4514,7 @@ const _aiMessages = [];
 let _aiCurrentCase = null;
 let _aiContextDismissed = false;
 let _aiFlowState = 'idle'; // idle | analyzing | response | planning | approved
+let _aiFlowUserMsg = '';   // pill text shown as the user's message bubble
 let searchOpen = false;
 let tasksOpen = false;
 
@@ -6178,6 +6179,7 @@ function renderCasePage(caseId) {
   if (row?.documents) {
     _renderDocumentCase(row);
   } else {
+    _setCaseTabs(_ORIGINAL_TABS);
     renderCaseSections(CASE_SECTIONS);
     // Populate known fields from row data
     const set = (elId, val) => { const el = document.getElementById(elId); if (el) el.value = val || ''; };
@@ -6188,8 +6190,7 @@ function renderCasePage(caseId) {
     set('field-trk-opened', row?.created || '');
     set('field-trk-updated', row?.created || '');
   }
-  // Reset nav tab to first section, reset utility + progress
-  document.querySelectorAll('.chf-tab').forEach((t,i) => t.classList.toggle('active', i===0));
+  // Reset utility + progress (tabs already set to first-active by _setCaseTabs)
   closeUtility();
   closeProgress();
   // Update AI context to this case (if drawer is open)
@@ -7161,9 +7162,31 @@ document.addEventListener('click', e => {
 });
 
 // ── Document Case Rendering ─────────────────────────────────────────────────
+const _DOC_CASE_TABS = [
+  { key: 'general-details', label: 'General Details' },
+  { key: 'doc-status',      label: 'Document Status' },
+];
+const _ORIGINAL_TABS = [
+  { key: 'history',  label: 'History'  },
+  { key: 'details',  label: 'Details'  },
+  { key: 'research', label: 'Research' },
+  { key: 'host',     label: 'Host'     },
+  { key: 'general',  label: 'General'  },
+  { key: 'payment',  label: 'Payment'  },
+  { key: 'scmt',     label: 'SCMT'     },
+  { key: 'tracking', label: 'Tracking' },
+];
+function _setCaseTabs(tabs) {
+  const el = document.getElementById('chf-tabs');
+  if (!el) return;
+  el.innerHTML = tabs.map((t, i) =>
+    `<button class="chf-tab${i === 0 ? ' active' : ''}" data-tab="${t.key}">${t.label}</button>`
+  ).join('');
+}
 function _renderDocumentCase(row) {
   const area = document.getElementById('case-form-area');
   if (!area) return;
+  _setCaseTabs(_DOC_CASE_TABS);
   area.innerHTML = `
     <div class="case-section" id="case-section-general-details">
       <div class="case-section-header" onclick="toggleCaseSection('general-details')">
@@ -7245,6 +7268,7 @@ function _clearAiContext() {
   _aiCurrentCase = null;
   _aiContextDismissed = false;
   _aiFlowState = 'idle';
+  _aiFlowUserMsg = '';
   _renderAiDrawerContext();
 }
 
@@ -7293,8 +7317,8 @@ function _renderAiDrawerContext() {
   const activePills = isException ? exceptionPills : (hasContext ? contextPills : genericPills);
   pills.innerHTML = activePills.map(p =>
     p.flow
-      ? `<button class="ai-pill" onclick="_startAiFlow(${JSON.stringify(p.label)})">${p.label}</button>`
-      : `<button class="ai-pill" onclick="sendAiPill(${JSON.stringify(p.msg)})">${p.label}</button>`
+      ? `<button class="ai-pill" onclick="_startAiFlow('${p.label.replace(/'/g,"&#39;")}')">${p.label}</button>`
+      : `<button class="ai-pill" onclick="sendAiPill('${p.msg.replace(/'/g,"&#39;")}')">${p.label}</button>`
   ).join('');
 }
 
@@ -7306,9 +7330,10 @@ function sendAiPill(text) {
 
 // ── AI Guided Flow (scripted for document-failure cases) ──────────────────
 function _startAiFlow(pillLabel) {
+  _aiFlowUserMsg = pillLabel;
   _aiFlowState = 'analyzing';
   _renderAiFlow();
-  _renderAiDrawerContext(); // keep pills visible, just refresh state
+  _renderAiDrawerContext(); // keep pills visible during analyzing + response
   setTimeout(() => { _aiFlowState = 'response'; _renderAiFlow(); _renderAiDrawerContext(); }, 2200);
 }
 
@@ -7316,6 +7341,12 @@ function _renderAiFlow() {
   const body  = document.getElementById('ai-drawer-body');
   const empty = document.getElementById('ai-empty');
   if (empty) empty.style.display = 'none';
+
+  // User message bubble — the pill text shown as if the user sent it
+  const userBubble = _aiFlowUserMsg ? `
+    <div class="ai-msg user" style="margin-bottom:12px">
+      <div class="ai-bubble">${_aiFlowUserMsg}</div>
+    </div>` : '';
 
   const missingCard = `
     <div class="ai-missing-card">
@@ -7327,14 +7358,14 @@ function _renderAiFlow() {
     </div>`;
 
   if (_aiFlowState === 'analyzing') {
-    body.innerHTML = `
+    body.innerHTML = userBubble + `
       <div class="ai-analyzing">
         <span class="material-symbols-outlined">autorenew</span>
         <span class="ai-analyzing-text">Summarizing current case failure statuses</span>
       </div>`;
 
   } else if (_aiFlowState === 'response') {
-    body.innerHTML = `
+    body.innerHTML = userBubble + `
       <div class="ai-response-msg">I noticed this case is in Exception status because the POD file is currently marked as Failed.</div>
       <div class="ai-response-msg" style="margin-top:8px">I can try to locate and retrieve the correct POD document from the carrier portal. Want me to start?</div>
       ${missingCard}
@@ -7344,7 +7375,7 @@ function _renderAiFlow() {
       </div>`;
 
   } else if (_aiFlowState === 'planning') {
-    body.innerHTML = `
+    body.innerHTML = userBubble + `
       ${missingCard}
       <div class="ai-analyzing">
         <span class="material-symbols-outlined">autorenew</span>
@@ -7369,7 +7400,7 @@ function _renderAiFlow() {
       <div class="ai-plan-note">AI Assistant will only access sites you're already connected to. You'll be asked for permission before accessing anything else.</div>`;
 
   } else if (_aiFlowState === 'approved') {
-    body.innerHTML = `
+    body.innerHTML = userBubble + `
       ${missingCard}
       <div class="ai-approved-msg">
         <span class="material-symbols-outlined">check_circle</span>
