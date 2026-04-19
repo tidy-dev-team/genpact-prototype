@@ -208,19 +208,35 @@
   }
   .topbar .topbar-actions .icon-btn:hover { background: #d4d4d4; }
   .topbar .topbar-actions .icon-btn .material-symbols-outlined { font-size: 20px; }
-  /* AI button */
+  /* AI button — purple branded */
   .ai-btn {
     display: flex; align-items: center; gap: 5px;
     height: 28px; padding: 0 10px;
-    border: 1px solid #292929; border-radius: 6px;
-    background: #1a1a1a;
+    border: 1px solid #6d28d9; border-radius: 6px;
+    background: #7c3aed;
     color: #fff; font-size: 12px; font-weight: 600; font-family: inherit;
     cursor: pointer; white-space: nowrap;
     transition: background 0.15s;
+    position: relative;
   }
-  .ai-btn:hover { background: #333; }
-  .ai-btn.active { background: #000; }
+  .ai-btn:hover { background: #6d28d9; }
+  .ai-btn.active { background: #5b21b6; border-color: #5b21b6; }
   .ai-btn .material-symbols-outlined { font-size: 15px; }
+  /* AI button notification badge */
+  .ai-btn-badge {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #fbbf24;
+    border: 1.5px solid #7c3aed;
+    position: absolute; top: 2px; right: 2px;
+    pointer-events: none;
+  }
+  /* Case tab AI attention badge dot */
+  .ai-tab-badge {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #a855f7;
+    flex-shrink: 0; display: inline-flex;
+    align-self: center; margin-left: 1px;
+  }
   /* Main body wrapper — sits below topbar, enables push layout */
   .main-body {
     display: flex; flex-direction: row;
@@ -247,16 +263,17 @@
   .ai-drawer-header {
     display: flex; align-items: center; gap: 8px;
     height: 52px; padding: 0 16px;
-    border-bottom: 1px solid #333;
+    border-bottom: 1px solid #3b1f6e;
+    background: #1a0b2e;
     flex-shrink: 0;
   }
   .ai-drawer-icon {
     width: 28px; height: 28px; border-radius: 8px;
-    background: #fff;
+    background: #7c3aed;
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
   }
-  .ai-drawer-icon .material-symbols-outlined { font-size: 16px; color: #1a1a1a; }
+  .ai-drawer-icon .material-symbols-outlined { font-size: 16px; color: #fff; }
   .ai-drawer-title {
     font-size: 14px; font-weight: 600; color: #fff; flex: 1;
   }
@@ -273,12 +290,34 @@
     display: flex; flex-direction: column;
     padding: 16px; gap: 12px;
   }
-  .ai-drawer-footer {
-    padding: 12px 16px;
-    border-top: 1px solid #333;
-    flex-shrink: 0;
+  .ai-drawer-footer { flex-shrink: 0; }
+  /* Each child provides its own border-top — empty footer has no line */
+  .ai-footer-input {
     display: flex; align-items: center; gap: 8px;
+    padding: 12px 16px; border-top: 1px solid #333;
   }
+  .ai-footer-login {
+    display: flex; flex-direction: column; gap: 8px;
+    padding: 12px 14px; border-top: 1px solid #333;
+  }
+  .ai-footer-login-title { font-size: 12px; font-weight: 600; color: #bbb; }
+  .ai-footer-login-fields { display: flex; gap: 6px; }
+  .ai-footer-login-fields .ai-login-input {
+    flex: 1; min-width: 0;
+    background: #2c2c2c; border-color: #444; color: #fff;
+  }
+  .ai-footer-login-fields .ai-login-input::placeholder { color: #666; }
+  .ai-footer-login-row { display: flex; align-items: center; gap: 8px; }
+  .ai-footer-login-row .ai-login-submit { flex: 1; }
+  /* Planning modal in footer — replaces the chat input */
+  .ai-footer-plan {
+    display: flex; flex-direction: column; gap: 10px;
+    padding: 12px 14px; border-top: 1px solid #333;
+    max-height: 340px; overflow-y: auto;
+  }
+  .ai-footer-plan-btns { display: flex; gap: 8px; }
+  /* Inline action buttons rendered inside the chat body */
+  .ai-inline-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
   .ai-input {
     flex: 1; height: 36px; padding: 0 12px;
     border: 1px solid #444; border-radius: 8px;
@@ -292,16 +331,38 @@
     width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
     border: none; background: #fff;
-    color: #1a1a1a; cursor: pointer; transition: background 0.15s;
+    color: #1a1a1a; cursor: pointer; transition: background 0.15s, color 0.15s;
   }
   .ai-send-btn:hover { background: #ddd; }
   .ai-send-btn .material-symbols-outlined { font-size: 18px; }
+  /* Send → Stop when processing */
+  .ai-send-btn.processing { background: #2c2c2c; }
+  .ai-send-btn.processing:hover { background: #3a3a3a; }
+  .ai-send-btn.processing .material-symbols-outlined { color: #ef4444; font-size: 16px; }
+  /* AI typing indicator — 3 bouncing dots */
+  .ai-typing-indicator {
+    display: flex; align-items: center; gap: 5px;
+    padding: 9px 12px;
+    background: #242424; border-radius: 12px 12px 12px 4px;
+    align-self: flex-start; margin-top: 6px; width: fit-content;
+  }
+  .ai-typing-indicator span {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #a855f7; display: block;
+    animation: ai-typing-bounce 1.1s ease-in-out infinite;
+  }
+  .ai-typing-indicator span:nth-child(2) { animation-delay: 0.18s; }
+  .ai-typing-indicator span:nth-child(3) { animation-delay: 0.36s; }
+  @keyframes ai-typing-bounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.35; }
+    30%           { transform: translateY(-5px); opacity: 1; }
+  }
   .ai-empty {
     flex: 1; display: flex; flex-direction: column;
     align-items: center; justify-content: center;
     gap: 8px; text-align: center; padding: 40px 20px;
   }
-  .ai-empty .material-symbols-outlined { font-size: 36px; color: #555; }
+  .ai-empty .material-symbols-outlined { font-size: 36px; color: #7c3aed; }
   .ai-empty-title { font-size: 14px; font-weight: 600; color: #aaa; }
   .ai-empty-sub { font-size: 12px; color: #666; }
   /* AI message bubbles */
@@ -1071,11 +1132,17 @@
     padding: 0 !important; border: none !important; overflow: visible;
   }
   .row-actions {
-    position: absolute; right: 0; top: 0; bottom: 0; width: 300px;
+    position: absolute; right: 0; top: 0; bottom: 0;
     display: flex; align-items: center; justify-content: flex-end;
     gap: 4px; padding: 0 12px;
-    background: linear-gradient(to right, transparent, var(--hover-row) 30%);
+    background: #fafafa; /* solid — buttons always on clean background */
     opacity: 0; transition: opacity 0.15s; pointer-events: none;
+  }
+  /* Gradient fade extends LEFT of the buttons panel as a separate layer */
+  .row-actions::before {
+    content: ''; position: absolute; right: 100%; top: 0; bottom: 0; width: 80px;
+    background: linear-gradient(to right, rgba(250,250,250,0), #fafafa);
+    pointer-events: none;
   }
   tbody tr:hover .row-actions { opacity: 1; pointer-events: auto; }
   .row-action-btn {
@@ -1174,11 +1241,11 @@
     width: 100%; min-width: 520px; border-collapse: collapse;
     font-size: 13px; table-layout: fixed;
   }
-  .doc-status-table col.col-type   { width: 120px; }
-  .doc-status-table col.col-name   { width: auto; }
-  .doc-status-table col.col-status { width: 130px; }
-  .doc-status-table col.col-eye    { width: 120px; }
-  .doc-status-table col.col-action { width: 44px; }
+  .doc-status-table col.col-type   { width: 16%; }
+  .doc-status-table col.col-name   { width: 30%; }
+  .doc-status-table col.col-status { width: 16%; }
+  .doc-status-table col.col-eye    { width: 28%; }
+  .doc-status-table col.col-action { width: 36px; }
   .doc-status-table th {
     text-align: left; padding: 8px 14px; white-space: nowrap;
     font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
@@ -1197,8 +1264,9 @@
   .doc-upload-btn {
     width: 28px; height: 28px; border-radius: 6px; border: none; background: none;
     cursor: pointer; color: var(--text-muted); display: inline-flex; align-items: center; justify-content: center;
-    transition: background 0.1s, color 0.1s;
+    opacity: 0; transition: opacity 0.15s, background 0.1s, color 0.1s;
   }
+  .doc-status-table tr:hover .doc-upload-btn { opacity: 1; }
   .doc-upload-btn:hover { background: #fee2e2; color: #dc2626; }
   .doc-upload-btn .material-symbols-outlined { font-size: 18px; }
 
@@ -1208,7 +1276,7 @@
     display: flex; align-items: center; gap: 10px; padding: 6px 0;
   }
   .ai-analyzing .material-symbols-outlined {
-    font-size: 18px; color: #777; animation: ai-spin 1.5s linear infinite; flex-shrink: 0;
+    font-size: 18px; color: #a855f7; animation: ai-spin 1.5s linear infinite; flex-shrink: 0;
   }
   .ai-analyzing-text { font-size: 13px; color: #999; }
   .ai-response-msg { font-size: 13px; color: #d0d0d0; line-height: 1.65; }
@@ -1229,8 +1297,8 @@
     font-size: 13px; font-weight: 500; font-family: inherit; cursor: pointer;
     transition: background 0.15s, color 0.15s;
   }
-  .ai-flow-btn.primary { background: #fff; color: #1a1a1a; border: none; }
-  .ai-flow-btn.primary:hover { background: #ddd; }
+  .ai-flow-btn.primary { background: #7c3aed; color: #fff; border: none; }
+  .ai-flow-btn.primary:hover { background: #6d28d9; }
   .ai-flow-btn.secondary { background: none; color: #aaa; border: 1px solid #444; }
   .ai-flow-btn.secondary:hover { background: #2c2c2c; color: #fff; }
   .ai-plan {
@@ -1251,14 +1319,68 @@
     height: 36px; border-radius: 8px; font-size: 13px; font-weight: 600;
     font-family: inherit; cursor: pointer; transition: background 0.15s;
   }
-  .ai-plan-btn.approve { flex: 1; background: #fff; color: #1a1a1a; border: none; }
-  .ai-plan-btn.approve:hover { background: #e0e0e0; }
+  .ai-plan-btn.approve { flex: 1; background: #7c3aed; color: #fff; border: none; }
+  .ai-plan-btn.approve:hover { background: #6d28d9; }
   .ai-plan-btn.edit { background: none; color: #aaa; border: 1px solid #444; padding: 0 16px; }
   .ai-plan-btn.edit:hover { background: #2c2c2c; color: #fff; }
   .ai-plan-note { font-size: 11px; color: #4a4a4a; line-height: 1.6; text-align: center; padding: 4px 0; }
   .ai-approved-msg { display: flex; align-items: center; gap: 8px; padding: 8px 0; }
   .ai-approved-msg .material-symbols-outlined { font-size: 18px; color: #6ee7b7; flex-shrink: 0; }
   .ai-approved-text { font-size: 13px; color: #6ee7b7; }
+
+  /* ── Toast notifications ─────────────────────────────── */
+  #toast-container {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    z-index: 9999; display: flex; flex-direction: column; gap: 8px;
+    align-items: center; pointer-events: none;
+  }
+  .toast {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 16px; border-radius: 10px;
+    background: #1a1a1a; border: 1px solid #333;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+    font-size: 13px; font-weight: 500; color: #e8e8e8;
+    pointer-events: auto; white-space: nowrap;
+    animation: toast-in 0.25s ease;
+  }
+  .toast.toast-out { animation: toast-out 0.25s ease forwards; }
+  .toast .toast-icon { font-size: 17px; flex-shrink: 0; }
+  .toast.toast-success .toast-icon { color: #34d399; }
+  @keyframes toast-in  { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes toast-out { from { opacity:1; transform:translateY(0); } to { opacity:0; transform:translateY(6px); } }
+
+  /* AI inline login form */
+  .ai-login-card {
+    background: #fff; border-radius: 10px;
+    padding: 16px; display: flex; flex-direction: column; gap: 12px;
+    margin-top: 8px;
+  }
+  .ai-login-title { font-size: 13px; font-weight: 600; color: #1a1a1a; text-align: center; }
+  .ai-login-field { display: flex; flex-direction: column; gap: 4px; }
+  .ai-login-label { font-size: 11px; font-weight: 600; color: #374151; }
+  .ai-login-input {
+    height: 34px; padding: 0 10px; border-radius: 6px;
+    border: 1px solid #d1d5db; font-size: 13px; color: #1a1a1a;
+    font-family: inherit; outline: none;
+  }
+  .ai-login-input:focus { border-color: #6b7280; }
+  .ai-login-submit {
+    height: 36px; border-radius: 6px; border: none; cursor: pointer;
+    background: #f97316; color: #fff; font-size: 13px; font-weight: 600;
+    font-family: inherit; transition: background 0.15s;
+  }
+  .ai-login-submit:hover { background: #ea6c0a; }
+  .ai-login-forgot { font-size: 12px; color: #7c3aed; text-align: center; cursor: pointer; background: none; border: none; font-family: inherit; }
+  /* AI success download card */
+  .ai-download-card {
+    background: #242424; border: 1px solid #333; border-radius: 8px;
+    padding: 10px 12px; display: flex; align-items: center; gap: 10px;
+    margin-top: 4px;
+  }
+  .ai-download-card-info { flex: 1; }
+  .ai-download-card-label { font-size: 12px; font-weight: 600; color: #e8e8e8; }
+  .ai-download-card-name { font-size: 12px; color: #888; margin-top: 2px; }
+  .ai-download-icon { color: #a855f7; font-size: 20px; cursor: pointer; }
 
   input[type="checkbox"] {
     width: 16px; height: 16px; cursor: pointer;
@@ -3073,6 +3195,7 @@
       <button class="ai-btn" id="ai-btn" title="AI Assistant" onclick="toggleAiDrawer()">
         <span class="material-symbols-outlined">auto_awesome</span>
         AI
+        <span class="ai-btn-badge" id="ai-btn-badge" style="display:none"></span>
       </button>
     </div>
   </div>
@@ -3579,13 +3702,8 @@
         Case ID <span id="ai-ctx-id"></span>
         <button class="ai-context-close" onclick="dismissAiContext()" title="Remove context">×</button>
       </div>
-      <div class="ai-drawer-footer">
-        <input class="ai-input" id="ai-input" type="text" placeholder="Ask anything…"
-          onkeydown="if(event.key==='Enter') sendAiMessage()" />
-        <button class="ai-send-btn" onclick="sendAiMessage()" title="Send">
-          <span class="material-symbols-outlined">send</span>
-        </button>
-      </div>
+      <!-- Footer — dynamically rendered by _renderAiFooter() -->
+      <div class="ai-drawer-footer" id="ai-drawer-footer"></div>
     </div>
   </div><!-- /ai-drawer -->
 
@@ -4525,8 +4643,11 @@ let notifOpen = false;
 const _aiMessages = [];
 let _aiCurrentCase = null;
 let _aiContextDismissed = false;
-let _aiFlowState = 'idle'; // idle | analyzing | response | planning | approved
+let _aiFlowState = 'idle'; // idle | analyzing | response | planning | approved | login-required | success | completed | closing | case-done
 let _aiFlowUserMsg = '';   // pill text shown as the user's message bubble
+let _aiAttentionCaseId = null; // tab ID that should show the AI badge dot
+let _aiProcessing = false;
+let _aiProcessingTimer = null;
 let searchOpen = false;
 let tasksOpen = false;
 
@@ -5161,14 +5282,7 @@ const SECTION_META = {
 };
 
 const sectionTabs = {
-  mywork:    [{ id: 'home', label: 'My Work',   icon: 'home',        home: true  },
-              { id: '100004', label: '100004', icon: 'folder_open', home: false },
-              { id: '100005', label: '100005', icon: 'folder_open', home: false },
-              { id: '100006', label: '100006', icon: 'folder_open', home: false },
-              { id: '100007', label: '100007', icon: 'folder_open', home: false },
-              { id: '100008', label: '100008', icon: 'folder_open', home: false },
-              { id: '100009', label: '100009', icon: 'folder_open', home: false },
-              { id: '100010', label: '100010', icon: 'folder_open', home: false }],
+  mywork:    [{ id: 'home', label: 'My Work',   icon: 'home',       home: true  }],
   allwork:   [{ id: 'home', label: 'All Work',  icon: 'grid_view',  home: true  }],
   analytics: [{ id: 'home', label: 'Analytics', icon: 'bar_chart',  home: true  }],
   archive:   [{ id: 'home', label: 'Archive',   icon: 'archive',    home: true  }],
@@ -5227,10 +5341,13 @@ function renderTopbarTabs() {
     <span class="material-symbols-outlined">${home.icon}</span><span class="tab-label">${home.label}</span><span class="home-tab-shortcut">${shortcutLabel}</span>
   </button>` : '';
 
-  const casesHtml = visibleCases.map(t => `<button class="case-tab ${t.id === activeId ? 'selected' : ''}" onclick="selectTab('${t.id}')" data-tab-id="${t.id}" style="width:${tabW}px">
-    <span class="material-symbols-outlined">${t.icon}</span><span class="tab-label">${t.label}</span>
-    <span class="tab-close" onclick="closeTab(event,'${t.id}')">&times;</span>
-  </button>`).join('');
+  const casesHtml = visibleCases.map(t => {
+    const hasBadge = t.id === _aiAttentionCaseId;
+    return `<button class="case-tab ${t.id === activeId ? 'selected' : ''}" onclick="selectTab('${t.id}')" data-tab-id="${t.id}" style="width:${tabW}px">
+      <span class="material-symbols-outlined">${t.icon}</span><span class="tab-label">${t.label}</span>${hasBadge ? '<span class="ai-tab-badge"></span>' : ''}
+      <span class="tab-close" onclick="closeTab(event,'${t.id}')">&times;</span>
+    </button>`;
+  }).join('');
 
   const chevronHtml = overflowCases.length > 0 ? `<div class="tabs-overflow-wrap">
     <button class="tabs-overflow-btn" onclick="toggleTabsOverflow(event)" id="tabs-overflow-btn">
@@ -5741,6 +5858,7 @@ _updateSolutionAvatar();
 _syncSolutionNav();
 selectView('default'); // initialise view state + render btn
 _renderAiDrawerContext(); // init pills in generic mode
+_renderAiFooter();        // init footer with default input
 
 // Cmd+K / Ctrl+K → navigate home
 document.addEventListener('keydown', e => {
@@ -7151,6 +7269,20 @@ function collapseCaseSection(key, ev) { if (ev) ev.stopPropagation(); toggleCase
 function copyCaseSection(key, ev)     { if (ev) ev.stopPropagation(); _closeAllCaseSectionMenus(); /* prototype placeholder */ }
 function resetCaseSection(key, ev)    { if (ev) ev.stopPropagation(); _closeAllCaseSectionMenus(); /* prototype placeholder */ }
 
+// ── Toast ──────────────────────────────────────────────────────────────────
+function showToast(message, { type = 'success', duration = 3800 } = {}) {
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+  const el = document.createElement('div');
+  el.className = `toast toast-${type}`;
+  el.innerHTML = `<span class="material-symbols-outlined toast-icon">task_alt</span><span>${message}</span>`;
+  container.appendChild(el);
+  setTimeout(() => {
+    el.classList.add('toast-out');
+    el.addEventListener('animationend', () => el.remove(), { once: true });
+  }, duration);
+}
+
 function returnCase() {
   const id = sectionActiveTab[activeSection];
   if (id && id !== 'home') closeTab(null, id);
@@ -7258,12 +7390,135 @@ function _renderDocumentStatusTable(docs) {
 
 // ── AI Drawer ──────────────────────────────────────────────────────────────
 
+// ── Dynamic footer renderer ─────────────────────────────────────────────────
+function _renderAiFooter() {
+  const footer = document.getElementById('ai-drawer-footer');
+  if (!footer) return;
+
+  // response / completed — buttons live inline in the chat body; footer is blank
+  if (_aiFlowState === 'response' || _aiFlowState === 'completed') {
+    footer.innerHTML = '';
+    return;
+  }
+
+  // planning — plan card replaces the chat input box
+  if (_aiFlowState === 'planning') {
+    footer.innerHTML = `
+      <div class="ai-footer-plan">
+        <div class="ai-plan">
+          <div class="ai-plan-allow">Allow actions on: <strong>ⓘ Vendor Document portal</strong></div>
+          <div class="ai-plan-steps-label">Plan details:</div>
+          <div class="ai-plan-step"><span class="ai-plan-step-num">1.</span><span>Navigate to document portal</span></div>
+          <div class="ai-plan-step"><span class="ai-plan-step-num">2.</span><span>Search for the required document by locating its name and ID as appears in the ticket</span></div>
+          <div class="ai-plan-step"><span class="ai-plan-step-num">3.</span><span>Open the document and read to verify its fit</span></div>
+          <div class="ai-plan-step"><span class="ai-plan-step-num">4.</span><span>Download it and send it back here</span></div>
+        </div>
+        <div class="ai-plan-note">AI Assistant will only access sites you're already connected to. You'll be asked for permission before accessing anything else.</div>
+        <div class="ai-footer-plan-btns">
+          <button class="ai-plan-btn approve" onclick="triggerAiFlowApprove()">Approve</button>
+          <button class="ai-plan-btn edit">Edit plan</button>
+        </div>
+      </div>`;
+    return;
+  }
+
+  // Login-required — replace footer with compact login form
+  if (_aiFlowState === 'login-required') {
+    footer.innerHTML = `
+      <div class="ai-footer-login">
+        <div class="ai-footer-login-title">Sign in to AmazonFresh Vendor Portal</div>
+        <div class="ai-footer-login-fields">
+          <input class="ai-login-input" type="text" placeholder="Username" id="ai-login-user" />
+          <input class="ai-login-input" type="password" value="dcascadsaasd" id="ai-login-pass" />
+        </div>
+        <div class="ai-footer-login-row">
+          <button class="ai-login-submit" onclick="triggerLoginSignIn()">Sign In</button>
+          <button class="ai-login-forgot">Forgot password?</button>
+        </div>
+      </div>`;
+    return;
+  }
+
+  // Default — normal text input + send/stop button
+  footer.innerHTML = `
+    <div class="ai-footer-input">
+      <input class="ai-input" id="ai-input" type="text" placeholder="Ask anything…"
+        onkeydown="if(event.key==='Enter') sendAiMessage()" />
+      ${_aiProcessing
+        ? `<button class="ai-send-btn processing" id="ai-send-btn" onclick="stopAiProcessing()" title="Stop"><span class="material-symbols-outlined">stop</span></button>`
+        : `<button class="ai-send-btn" id="ai-send-btn" onclick="sendAiMessage()" title="Send"><span class="material-symbols-outlined">send</span></button>`}
+    </div>`;
+}
+
+// ── AI processing state (typing indicator + send→stop button) ───────────────
+function _setAiProcessing(on) {
+  _aiProcessing = on;
+
+  // Re-render footer so send ↔ stop button reflects processing state
+  _renderAiFooter();
+
+  // Show/remove typing indicator at bottom of body
+  const body = document.getElementById('ai-drawer-body');
+  const existing = document.getElementById('ai-typing-indicator');
+  if (on) {
+    if (!existing && body) {
+      const el = document.createElement('div');
+      el.id = 'ai-typing-indicator';
+      el.className = 'ai-typing-indicator';
+      el.innerHTML = '<span></span><span></span><span></span>';
+      body.appendChild(el);
+      body.scrollTop = body.scrollHeight;
+    }
+  } else {
+    if (existing) existing.remove();
+  }
+}
+
+function stopAiProcessing() {
+  if (_aiProcessingTimer) { clearTimeout(_aiProcessingTimer); _aiProcessingTimer = null; }
+  _setAiProcessing(false);
+  _aiFlowState = 'idle';
+  _aiFlowUserMsg = '';
+  _renderAiFlow();
+  _renderAiDrawerContext();
+}
+
+// States where AI is waiting for user input — badge shown on button + case tab
+const _AI_ATTENTION_STATES = ['response', 'planning', 'login-required', 'completed'];
+
+function _updateAiBadge() {
+  const needsAttention = _AI_ATTENTION_STATES.includes(_aiFlowState);
+  const drawerOpen = document.getElementById('ai-drawer')?.classList.contains('open');
+
+  // Update AI button badge (only when drawer is closed)
+  const btnBadge = document.getElementById('ai-btn-badge');
+  if (btnBadge) btnBadge.style.display = (needsAttention && !drawerOpen) ? '' : 'none';
+
+  // Track which case tab should show the dot
+  const newAttnId = (needsAttention && _aiCurrentCase)
+    ? String(_aiCurrentCase.id).replace(/^#\s*/, '')
+    : null;
+
+  if (newAttnId !== _aiAttentionCaseId) {
+    _aiAttentionCaseId = newAttnId;
+    renderTopbarTabs(); // re-render to add/remove badge dot on tabs
+  } else if (!needsAttention && _aiAttentionCaseId) {
+    _aiAttentionCaseId = null;
+    renderTopbarTabs();
+  }
+}
+
 function toggleAiDrawer() {
   const drawer = document.getElementById('ai-drawer');
   const btn    = document.getElementById('ai-btn');
   const isOpen = drawer.classList.toggle('open');
   btn.classList.toggle('active', isOpen);
   if (isOpen) {
+    // Clear button badge — user is now looking at the AI panel
+    const btnBadge = document.getElementById('ai-btn-badge');
+    if (btnBadge) btnBadge.style.display = 'none';
+    // Render footer for the current state
+    _renderAiFooter();
     // Sync context with the currently open case (if any)
     const caseId = sectionActiveTab[activeSection];
     if (caseId && caseId !== 'home') {
@@ -7271,7 +7526,7 @@ function toggleAiDrawer() {
     } else {
       _clearAiContext();
     }
-    setTimeout(() => document.getElementById('ai-input').focus(), 220);
+    setTimeout(() => { const inp = document.getElementById('ai-input'); if (inp) inp.focus(); }, 220);
   }
 }
 
@@ -7310,8 +7565,9 @@ function _renderAiDrawerContext() {
     banner.style.display = 'none';
   }
 
-  // Helping pills — hide only during planning/approved (keep visible during analyzing + response)
-  if (_aiMessages.length > 0 || _aiFlowState === 'planning' || _aiFlowState === 'approved') { pills.style.display = 'none'; return; }
+  // Helping pills — hide whenever AI is in an active flow (any state except idle)
+  const _pillHideStates = ['response', 'planning', 'approved', 'login-required', 'success', 'completed', 'closing', 'case-done'];
+  if (_aiMessages.length > 0 || _pillHideStates.includes(_aiFlowState)) { pills.style.display = 'none'; return; }
   pills.style.display = '';
 
   const isException = hasContext && _aiCurrentCase?.status === 'Exception';
@@ -7351,8 +7607,14 @@ function _startAiFlow(pillLabel) {
   _aiFlowUserMsg = pillLabel;
   _aiFlowState = 'analyzing';
   _renderAiFlow();
-  _renderAiDrawerContext(); // keep pills visible during analyzing + response
-  setTimeout(() => { _aiFlowState = 'response'; _renderAiFlow(); _renderAiDrawerContext(); }, 2200);
+  _renderAiDrawerContext();
+  _setAiProcessing(true);
+  _aiProcessingTimer = setTimeout(() => {
+    _setAiProcessing(false);
+    _aiFlowState = 'response';
+    _renderAiFlow();
+    _renderAiDrawerContext();
+  }, 2200);
 }
 
 function _renderAiFlow() {
@@ -7360,7 +7622,7 @@ function _renderAiFlow() {
   const empty = document.getElementById('ai-empty');
   if (empty) empty.style.display = 'none';
 
-  // User message bubble — the pill text shown as if the user sent it
+  // User message bubble
   const userBubble = _aiFlowUserMsg ? `
     <div class="ai-msg user" style="margin-bottom:12px">
       <div class="ai-bubble">${_aiFlowUserMsg}</div>
@@ -7383,18 +7645,23 @@ function _renderAiFlow() {
       </div>`;
 
   } else if (_aiFlowState === 'response') {
+    // Action buttons rendered inline in the chat, right after the AI answer
     body.innerHTML = userBubble + `
       <div class="ai-response-msg">I noticed this case is in Exception status because the POD file is currently marked as Failed.</div>
       <div class="ai-response-msg" style="margin-top:8px">I can try to locate and retrieve the correct POD document from the carrier portal. Want me to start?</div>
       ${missingCard}
-      <div class="ai-flow-actions">
+      <div class="ai-inline-actions">
         <button class="ai-flow-btn primary" onclick="triggerAiFlowYes()">Yes, Start</button>
         <button class="ai-flow-btn secondary">search again</button>
       </div>`;
 
   } else if (_aiFlowState === 'planning') {
+    // Plan card goes to footer; body shows the conversation only
     body.innerHTML = userBubble + `
       ${missingCard}
+      <div class="ai-msg user" style="margin-bottom:8px; margin-top:4px">
+        <div class="ai-bubble">Yes please</div>
+      </div>
       <div class="ai-analyzing">
         <span class="material-symbols-outlined">autorenew</span>
         <span class="ai-analyzing-text">Creating plan</span>
@@ -7402,49 +7669,222 @@ function _renderAiFlow() {
       <div class="ai-analyzing" style="padding-top:0; opacity:0.6">
         <span class="material-symbols-outlined" style="animation:none;color:#555">pending</span>
         <span class="ai-analyzing-text">Pending feedback</span>
-      </div>
-      <div class="ai-plan">
-        <div class="ai-plan-allow">Allow actions on: <strong>ⓘ Vendor Document portal</strong></div>
-        <div class="ai-plan-steps-label">Plan details:</div>
-        <div class="ai-plan-step"><span class="ai-plan-step-num">1.</span><span>Navigate to document portal</span></div>
-        <div class="ai-plan-step"><span class="ai-plan-step-num">2.</span><span>Search for the required document by locating its name and ID as appears in the ticket</span></div>
-        <div class="ai-plan-step"><span class="ai-plan-step-num">3.</span><span>Open the document and read to verify its fit</span></div>
-        <div class="ai-plan-step"><span class="ai-plan-step-num">4.</span><span>Download it and send it back here</span></div>
-        <div class="ai-plan-actions">
-          <button class="ai-plan-btn approve" onclick="triggerAiFlowApprove()">Approve</button>
-          <button class="ai-plan-btn edit">Edit plan</button>
-        </div>
-      </div>
-      <div class="ai-plan-note">AI Assistant will only access sites you're already connected to. You'll be asked for permission before accessing anything else.</div>`;
+      </div>`;
 
   } else if (_aiFlowState === 'approved') {
     body.innerHTML = userBubble + `
       ${missingCard}
+      <div class="ai-msg user" style="margin-bottom:8px; margin-top:4px">
+        <div class="ai-bubble">Yes please</div>
+      </div>
       <div class="ai-approved-msg">
-        <span class="material-symbols-outlined">check_circle</span>
-        <span class="ai-approved-text">Plan approved — retrieving POD document from carrier portal…</span>
+        <span class="material-symbols-outlined" style="color:#a855f7">check_circle</span>
+        <span class="ai-approved-text" style="color:#a855f7">Created plan</span>
       </div>
       <div class="ai-analyzing">
         <span class="material-symbols-outlined">autorenew</span>
-        <span class="ai-analyzing-text">Accessing Vendor Document portal</span>
+        <span class="ai-analyzing-text">Navigate to https://vendor-portal.amazon.com</span>
+      </div>
+      <div class="ai-analyzing" style="padding-top:0">
+        <span class="material-symbols-outlined">autorenew</span>
+        <span class="ai-analyzing-text">Checking portals for customer 2001448</span>
       </div>`;
+
+  } else if (_aiFlowState === 'login-required') {
+    body.innerHTML = userBubble + `
+      ${missingCard}
+      <div class="ai-msg user" style="margin-bottom:8px; margin-top:4px">
+        <div class="ai-bubble">Yes please</div>
+      </div>
+      <div class="ai-response-msg" style="margin-top:4px">Since you are not already logged in to the portal, I will need you to log in. Use the form below — after that I will continue the task.</div>`;
+    body.scrollTop = body.scrollHeight;
+
+  } else if (_aiFlowState === 'success') {
+    body.innerHTML = userBubble + `
+      ${missingCard}
+      <div class="ai-msg user" style="margin-bottom:8px; margin-top:4px">
+        <div class="ai-bubble">Yes please</div>
+      </div>
+      <div class="ai-approved-msg">
+        <span class="material-symbols-outlined" style="color:#059669">check_circle</span>
+        <span class="ai-approved-text" style="color:#059669">Sucess!</span>
+      </div>
+      <div class="ai-response-msg" style="margin-top:4px">POD file successfully retrieved and downloaded to your device. Here they are - I also updated the files table already.</div>
+      <div class="ai-download-card">
+        <div class="ai-download-card-info">
+          <div class="ai-download-card-label">POD File</div>
+          <div class="ai-download-card-name">251206811 pod.pdf</div>
+        </div>
+        <span class="material-symbols-outlined ai-download-icon">download</span>
+      </div>`;
+    body.scrollTop = body.scrollHeight;
+
+  } else if (_aiFlowState === 'completed') {
+    const validCard = `
+      <div class="ai-missing-card" style="border-color:#d1fae5; background:#f0fdf4">
+        <div class="ai-missing-card-body">
+          <div class="ai-missing-title" style="color:#065f46">POD File</div>
+          <div class="ai-missing-req">251206811 pod.pdf — retrieved &amp; verified</div>
+        </div>
+        <span class="ai-missing-badge" style="background:#059669">Valid</span>
+      </div>`;
+    // Action buttons rendered inline in the chat, right after the AI answer
+    body.innerHTML = userBubble + `
+      <div class="ai-approved-msg">
+        <span class="material-symbols-outlined" style="color:#059669">check_circle</span>
+        <span class="ai-approved-text" style="color:#059669">POD document retrieved and verified successfully.</span>
+      </div>
+      ${validCard}
+      <div class="ai-response-msg" style="margin-top:10px">All documents are now valid. The case is ready to be completed — would you like me to close it?</div>
+      <div class="ai-inline-actions">
+        <button class="ai-flow-btn primary" onclick="triggerAiFlowComplete()">Complete Case</button>
+        <button class="ai-flow-btn secondary">Review</button>
+      </div>`;
+    body.scrollTop = body.scrollHeight;
+
+  } else if (_aiFlowState === 'closing') {
+    body.innerHTML = userBubble + `
+      <div class="ai-approved-msg">
+        <span class="material-symbols-outlined" style="color:#059669">check_circle</span>
+        <span class="ai-approved-text" style="color:#059669">POD document retrieved and verified successfully.</span>
+      </div>
+      <div class="ai-analyzing">
+        <span class="material-symbols-outlined">autorenew</span>
+        <span class="ai-analyzing-text">Closing the case and marking as completed…</span>
+      </div>`;
+    body.scrollTop = body.scrollHeight;
+
+  } else if (_aiFlowState === 'case-done') {
+    body.innerHTML = userBubble + `
+      <div class="ai-approved-msg">
+        <span class="material-symbols-outlined" style="color:#059669">task_alt</span>
+        <span class="ai-approved-text" style="color:#059669">Case completed successfully.</span>
+      </div>
+      <div class="ai-response-msg" style="margin-top:8px; color:#6b7280">Case <strong>#2001448 AMAZONFRESH</strong> has been marked as complete. All documents were validated and the exception has been resolved.</div>`;
+    body.scrollTop = body.scrollHeight;
   }
+
+  // Render footer buttons / input for this state
+  _renderAiFooter();
+
+  // Update notification badges after every flow state change
+  _updateAiBadge();
+}
+
+function triggerLoginSignIn() {
+  _setAiProcessing(true);
+  _aiProcessingTimer = setTimeout(() => {
+    _setAiProcessing(false);
+    _aiFlowState = 'success';
+    _renderAiFlow();
+    _renderAiDrawerContext();
+    // Transition to completed after brief pause
+    _aiProcessingTimer = setTimeout(() => {
+      _updatePodRowToValid();
+      _aiFlowState = 'completed';
+      _renderAiFlow();
+      _renderAiDrawerContext();
+    }, 1500);
+  }, 1200);
 }
 
 function triggerAiFlowYes() {
-  _aiFlowState = 'planning';
-  _renderAiFlow();
-  _renderAiDrawerContext(); // hides pills in planning state
+  _setAiProcessing(true);
+  _aiProcessingTimer = setTimeout(() => {
+    _setAiProcessing(false);
+    _aiFlowState = 'planning';
+    _renderAiFlow();
+    _renderAiDrawerContext();
+  }, 900);
 }
 
 function triggerAiFlowApprove() {
   _aiFlowState = 'approved';
   _renderAiFlow();
-  _renderAiDrawerContext(); // keeps pills hidden in approved state
+  _renderAiDrawerContext();
+  _setAiProcessing(true);
+  _aiProcessingTimer = setTimeout(() => {
+    _setAiProcessing(false);
+    _aiFlowState = 'login-required';
+    _renderAiFlow();
+    _renderAiDrawerContext();
+  }, 2500);
+}
+
+function _updatePodRowToValid() {
+  const failedRow = document.querySelector('.doc-status-table tr.doc-row-failed');
+  if (!failedRow) return;
+  // Remove red highlight
+  failedRow.classList.remove('doc-row-failed');
+  // Update status badge
+  const statusVal = failedRow.querySelector('.doc-status-val');
+  if (statusVal) { statusVal.className = 'doc-status-val valid'; statusVal.textContent = 'Valid'; }
+  // Remove upload button
+  const btn = failedRow.querySelector('.doc-upload-btn');
+  if (btn) btn.parentElement.innerHTML = '';
+  // Remove left border override on first cell
+  const firstTd = failedRow.querySelector('td');
+  if (firstTd) { firstTd.style.borderLeft = ''; firstTd.style.paddingLeft = ''; }
+}
+
+function triggerAiFlowComplete() {
+  // Step 1 — show analyzing/closing spinner
+  _aiFlowState = 'closing';
+  _renderAiFlow();
+  _renderAiDrawerContext();
+
+  setTimeout(() => {
+    // Step 2 — capture case ref before nulling, update data
+    const caseRef = _aiCurrentCase;
+    if (caseRef) {
+      const row = assignedData.find(r => r.id === caseRef.id) || queueData.find(r => r.id === caseRef.id);
+      if (row) { row.status = 'completed'; row.stage = 'Closed'; }
+    }
+
+    // Step 3 — reset AI state
+    const closedCaseId = caseRef ? String(caseRef.id).replace(/^#\s*/, '') : null;
+    _aiFlowState        = 'idle';
+    _aiFlowUserMsg      = '';
+    _aiCurrentCase      = null;
+    _aiContextDismissed = false;
+
+    // Step 4 — refresh table data
+    applyAndRender();
+
+    // Step 5 — close the utility panel
+    closeUtility();
+
+    // Step 6 — close the case tab and return to My Work
+    const caseLabel = caseRef ? (caseRef.name ? `${caseRef.id} ${caseRef.name}` : caseRef.id) : (closedCaseId || 'case');
+    if (closedCaseId) {
+      closeTab(null, closedCaseId);
+    } else {
+      const activeId = sectionActiveTab[activeSection];
+      if (activeId && activeId !== 'home') closeTab(null, activeId);
+    }
+
+    // Step 6b — toast confirmation on the My Work portal
+    showToast(`Case ${caseLabel} completed`);
+
+    // Step 7 — reset AI drawer body to idle empty state
+    const aiBody = document.getElementById('ai-drawer-body');
+    if (aiBody) {
+      aiBody.innerHTML = `
+        <div class="ai-empty" id="ai-empty">
+          <span class="material-symbols-outlined">auto_awesome</span>
+          <div class="ai-empty-title">How can I help?</div>
+          <div class="ai-empty-sub">Ask me anything about this case or workspace.</div>
+        </div>`;
+    }
+    _renderAiDrawerContext();
+    _renderAiFooter();
+  }, 1800);
 }
 
 function sendAiMessage() {
+  if (_aiProcessing) return; // ignore while processing
   const input = document.getElementById('ai-input');
+  if (!input) return; // footer may be in action-button mode
   const text  = input.value.trim();
   if (!text) return;
   input.value = '';
@@ -7452,11 +7892,13 @@ function sendAiMessage() {
   _aiMessages.push({ role: 'user', text });
   _renderAiMessages();
 
-  // Placeholder response
-  setTimeout(() => {
+  // Show typing indicator while "thinking"
+  _setAiProcessing(true);
+  _aiProcessingTimer = setTimeout(() => {
+    _setAiProcessing(false);
     _aiMessages.push({ role: 'assistant', text: 'Got it! This is a placeholder response. Connect an AI backend to make this live.' });
     _renderAiMessages();
-  }, 600);
+  }, 1400);
 }
 
 function _renderAiMessages() {
@@ -7479,5 +7921,6 @@ function _renderAiMessages() {
 }
 </script>
 <div id="col-resize-line"></div>
+<div id="toast-container"></div>
 </body>
 </html>
