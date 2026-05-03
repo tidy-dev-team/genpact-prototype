@@ -3239,6 +3239,8 @@
 
   /* Agent view: override case-fields 2-col grid — sections use block layout */
   #av-content-area .case-fields { display: block; padding: 0; }
+  /* Preserve hidden state with higher specificity */
+  #av-content-area .case-fields.hidden { display: none; }
 
   /* Agent section nav pills */
   .av-nav-tabs { display:flex; gap:0; }
@@ -8290,6 +8292,38 @@ let _aiProcessingTimer = null;
 let searchOpen = false;
 let tasksOpen = false;
 
+function _resetCasey() {
+  // Clear conversation messages
+  _aiMessages.length = 0;
+  // Reset flow state
+  _aiFlowState = 'idle';
+  _aiFlowUserMsg = '';
+  _workFeedMode = false;
+  _workFeedCaseId = null;
+  _wfInitialized = false;
+  _wfComparisonHandoffSent = false;
+  _aiContextDismissed = false;
+  // Clear case context so _renderAiDrawerContext shows generic state, not old case
+  _aiCurrentCase = null;
+  // Stop any in-flight processing
+  if (_aiProcessingTimer) { clearTimeout(_aiProcessingTimer); _aiProcessingTimer = null; }
+  _aiProcessing = false;
+  // Clear dynamic drawer content, preserve #ai-empty
+  const body = document.getElementById('ai-drawer-body');
+  if (body) {
+    Array.from(body.children).forEach(child => {
+      if (child.id !== 'ai-empty') child.remove();
+    });
+  }
+  const empty = document.getElementById('ai-empty');
+  if (empty) empty.style.display = '';
+  // Clear footer
+  const footer = document.getElementById('ai-drawer-footer');
+  if (footer) footer.innerHTML = '';
+  // Re-render context pills for the new page
+  _renderAiDrawerContext();
+}
+
 function toggleSearchDrawer() {
   searchOpen = !searchOpen;
   document.getElementById('search-drawer').classList.toggle('open', searchOpen);
@@ -9031,6 +9065,7 @@ document.addEventListener('click', e => {
 });
 
 function selectTab(id) {
+  _resetCasey();
   sectionActiveTab[activeSection] = id;
   renderTopbarTabs();
   const isHome = id === 'home';
@@ -9120,6 +9155,7 @@ function _hideOosState() {
 }
 
 function navSidebar(el, section) {
+  _resetCasey();
   const target = section || 'mywork';
 
   // Hide standalone pages whenever switching away
@@ -10232,20 +10268,140 @@ function _agentUtilContent(util, type) {
   const d = agentDetailData[type] || {};
   const fd = agentData.find(a => a.type === type) || {};
   if (util === 'activity') {
-    const events = [
-      { icon: 'task_alt',      color: '#16a34a', label: 'Case #2947-5839 completed',       time: '2m ago'  },
-      { icon: 'person',        color: '#7c3aed', label: 'Assist requested: Credentials',   time: '7m ago'  },
-      { icon: 'sync',          color: '#2563eb', label: 'Batch run started (14 documents)', time: '12m ago' },
-      { icon: 'warning',       color: '#d97706', label: 'CAPTCHA block — case #1233-9845', time: '18m ago' },
-      { icon: 'check_circle',  color: '#16a34a', label: 'Case #3212-2345 closed',          time: '31m ago' },
-    ];
-    return `<div style="padding:4px 16px 16px">` +
-      events.map(e => `
-        <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-light)">
-          <span class="material-symbols-outlined" style="font-size:16px;color:${e.color};flex-shrink:0;margin-top:1px">${e.icon}</span>
+    const logsByType = {
+      Retriever: [
+        { icon: 'task_alt',        color: '#16a34a', label: 'Case #2947-5839 resolved',                  sub: 'Invoice matched & forwarded to Signer',               time: 'Just now',  tag: null },
+        { icon: 'search',          color: '#2563eb', label: 'Querying vendor portal — TechLogic Inc.',   sub: 'Endpoint: /api/invoices?ref=INV-9921',                 time: '1m ago',    tag: 'API call' },
+        { icon: 'check_circle',    color: '#16a34a', label: 'Invoice INV-9921 located',                  sub: 'File size: 142 KB · Pages: 3',                        time: '2m ago',    tag: null },
+        { icon: 'person',          color: '#7c3aed', label: 'Assist requested: Credentials',             sub: 'Portal login token expired — escalated to agent',     time: '7m ago',    tag: 'Assist' },
+        { icon: 'sync',            color: '#2563eb', label: 'Batch run initiated (14 documents)',         sub: 'Cases: #1002–#1015 · Priority: Normal',               time: '12m ago',   tag: 'Batch' },
+        { icon: 'warning',         color: '#d97706', label: 'CAPTCHA block on case #1233-9845',          sub: 'Vendor: GlobalSource LLC · Retrying in 60s',          time: '18m ago',   tag: 'Blocked' },
+        { icon: 'check_circle',    color: '#16a34a', label: 'Case #3212-2345 closed',                    sub: '2 documents retrieved · Handoff complete',            time: '31m ago',   tag: null },
+        { icon: 'search',          color: '#2563eb', label: 'Querying portal — Apex Freight',            sub: 'Retry #2 of 3 · Previous timeout: 30s',               time: '38m ago',   tag: 'Retry' },
+        { icon: 'file_present',    color: '#0891b2', label: 'Document cached: CERT-4490.pdf',            sub: 'Expiry: 24h · Stored in secure buffer',               time: '45m ago',   tag: null },
+        { icon: 'error_outline',   color: '#dc2626', label: 'Portal unreachable — ClearBridge Inc.',     sub: 'HTTP 503 · Case #5510-2231 paused',                   time: '54m ago',   tag: 'Error' },
+        { icon: 'task_alt',        color: '#16a34a', label: 'Case #4401-1120 resolved',                  sub: '1 document retrieved in 4.2s',                        time: '1h ago',    tag: null },
+        { icon: 'sync',            color: '#2563eb', label: 'Auth token refreshed — NovaBridge Portal',  sub: 'Session extended by 8h',                             time: '1h 12m ago',tag: null },
+        { icon: 'warning',         color: '#d97706', label: 'Rate limit hit — PrimeDocs API',            sub: '60 req/min exceeded · Queue paused 2m',               time: '1h 20m ago',tag: 'Blocked' },
+        { icon: 'file_present',    color: '#0891b2', label: '3 invoices retrieved — Batch #007',         sub: 'Cases #1010, #1011, #1012 · Total: 540 KB',           time: '1h 34m ago',tag: 'Batch' },
+        { icon: 'person',          color: '#7c3aed', label: 'Assist resolved by Alex K.',                sub: 'New credentials applied · 2 blocked cases resumed',   time: '1h 41m ago',tag: 'Assist' },
+        { icon: 'check_circle',    color: '#16a34a', label: 'Case #2201-8830 closed',                    sub: 'SLA met · 3 min under deadline',                      time: '2h ago',    tag: null },
+        { icon: 'search',          color: '#2563eb', label: 'Deep crawl — Nexus Vendor Hub',             sub: 'Traversed 4 pages · Found ref: NX-00492',             time: '2h 15m ago',tag: null },
+        { icon: 'error_outline',   color: '#dc2626', label: 'Extraction failed — INV-7731.pdf',          sub: 'Corrupted file · Case escalated for manual review',   time: '2h 29m ago',tag: 'Error' },
+        { icon: 'sync',            color: '#2563eb', label: 'Scheduled batch started (22 documents)',    sub: 'Priority: High · ETA 8 min',                         time: '3h ago',    tag: 'Batch' },
+        { icon: 'task_alt',        color: '#16a34a', label: 'Case #1998-6610 resolved',                  sub: 'Retrieval time: 1.8s · No assist needed',             time: '3h 20m ago',tag: null },
+      ],
+      Signer: [
+        { icon: 'task_alt',        color: '#16a34a', label: 'Document signed — AGRMT-2291.pdf',          sub: 'Signature applied at field 3 of 3 · Case #4481',      time: 'Just now',  tag: null },
+        { icon: 'draw',            color: '#2563eb', label: 'Signature fields detected (3)',              sub: 'Fields: sign_1, initials_1, date_1',                  time: '3m ago',    tag: 'OCR' },
+        { icon: 'person',          color: '#7c3aed', label: 'Assist requested: Authority check',         sub: 'Signatory not in approved list — escalated',          time: '9m ago',    tag: 'Assist' },
+        { icon: 'check_circle',    color: '#16a34a', label: 'Certificate validated — CERT-8820',         sub: 'Chain of trust verified · Expiry: 2026-01-01',        time: '15m ago',   tag: null },
+        { icon: 'task_alt',        color: '#16a34a', label: 'Batch signed: 6 documents',                 sub: 'Cases #3310–#3315 · Avg 1.2s/doc',                    time: '24m ago',   tag: 'Batch' },
+        { icon: 'warning',         color: '#d97706', label: 'Signature mismatch on CONTR-0041.pdf',      sub: 'Expected: DocuSign · Found: WetInk scan',             time: '33m ago',   tag: 'Warning' },
+        { icon: 'draw',            color: '#2563eb', label: 'Signing — INVOICE-5510.pdf',                sub: 'Field 2 of 4 · Vendor: ClearPath Ltd',                time: '41m ago',   tag: null },
+        { icon: 'check_circle',    color: '#16a34a', label: 'Case #5102-3390 resolved',                  sub: '2 documents signed · Forwarded to Comparer',         time: '52m ago',   tag: null },
+        { icon: 'error_outline',   color: '#dc2626', label: 'Auth failure — e-Sign gateway',             sub: 'Token expired mid-flow · Case #5290 paused',         time: '1h 5m ago', tag: 'Error' },
+        { icon: 'task_alt',        color: '#16a34a', label: 'Document countersigned — NDA-0029.pdf',     sub: 'Both parties confirmed · Case closed',                time: '1h 18m ago',tag: null },
+        { icon: 'person',          color: '#7c3aed', label: 'Assist resolved — Sarah M.',                sub: 'New signing cert uploaded · 3 cases resumed',         time: '1h 30m ago',tag: 'Assist' },
+        { icon: 'sync',            color: '#2563eb', label: 'Batch signing started (11 documents)',      sub: 'Priority: Urgent · Est. 14s total',                   time: '1h 45m ago',tag: 'Batch' },
+        { icon: 'draw',            color: '#2563eb', label: 'Signature placed — AGRMT-1902.pdf',         sub: 'Annotation: clause 7.2 initialled',                   time: '2h ago',    tag: null },
+        { icon: 'check_circle',    color: '#16a34a', label: 'Case #4809-2210 closed',                    sub: 'SLA met · 7 min under deadline',                     time: '2h 20m ago',tag: null },
+        { icon: 'error_outline',   color: '#dc2626', label: 'PDF locked — cannot apply signature',       sub: 'Owner password required · Escalated',                time: '2h 40m ago',tag: 'Error' },
+        { icon: 'task_alt',        color: '#16a34a', label: '8 documents signed in batch run',           sub: 'All fields populated · No mismatches',               time: '3h ago',    tag: 'Batch' },
+        { icon: 'warning',         color: '#d97706', label: 'Date field auto-fill overridden',           sub: 'Doc requested specific format: DD/MM/YYYY',           time: '3h 15m ago',tag: 'Warning' },
+        { icon: 'check_circle',    color: '#16a34a', label: 'Case #3220-1105 resolved',                  sub: 'Signed in 2.1s · Routed to OCR for extraction',       time: '3h 30m ago',tag: null },
+      ],
+      OCR: [
+        { icon: 'task_alt',        color: '#16a34a', label: 'Extraction complete — INV-9921.pdf',        sub: '12 fields extracted · Confidence: 98.4%',             time: 'Just now',  tag: null },
+        { icon: 'document_scanner',color: '#2563eb', label: 'Scanning page 2/3 — CONTR-4410.pdf',        sub: 'Vendor: TechLogic Inc. · Resolution: 300dpi',         time: '2m ago',    tag: null },
+        { icon: 'warning',         color: '#d97706', label: 'Low confidence — field "Total Amount"',     sub: 'Score: 61% · Flagged for human review',               time: '8m ago',    tag: 'Review' },
+        { icon: 'check_circle',    color: '#16a34a', label: 'Batch extraction — 9 documents',            sub: 'Avg confidence: 96.1% · 2 flagged',                   time: '14m ago',   tag: 'Batch' },
+        { icon: 'person',          color: '#7c3aed', label: 'Assist requested: Handwriting',             sub: 'Signature block unreadable — escalated',              time: '22m ago',   tag: 'Assist' },
+        { icon: 'document_scanner',color: '#2563eb', label: 'Re-scanning — CERT-8820.pdf (attempt 2)',   sub: 'Increased contrast · DPI: 600',                       time: '29m ago',   tag: 'Retry' },
+        { icon: 'check_circle',    color: '#16a34a', label: 'Field mapping complete — Case #3312',       sub: '8 fields → CRM schema · 0 errors',                   time: '37m ago',   tag: null },
+        { icon: 'error_outline',   color: '#dc2626', label: 'Corrupt page — INVOICE-0042.pdf p.4',       sub: 'Skipped · Remaining 3 pages extracted',              time: '48m ago',   tag: 'Error' },
+        { icon: 'task_alt',        color: '#16a34a', label: 'Case #2991-4410 resolved',                  sub: 'All 14 fields validated · Forwarded to Writer',       time: '57m ago',   tag: null },
+        { icon: 'document_scanner',color: '#2563eb', label: 'Template matched — StandardInvoice_v3',    sub: 'Confidence: 99.2% · Fields pre-mapped',               time: '1h 5m ago', tag: null },
+        { icon: 'warning',         color: '#d97706', label: 'Currency mismatch — field "Amount Due"',   sub: 'USD vs EUR detected · Flagged',                       time: '1h 18m ago',tag: 'Review' },
+        { icon: 'check_circle',    color: '#16a34a', label: 'Batch extraction — 14 documents',           sub: 'All fields above 90% confidence',                     time: '1h 32m ago',tag: 'Batch' },
+        { icon: 'document_scanner',color: '#2563eb', label: 'Scanning AGRMT-5510.pdf',                   sub: '6 pages · Clause extraction mode',                   time: '1h 50m ago',tag: null },
+        { icon: 'person',          color: '#7c3aed', label: 'Assist resolved — Jamie T.',                sub: 'Handwritten amount confirmed: $4,220.00',             time: '2h 8m ago', tag: 'Assist' },
+        { icon: 'task_alt',        color: '#16a34a', label: 'Case #4102-1189 closed',                    sub: 'Extraction rate: 100% · SLA met',                     time: '2h 30m ago',tag: null },
+        { icon: 'error_outline',   color: '#dc2626', label: 'Scan engine timeout — NDA-0044.pdf',        sub: 'File size 48 MB exceeded limit · Chunked retry',      time: '2h 50m ago',tag: 'Error' },
+        { icon: 'check_circle',    color: '#16a34a', label: '20 fields extracted — CERT-3390.pdf',       sub: 'Confidence: 97.7% · Zero manual corrections',         time: '3h 12m ago',tag: null },
+      ],
+      Writer: [
+        { icon: 'task_alt',        color: '#16a34a', label: 'Email drafted — Case #5510',                sub: 'To: vendor@techlogic.com · 142 words · Tone: formal', time: 'Just now',  tag: null },
+        { icon: 'edit_note',       color: '#2563eb', label: 'Generating dispute letter — Case #4481',    sub: 'Template: InvoiceDisputeV2 · 3 clauses',              time: '4m ago',    tag: null },
+        { icon: 'check_circle',    color: '#16a34a', label: 'Summary report created — Case #3312',       sub: '280 words · PDF exported',                           time: '11m ago',   tag: null },
+        { icon: 'person',          color: '#7c3aed', label: 'Assist requested: Legal tone review',       sub: 'Output flagged for compliance check',                 time: '19m ago',   tag: 'Assist' },
+        { icon: 'edit_note',       color: '#2563eb', label: 'Drafting follow-up email — Case #2291',     sub: 'Prior thread: 4 messages · Context injected',         time: '27m ago',   tag: null },
+        { icon: 'warning',         color: '#d97706', label: 'Ambiguous instruction — Case #5290',        sub: '"Send reminder" — multiple contacts found',           time: '35m ago',   tag: 'Warning' },
+        { icon: 'check_circle',    color: '#16a34a', label: 'Notification batch sent — 8 cases',         sub: 'Channel: email · 0 bounces',                          time: '44m ago',   tag: 'Batch' },
+        { icon: 'task_alt',        color: '#16a34a', label: 'Case #1998-6610 resolved',                  sub: 'Closing summary approved · Case archived',            time: '53m ago',   tag: null },
+        { icon: 'edit_note',       color: '#2563eb', label: 'Generating SLA breach notice — Case #4809', sub: 'Deadline: 2026-05-02 · Days overdue: 1',             time: '1h 2m ago', tag: null },
+        { icon: 'error_outline',   color: '#dc2626', label: 'Template not found — InvoiceEscalation_v4', sub: 'Fallback to v3 · Minor format diff',                  time: '1h 15m ago',tag: 'Error' },
+        { icon: 'check_circle',    color: '#16a34a', label: 'Batch notifications sent — 12 vendors',     sub: 'All delivered · Open rate: 83%',                      time: '1h 28m ago',tag: 'Batch' },
+        { icon: 'person',          color: '#7c3aed', label: 'Assist resolved — Dana L.',                 sub: 'Escalation letter approved · Sent',                   time: '1h 40m ago',tag: 'Assist' },
+        { icon: 'edit_note',       color: '#2563eb', label: 'Contract amendment drafted — CONTR-0099',   sub: 'Clause 4.1 revised · 3 redlines',                    time: '2h ago',    tag: null },
+        { icon: 'check_circle',    color: '#16a34a', label: 'Case #3220-1105 resolved',                  sub: '2 emails sent · No reply required',                  time: '2h 20m ago',tag: null },
+        { icon: 'warning',         color: '#d97706', label: 'Tone mismatch flagged — Case #4102',        sub: 'AI draft: assertive · Expected: neutral',            time: '2h 38m ago',tag: 'Warning' },
+        { icon: 'task_alt',        color: '#16a34a', label: '14 case summaries generated',               sub: 'Avg 210 words/summary · Batch #12',                  time: '3h ago',    tag: 'Batch' },
+      ],
+      Comparer: [
+        { icon: 'task_alt',        color: '#16a34a', label: 'Comparison passed — Case #4481',            sub: 'Invoice matches PO #PO-2291 · 0 discrepancies',       time: 'Just now',  tag: null },
+        { icon: 'compare_arrows',  color: '#2563eb', label: 'Comparing INV-9921 vs PO-2291',             sub: '6 fields compared · 1 delta found',                   time: '3m ago',    tag: null },
+        { icon: 'warning',         color: '#d97706', label: 'Amount delta — Case #5102',                 sub: 'Invoice: $12,450 · PO: $12,200 · Diff: $250',         time: '9m ago',    tag: 'Delta' },
+        { icon: 'check_circle',    color: '#16a34a', label: 'Batch comparison — 8 pairs complete',       sub: '7 passed · 1 flagged · Avg 1.4s/pair',                time: '16m ago',   tag: 'Batch' },
+        { icon: 'person',          color: '#7c3aed', label: 'Assist requested: Ambiguous PO line',       sub: 'PO-4490 line 4 has two matching SKUs',                time: '24m ago',   tag: 'Assist' },
+        { icon: 'compare_arrows',  color: '#2563eb', label: 'Line-item comparison — INVOICE-5510',       sub: '14 line items · Tolerance: ±$0.01',                   time: '32m ago',   tag: null },
+        { icon: 'check_circle',    color: '#16a34a', label: 'Case #3312-2345 resolved',                  sub: 'Match confirmed · Approved for payment',              time: '41m ago',   tag: null },
+        { icon: 'error_outline',   color: '#dc2626', label: 'Schema mismatch — AGRMT-0042 vs template',  sub: 'Missing field: "delivery_date" · Escalated',          time: '50m ago',   tag: 'Error' },
+        { icon: 'task_alt',        color: '#16a34a', label: 'Case #2947-5839 resolved',                  sub: 'All 9 fields matched · Forwarded to Signer',          time: '1h ago',    tag: null },
+        { icon: 'compare_arrows',  color: '#2563eb', label: 'Re-compare after correction — Case #5290',  sub: 'Retry #1 · Previous: 2 deltas',                      time: '1h 12m ago',tag: 'Retry' },
+        { icon: 'warning',         color: '#d97706', label: 'Date format delta — Case #4809',            sub: 'PO: 2026-04-30 · Invoice: 30/04/2026',               time: '1h 25m ago',tag: 'Delta' },
+        { icon: 'check_circle',    color: '#16a34a', label: 'Batch comparison — 11 pairs complete',      sub: 'All passed · No manual review needed',               time: '1h 38m ago',tag: 'Batch' },
+        { icon: 'person',          color: '#7c3aed', label: 'Assist resolved — Alex K.',                 sub: 'Correct PO identified · Comparison rerun',            time: '1h 55m ago',tag: 'Assist' },
+        { icon: 'check_circle',    color: '#16a34a', label: 'Case #4102-1189 closed',                    sub: '6 pairs compared · 100% match rate',                 time: '2h 10m ago',tag: null },
+        { icon: 'error_outline',   color: '#dc2626', label: 'Comparison engine error — timeout',         sub: 'Case #3220 paused · Retrying in 30s',                time: '2h 30m ago',tag: 'Error' },
+        { icon: 'task_alt',        color: '#16a34a', label: '18 comparisons run — Batch #14',            sub: '16 passed · 2 flagged for review',                   time: '3h ago',    tag: 'Batch' },
+        { icon: 'compare_arrows',  color: '#2563eb', label: 'Deep diff — CONTR-0099 vs CONTR-0098',      sub: '3 clause changes detected · Highlighted',            time: '3h 20m ago',tag: null },
+      ],
+      Classifier: [
+        { icon: 'task_alt',        color: '#16a34a', label: 'Case #5510 classified: Invoice',            sub: 'Confidence: 99.1% · Routed to Retriever',             time: 'Just now',  tag: null },
+        { icon: 'category',        color: '#2563eb', label: 'Classifying CONTR-4410.pdf',                sub: 'Model: DocClassifier-v4 · 3 candidate labels',        time: '2m ago',    tag: null },
+        { icon: 'warning',         color: '#d97706', label: 'Low confidence — Case #4481',               sub: 'Score: 58% · Invoice vs Receipt ambiguous',           time: '7m ago',    tag: 'Review' },
+        { icon: 'check_circle',    color: '#16a34a', label: 'Batch classified — 12 documents',           sub: '11 auto-routed · 1 flagged · Avg 0.4s/doc',           time: '13m ago',   tag: 'Batch' },
+        { icon: 'person',          color: '#7c3aed', label: 'Assist requested: New doc type',            sub: 'Unknown format "GmbH Rechnung" — escalated',          time: '21m ago',   tag: 'Assist' },
+        { icon: 'category',        color: '#2563eb', label: 'Re-classifying after label correction',     sub: 'Case #3312 · Updated: Receipt → Invoice',            time: '29m ago',   tag: 'Retry' },
+        { icon: 'check_circle',    color: '#16a34a', label: 'Routing rule applied — Case #2291',         sub: 'Invoice → OCR → Comparer → Signer pipeline',          time: '37m ago',   tag: null },
+        { icon: 'error_outline',   color: '#dc2626', label: 'Classification model error — Case #5290',   sub: 'Fallback to rule-based · Manual review flagged',      time: '46m ago',   tag: 'Error' },
+        { icon: 'task_alt',        color: '#16a34a', label: 'Case #1998-6610 resolved',                  sub: 'Classified + routed in 0.3s',                        time: '55m ago',   tag: null },
+        { icon: 'category',        color: '#2563eb', label: 'Classifying 20-document batch',             sub: 'Batch #009 · Mixed: Invoice, PO, Cert',              time: '1h 4m ago', tag: 'Batch' },
+        { icon: 'warning',         color: '#d97706', label: 'Routing conflict — Case #4809',             sub: '2 rules matched · Highest priority applied',          time: '1h 17m ago',tag: 'Warning' },
+        { icon: 'check_circle',    color: '#16a34a', label: 'New template learned — "EU Invoice"',       sub: 'Added to model registry · v4.1.2',                   time: '1h 32m ago',tag: null },
+        { icon: 'person',          color: '#7c3aed', label: 'Assist resolved — Jamie T.',                sub: '"GmbH Rechnung" mapped to Invoice class',             time: '1h 48m ago',tag: 'Assist' },
+        { icon: 'task_alt',        color: '#16a34a', label: '25 documents classified — Batch #010',      sub: 'All above 90% · 0 manual reviews',                   time: '2h ago',    tag: 'Batch' },
+        { icon: 'category',        color: '#2563eb', label: 'Priority re-classification — Case #4102',   sub: 'Urgency score updated: Normal → High',               time: '2h 22m ago',tag: null },
+        { icon: 'error_outline',   color: '#dc2626', label: 'Duplicate detected — Case #3220',           sub: 'Matches Case #3215 · Merged and closed',             time: '2h 42m ago',tag: 'Error' },
+        { icon: 'check_circle',    color: '#16a34a', label: 'Classification accuracy report generated',  sub: '30-day avg: 97.3% · Top miss: Receipt vs Invoice',   time: '3h ago',    tag: null },
+      ],
+    };
+    const events = logsByType[type] || logsByType['Retriever'];
+    const tagColors = { 'Assist':'#7c3aed', 'Batch':'#0891b2', 'Error':'#dc2626', 'Blocked':'#d97706', 'Retry':'#2563eb', 'Warning':'#d97706', 'Delta':'#d97706', 'Review':'#d97706', 'OCR':'#2563eb', 'API call':'#2563eb' };
+    return `<div style="padding:0 16px 16px">` +
+      events.map((e, i) => `
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;${i < events.length-1 ? 'border-bottom:1px solid var(--border-light)' : ''}">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:0;flex-shrink:0;padding-top:1px">
+            <span class="material-symbols-outlined" style="font-size:16px;color:${e.color}">${e.icon}</span>
+          </div>
           <div style="flex:1;min-width:0">
-            <div style="font-size:12px;color:var(--text-primary);line-height:1.4">${e.label}</div>
-            <div style="font-size:11px;color:var(--text-muted);margin-top:2px">${e.time}</div>
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+              <span style="font-size:12px;color:var(--text-primary);line-height:1.4;font-weight:500">${e.label}</span>
+              ${e.tag ? `<span style="font-size:10px;font-weight:600;color:${tagColors[e.tag]||'#666'};background:${tagColors[e.tag]||'#666'}18;border-radius:4px;padding:1px 5px;line-height:1.5">${e.tag}</span>` : ''}
+            </div>
+            <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;line-height:1.4">${e.sub}</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:3px">${e.time}</div>
           </div>
         </div>`).join('') + `</div>`;
   }
