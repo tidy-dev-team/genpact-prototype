@@ -3237,6 +3237,39 @@
   .av-empty { padding: 48px 24px; text-align: center; color: var(--text-muted); font-size: 13px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
   .av-empty .material-symbols-outlined { font-size: 32px; color: #d1d5db; }
 
+  /* Agent view: override case-fields 2-col grid — sections use block layout */
+  #av-content-area .case-fields { display: block; padding: 0; }
+
+  /* Agent section nav pills */
+  .av-nav-tabs { display:flex; gap:0; }
+  .av-nav-tab { padding:0 16px; height:34px; display:flex; align-items:center; font-size:13px; font-weight:500; color:var(--text-secondary); border:none; background:none; cursor:pointer; border-bottom:2px solid transparent; transition:color .15s,border-color .15s; }
+  .av-nav-tab.active { color:var(--text-primary); border-bottom-color:var(--text-primary); }
+  .av-nav-tab:hover:not(.active) { color:var(--text-primary); }
+
+  /* Queue filter pills */
+  .av-queue-filters { display:flex; gap:6px; padding:12px 0 10px; }
+  .av-queue-pill { padding:3px 10px; border-radius:20px; border:1px solid var(--border); background:#fff; font-size:12px; color:var(--text-secondary); cursor:pointer; transition:background .1s,color .1s; }
+  .av-queue-pill.active { background:var(--text-primary); color:#fff; border-color:var(--text-primary); }
+
+  /* Queue table (simplified — no block reason / elapsed) */
+  .av-queue-table { width:100%; border-collapse:collapse; }
+  .av-queue-table th { font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.4px; padding:6px 10px; border-bottom:2px solid var(--border); text-align:left; }
+  .av-queue-table td { padding:9px 10px; border-bottom:1px solid var(--border-light); font-size:13px; vertical-align:middle; overflow:hidden; }
+  .av-queue-table tr:hover td { background:#fafafa; cursor:pointer; }
+  .av-queue-table tr:last-child td { border-bottom:none; }
+
+  /* Capability sub-sections */
+  .av-cap-group { margin-top:16px; }
+  .av-cap-group:first-child { margin-top:8px; }
+  .av-cap-group-title { font-size:14px; font-weight:600; color:var(--text-primary); margin-bottom:10px; }
+  .av-cap-sub { margin-bottom:8px; }
+  .av-cap-sub-label { font-size:12px; font-weight:500; color:var(--text-secondary); margin-bottom:3px; }
+  .av-cap-list { margin:0 0 6px 0; padding-left:18px; list-style:disc; }
+  .av-cap-list li { font-size:13px; color:var(--text-primary); line-height:1.7; }
+
+  /* Overview section compact metrics */
+  .av-ov-metrics { display:grid; grid-template-columns:2fr 1fr 1fr; gap:10px; margin-bottom:16px; }
+
   /* Responsive: compact layout when Casey drawer is open */
   @container agent-view (max-width: 950px) {
     .av-body { padding: 16px 16px 24px; }
@@ -4752,8 +4785,23 @@ let _activeAgentType = null;   // type string when an agent view is open, null o
 const agentDetailData = {
   Retriever: {
     icon: 'find_in_page',
+    agentId: '2947-5839',
+    inHandling: 48,
+    lastAction: 'Resolved case #52317',
     objective: `The Retriever autonomously locates and fetches invoice documents and financial records from vendor portals, email inboxes, and third-party data sources. It handles authentication flows, navigates web UIs, resolves CAPTCHA challenges where policy permits, and delivers raw documents to downstream pipeline agents with full provenance metadata.`,
     capabilities: ['Multi-portal credential authentication', 'CAPTCHA challenge handling', 'Email attachment extraction', 'Structured document handoff', 'Retry logic with exponential backoff'],
+    capabilities_v2: {
+      triggers: {
+        automated: ['Portal Session Expiry', 'Credential Failure'],
+        manual: ['Mentioned', 'Assigned Task'],
+      },
+      access: {
+        workspaces: ['Queue In Line'],
+        external: ['Web Search', 'Gmail', 'Vendor Portals'],
+      },
+      skills: ['Document Retrieval', 'Portal Navigation', 'Credential Auth', 'CAPTCHA Handling'],
+      escalation: ['When portal requires 2FA not solvable by agent', 'When CAPTCHA type unsupported'],
+    },
     insights: [
       'Credential failures spike Monday mornings — 72% of weekly auth errors occur within the first 2 hours of the business day.',
       'DataMatch AI portal has a 34% CAPTCHA hit rate, 3× higher than any other integration in the fleet.',
@@ -4763,16 +4811,33 @@ const agentDetailData = {
     humanAssistFreq: '1 Per 1K', freqTrend: 'down',
     successRate: '89%', successTrend: 'up',
     pendingAssists: [
-      { caseId: '356212', assistType: 'Credentials', priority: 'High', minMax: '16s / 1m', blockReason: 'Session expired on vendor portal',         elapsed: '4m 32s'  },
-      { caseId: '452421', assistType: 'Captcha',     priority: 'High', minMax: '42s / 3m', blockReason: 'CAPTCHA challenge on initial portal access', elapsed: '2m 11s'  },
-      { caseId: '322511', assistType: 'Credentials', priority: 'High', minMax: '24s / 2m', blockReason: '2FA code required after login',              elapsed: '7m 04s'  },
-      { caseId: '523217', assistType: 'Authorize',   priority: 'Med',  minMax: '1m / 5m',  blockReason: 'Payment amount exceeds auto-approve limit',  elapsed: '18m 50s' },
+      { caseId: '356212', assistType: ['Credentials'],              priority: 'High', minMax: '16s / 1m',  blockReason: 'Session expired on vendor portal',         elapsed: '4m 32s'  },
+      { caseId: '452421', assistType: ['Captcha'],                  priority: 'High', minMax: '42s / 3m',  blockReason: 'CAPTCHA challenge on initial portal access', elapsed: '2m 11s'  },
+      { caseId: '322511', assistType: ['Credentials','Comparison'], priority: 'High', minMax: '24s / 2m',  blockReason: '2FA code required after login',              elapsed: '7m 04s'  },
+      { caseId: '523217', assistType: ['Authorize','Credentials'],  priority: 'Med',  minMax: '45s / 7m',  blockReason: 'Payment amount exceeds auto-approve limit',  elapsed: '18m 50s' },
+      { caseId: '694323', assistType: ['Captcha'],                  priority: 'Low',  minMax: '29s / 4m',  blockReason: 'CAPTCHA on secondary portal',                elapsed: '9m 12s'  },
+      { caseId: '362343', assistType: ['Compare','Credentials'],    priority: 'Low',  minMax: '43s / 6m',  blockReason: 'Document version mismatch',                  elapsed: '22m 05s' },
     ],
   },
   Signer: {
     icon: 'draw',
+    agentId: '4411-8823',
+    inHandling: 22,
+    lastAction: 'Signed contract #44821',
     objective: `The Signer manages digital signature workflows — coordinating with signatories and verification systems to collect legally-binding approvals on contracts and invoices. It integrates with DocuSign, Adobe Sign, and proprietary platforms, handling reminders, certificate validation, and audit-trail generation autonomously.`,
     capabilities: ['DocuSign / Adobe Sign integration', 'Signatory routing and reminders', 'Certificate chain validation', 'Legally-compliant audit trail'],
+    capabilities_v2: {
+      triggers: {
+        automated: ['Document Ready for Signature', 'Reminder Timer'],
+        manual: ['Mentioned', 'Manual Assignment'],
+      },
+      access: {
+        workspaces: ['Signature Queue'],
+        external: ['DocuSign', 'Adobe Sign'],
+      },
+      skills: ['Signature Routing', 'Certificate Validation', 'Audit Trail Generation', 'Reminder Sequences'],
+      escalation: ['When signatory is unresponsive after 3 reminders', 'When certificate validation fails'],
+    },
     insights: [
       'Signature verification failures are concentrated in 3 vendors: TechLogic, NovaCorp, and DataStream.',
       'Automated reminder sequences reduce average time-to-sign from 4.2 days to 1.8 days.',
@@ -4782,13 +4847,28 @@ const agentDetailData = {
     humanAssistFreq: '1 Per 2K', freqTrend: 'up',
     successRate: '94%', successTrend: 'up',
     pendingAssists: [
-      { caseId: '411033', assistType: 'Credentials', priority: 'Med', minMax: '30s / 5m', blockReason: 'Signing platform requires re-authentication', elapsed: '9m 17s' },
+      { caseId: '411033', assistType: ['Credentials'], priority: 'Med', minMax: '30s / 5m', blockReason: 'Signing platform requires re-authentication', elapsed: '9m 17s' },
     ],
   },
   OCR: {
     icon: 'document_scanner',
+    agentId: '3301-7729',
+    inHandling: 67,
+    lastAction: 'Processed batch #B-2901',
     objective: `The OCR agent applies optical character recognition and intelligent document parsing to convert scanned invoices, PDFs, and image attachments into structured, machine-readable data. It scores confidence per field and routes low-confidence extractions to the human review queue before handing off to downstream agents.`,
     capabilities: ['Multi-format document ingestion', 'Handwritten text recognition', 'Table structure extraction', 'Per-field confidence scoring'],
+    capabilities_v2: {
+      triggers: {
+        automated: ['New Document Uploaded', 'Batch Queue Ready'],
+        manual: ['Manual Reprocess Request'],
+      },
+      access: {
+        workspaces: ['Document Queue', 'Review Queue'],
+        external: ['OmniScan Pro'],
+      },
+      skills: ['Multi-format Ingestion', 'Table Extraction', 'Handwriting Recognition', 'Confidence Scoring'],
+      escalation: ['When confidence score below threshold for all retries', 'When document format unrecognized'],
+    },
     insights: [
       'Handwritten invoices are 8% of volume but responsible for 61% of extraction errors.',
       'Page-rotation auto-correction fixed 1,240 documents last month, avoiding manual re-scans.',
@@ -4801,8 +4881,23 @@ const agentDetailData = {
   },
   Writer: {
     icon: 'edit_note',
+    agentId: '5521-4490',
+    inHandling: 18,
+    lastAction: 'Sent dispute letter #DL-8821',
     objective: `The Writer composes outbound communications — dispute letters, approval requests, missing-data notifications — using case context and approved templates. It calibrates tone based on counterparty relationship tier and escalation history, then routes drafts through a human approval gate before sending.`,
     capabilities: ['Template-based draft generation', 'Tone calibration engine', 'Multi-language support (14 locales)', 'Approval routing before send'],
+    capabilities_v2: {
+      triggers: {
+        automated: ['Case Requires Outbound Communication'],
+        manual: ['Mentioned', 'Draft Review Requested'],
+      },
+      access: {
+        workspaces: ['Communication Queue'],
+        external: ['Email', 'Template Library'],
+      },
+      skills: ['Draft Generation', 'Tone Calibration', 'Multi-language Support', 'Approval Routing'],
+      escalation: ['When recipient details cannot be verified', 'When draft confidence low'],
+    },
     insights: [
       '"Insufficient data" errors spike when upstream OCR confidence falls below 72%.',
       'Custom tone profiles reduce customer escalation callbacks by 19% vs. default templates.',
@@ -4812,14 +4907,29 @@ const agentDetailData = {
     humanAssistFreq: '1 Per 800', freqTrend: 'down',
     successRate: '82%', successTrend: 'down',
     pendingAssists: [
-      { caseId: '788012', assistType: 'Authorize', priority: 'High', minMax: '5m / 22m', blockReason: 'Draft requires human sign-off before send',  elapsed: '11m 22s' },
-      { caseId: '334521', assistType: 'Authorize', priority: 'Med',  minMax: '8m / 30m', blockReason: 'Recipient details could not be auto-verified', elapsed: '26m 45s' },
+      { caseId: '788012', assistType: ['Authorize'], priority: 'High', minMax: '5m / 22m', blockReason: 'Draft requires human sign-off before send',  elapsed: '11m 22s' },
+      { caseId: '334521', assistType: ['Authorize'], priority: 'Med',  minMax: '8m / 30m', blockReason: 'Recipient details could not be auto-verified', elapsed: '26m 45s' },
     ],
   },
   Comparer: {
     icon: 'compare',
+    agentId: '9102-4456',
+    inHandling: 31,
+    lastAction: 'Flagged discrepancy on #39021',
     objective: `The Comparer performs multi-source invoice reconciliation — matching extracted data against PO records, GRN entries, and historical payment data. It computes match scores, surfaces contradictions ranked by severity, and flags transactions that require human sign-off before payment can proceed.`,
     capabilities: ['3-way PO / GRN / invoice matching', 'Fuzzy field matching with tolerances', 'Discrepancy severity scoring', 'Historical anomaly detection'],
+    capabilities_v2: {
+      triggers: {
+        automated: ['Invoice Received for Matching'],
+        manual: ['Manual Match Request'],
+      },
+      access: {
+        workspaces: ['Reconciliation Queue'],
+        external: ['AP Ledger', 'PO System'],
+      },
+      skills: ['3-way Matching', 'Fuzzy Field Matching', 'Discrepancy Scoring', 'Anomaly Detection'],
+      escalation: ['When match confidence below 85%', 'When duplicate invoice detected'],
+    },
     insights: [
       'Contradiction errors are most common when vendors submit amended invoices without version tags.',
       'Match confidence below 85% triggers human review — affecting 24% of monthly volume.',
@@ -4829,16 +4939,31 @@ const agentDetailData = {
     humanAssistFreq: '1 Per 400', freqTrend: 'down',
     successRate: '76%', successTrend: 'down',
     pendingAssists: [
-      { caseId: '902341', assistType: 'Comparison', priority: 'High', minMax: '2m / 15m', blockReason: 'Unit-price vs PO-price mismatch >3%',          elapsed: '3m 58s'  },
-      { caseId: '781234', assistType: 'Comparison', priority: 'High', minMax: '3m / 18m', blockReason: 'Duplicate invoice number detected',             elapsed: '8m 13s'  },
-      { caseId: '655432', assistType: 'Authorize',  priority: 'Med',  minMax: '4m / 31m', blockReason: 'Match confidence below 85% threshold',          elapsed: '14m 29s' },
-      { caseId: '512901', assistType: 'Authorize',  priority: 'Low',  minMax: '6m / 25m', blockReason: 'Amended invoice missing version tag',            elapsed: '31m 07s' },
+      { caseId: '902341', assistType: ['Comparison'], priority: 'High', minMax: '2m / 15m', blockReason: 'Unit-price vs PO-price mismatch >3%',          elapsed: '3m 58s'  },
+      { caseId: '781234', assistType: ['Comparison'], priority: 'High', minMax: '3m / 18m', blockReason: 'Duplicate invoice number detected',             elapsed: '8m 13s'  },
+      { caseId: '655432', assistType: ['Authorize'],  priority: 'Med',  minMax: '4m / 31m', blockReason: 'Match confidence below 85% threshold',          elapsed: '14m 29s' },
+      { caseId: '512901', assistType: ['Authorize'],  priority: 'Low',  minMax: '6m / 25m', blockReason: 'Amended invoice missing version tag',            elapsed: '31m 07s' },
     ],
   },
   Classifier: {
     icon: 'category',
+    agentId: '6612-8845',
+    inHandling: 54,
+    lastAction: 'Classified batch #C-5512',
     objective: `The Classifier categorizes incoming cases, documents, and transactions using ML-based classification models. It assigns case types, priority tiers, and routing destinations — enabling the pipeline to self-organize without human intervention for the vast majority of volume.`,
     capabilities: ['Multi-class document categorization', 'Priority scoring model', 'Custom routing rules engine', 'Continuous 14-day retraining cycle'],
+    capabilities_v2: {
+      triggers: {
+        automated: ['New Case Received', 'Document Uploaded'],
+        manual: ['Manual Classification Request'],
+      },
+      access: {
+        workspaces: ['Intake Queue'],
+        external: ['Classification Model API'],
+      },
+      skills: ['Multi-class Categorization', 'Priority Scoring', 'Custom Routing Rules', 'Continuous Retraining'],
+      escalation: ['When classification confidence below threshold', 'When new document type unrecognized'],
+    },
     insights: [
       'Model accuracy has remained above 95% for 60 consecutive days — best streak on record.',
       'Cross-border invoice edge cases are the primary source of misclassification events.',
@@ -5257,27 +5382,25 @@ function _showFleetView() {
 }
 
 function renderAgentView(type, tabKey) {
-  tabKey = tabKey || 'overview';
+  tabKey = tabKey || 'queue';
   const d = agentDetailData[type];
   if (!d) return;
   const fd = agentData.find(a => a.type === type) || {};
   const av = document.getElementById('agent-view');
 
-  const tabDefs = [
-    { key: 'overview',   label: 'Overview'  },
-    { key: 'status',     label: 'Status'    },
-    { key: 'knowledge',  label: 'Knowledge' },
-    { key: 'history',    label: 'History'   },
-    { key: 'feedback',   label: 'Feedback'  },
-  ];
-  const chfTabsHtml = tabDefs.map(t =>
-    `<button class="chf-tab${t.key === tabKey ? ' active' : ''}" onclick="renderAgentView('${type}','${t.key}')">${t.label}</button>`
-  ).join('');
+  const escalated = d.pendingAssists.filter(p => p.priority === 'High').length;
+  const inProgress = d.pendingAssists.filter(p => p.priority !== 'High').length;
+  const queueTotal = d.pendingAssists.length;
 
-  const totalAssists = d.openAssists.credentials + d.openAssists.captcha + d.openAssists.authorize;
-  const assistBadge = totalAssists > 0
-    ? `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;border-radius:9px;background:#7c3aed;color:#fff;font-size:10px;font-weight:700;padding:0 4px">${totalAssists}</span>`
-    : '<span style="color:var(--text-muted)">0</span>';
+  // ── Header ──────────────────────────────────────────────────────────────────
+  const tabDefs = [
+    { key: 'queue',        label: 'In Queue'     },
+    { key: 'overview',     label: 'Overview'     },
+    { key: 'capabilities', label: 'Capabilities' },
+  ];
+  const navTabsHtml = `<div class="av-nav-tabs">` + tabDefs.map(t =>
+    `<button class="av-nav-tab${t.key === tabKey ? ' active' : ''}" onclick="scrollToAvSection('${t.key}','${type}')">${t.label}</button>`
+  ).join('') + `</div>`;
 
   const header = `
     <div class="case-header progress-open">
@@ -5286,34 +5409,29 @@ function renderAgentView(type, tabKey) {
           <div class="case-header-id">
             <span class="case-company" style="display:flex;align-items:center;gap:6px">
               <div class="av-agent-icon"><span class="material-symbols-outlined">${d.icon}</span></div>
-              ${type} Agent
+              ${type}
             </span>
             <span class="case-num">
               <span class="material-symbols-outlined">smart_toy</span>
-              <span>${type}</span>
+              <span>${d.agentId || '2947-5839'}</span>
             </span>
           </div>
         </div>
         <div class="case-header-meta">
           <div class="case-meta-sep"></div>
           <div class="case-meta-item">
-            <span class="case-meta-label">Running</span>
-            <span class="case-meta-value">${fd.running ?? '—'} instances</span>
+            <span class="case-meta-label">In Handling</span>
+            <span class="case-meta-value">${d.inHandling ?? fd.running ?? '—'}</span>
           </div>
           <div class="case-meta-sep"></div>
           <div class="case-meta-item">
-            <span class="case-meta-label">Open Assists</span>
-            <span class="case-meta-value" style="display:flex;align-items:center;gap:5px">${assistBadge}</span>
+            <span class="case-meta-label">Escalated</span>
+            <span class="case-meta-value" style="color:${escalated > 0 ? '#dc2626' : 'inherit'}">${escalated}</span>
           </div>
           <div class="case-meta-sep"></div>
           <div class="case-meta-item">
-            <span class="case-meta-label">Success Rate</span>
-            <span class="case-meta-value">${d.successRate}</span>
-          </div>
-          <div class="case-meta-sep"></div>
-          <div class="case-meta-item">
-            <span class="case-meta-label">Assist Freq.</span>
-            <span class="case-meta-value">${d.humanAssistFreq}</span>
+            <span class="case-meta-label">Last action</span>
+            <span class="case-meta-value">${d.lastAction || '—'}</span>
           </div>
         </div>
         <div class="case-header-right">
@@ -5325,133 +5443,117 @@ function renderAgentView(type, tabKey) {
           </button>
         </div>
       </div>
-      <div class="case-header-footer">
-        <div class="chf-tabs">${chfTabsHtml}</div>
+      <div class="case-header-footer" style="padding-left:4px">
+        ${navTabsHtml}
       </div>
     </div>`;
 
-  let bodyContent = '';
-  if (tabKey === 'overview') {
-    // ── metrics ──
-    const totalAssists = d.openAssists.credentials + d.openAssists.captcha + d.openAssists.authorize;
-    const barHtml = totalAssists > 0 ? `
-      <div class="av-assists-bar">
-        ${d.openAssists.credentials > 0 ? `<div class="ab-seg" style="flex:${d.openAssists.credentials};background:#7c3aed"></div>` : ''}
-        ${d.openAssists.captcha     > 0 ? `<div class="ab-seg" style="flex:${d.openAssists.captcha};background:#f59e0b"></div>` : ''}
-        ${d.openAssists.authorize   > 0 ? `<div class="ab-seg" style="flex:${d.openAssists.authorize};background:#22c55e"></div>` : ''}
+  // ── Section: In Queue ────────────────────────────────────────────────────────
+  const queueRows = d.pendingAssists.map(p => {
+    const types = Array.isArray(p.assistType) ? p.assistType : [p.assistType];
+    const chips = types.map(t => `<span class="av-assist-tag ${t.toLowerCase().replace(/\s+/g,'')}">${t}</span>`).join(' ');
+    const prioClass = p.priority === 'High' ? 'high' : p.priority === 'Med' ? 'med' : 'low';
+    const prioIcon  = p.priority === 'High' ? 'priority_high' : p.priority === 'Med' ? 'remove' : 'expand_more';
+    return `<tr onclick="openCaseTab('${p.caseId}')">
+      <td><div class="av-case-link"><span class="material-symbols-outlined">folder_open</span>${p.caseId}</div></td>
+      <td><div style="display:flex;gap:4px;flex-wrap:wrap">${chips}</div></td>
+      <td><div class="av-priority-cell ${prioClass}"><span class="material-symbols-outlined">${prioIcon}</span>${p.priority}</div></td>
+      <td style="font-variant-numeric:tabular-nums;color:var(--text-secondary)">${p.minMax}</td>
+    </tr>`;
+  }).join('');
+
+  const queueSection = _avSection('queue', `In Queue (${queueTotal})`, 'Queue management', `
+    <div class="av-queue-filters">
+      <button class="av-queue-pill active" onclick="_avFilterQueue(event,'all','${type}')">All (${queueTotal})</button>
+      <button class="av-queue-pill" onclick="_avFilterQueue(event,'escalated','${type}')">Escalated (${escalated})</button>
+      <button class="av-queue-pill" onclick="_avFilterQueue(event,'progress','${type}')">In progress (${inProgress})</button>
+    </div>
+    ${queueTotal > 0 ? `
+    <div class="av-table-wrap">
+      <table class="av-queue-table" id="av-queue-tbl-${type}" style="table-layout:fixed">
+        <thead><tr>
+          <th style="width:110px">Case</th>
+          <th>Assist Needed</th>
+          <th style="width:110px">Priority</th>
+          <th style="width:170px">Min/Max Success Time</th>
+        </tr></thead>
+        <tbody>${queueRows}</tbody>
+      </table>
+    </div>` : `<div class="av-empty"><span class="material-symbols-outlined">check_circle</span>No items in queue — all clear</div>`}
+  `);
+
+  // ── Section: Overview ────────────────────────────────────────────────────────
+  const totalAssists = d.openAssists.credentials + d.openAssists.captcha + d.openAssists.authorize;
+  const barHtml = totalAssists > 0 ? `
+    <div class="av-assists-bar">
+      ${d.openAssists.credentials > 0 ? `<div class="ab-seg" style="flex:${d.openAssists.credentials};background:#7c3aed"></div>` : ''}
+      ${d.openAssists.captcha     > 0 ? `<div class="ab-seg" style="flex:${d.openAssists.captcha};background:#f59e0b"></div>` : ''}
+      ${d.openAssists.authorize   > 0 ? `<div class="ab-seg" style="flex:${d.openAssists.authorize};background:#22c55e"></div>` : ''}
+    </div>
+    <div class="av-assists-legend">
+      ${d.openAssists.credentials > 0 ? `<div class="av-legend-item"><div class="av-legend-dot" style="background:#7c3aed"></div>Credentials</div>` : ''}
+      ${d.openAssists.captcha     > 0 ? `<div class="av-legend-item"><div class="av-legend-dot" style="background:#f59e0b"></div>Captcha</div>` : ''}
+      ${d.openAssists.authorize   > 0 ? `<div class="av-legend-item"><div class="av-legend-dot" style="background:#22c55e"></div>Authorize</div>` : ''}
+    </div>` : `<div style="font-size:12px;color:var(--text-muted)">No open assists</div>`;
+  const rateNum = parseInt(d.successRate);
+  const rateColor = rateNum >= 93 ? '#15803d' : rateNum >= 85 ? '#b45309' : '#b91c1c';
+
+  const overviewSection = _avSection('overview', 'Overview', 'Agent performance and objective', `
+    <div class="av-ov-metrics">
+      <div class="av-metric-card">
+        <div class="av-metric-label">Open Assists</div>
+        <div class="av-metric-number-row"><div class="av-metric-number">${totalAssists}</div><div class="av-metric-unit">pending</div></div>
+        ${barHtml}
       </div>
-      <div class="av-assists-legend">
-        ${d.openAssists.credentials > 0 ? `<div class="av-legend-item"><div class="av-legend-dot" style="background:#7c3aed"></div>Credentials</div>` : ''}
-        ${d.openAssists.captcha     > 0 ? `<div class="av-legend-item"><div class="av-legend-dot" style="background:#f59e0b"></div>Captcha</div>` : ''}
-        ${d.openAssists.authorize   > 0 ? `<div class="av-legend-item"><div class="av-legend-dot" style="background:#22c55e"></div>Authorize</div>` : ''}
-      </div>` : `<div style="font-size:12px;color:var(--text-muted);margin-top:10px">No open assists</div>`;
-
-    const rateNum = parseInt(d.successRate);
-    const rateColor = rateNum >= 93 ? '#15803d' : rateNum >= 85 ? '#b45309' : '#b91c1c';
-
-    const metricsHtml = `
-      <div class="av-metrics">
-        <div class="av-metric-card">
-          <div class="av-metric-label">Open Assists</div>
-          <div class="av-metric-number-row">
-            <div class="av-metric-number">${totalAssists}</div>
-            <div class="av-metric-unit">pending</div>
-          </div>
-          ${barHtml}
-        </div>
-        <div class="av-metric-card">
-          <div class="av-metric-label">Human Assist Freq.</div>
-          <div class="av-metric-number-row" style="margin-bottom:8px">
-            <span class="av-trend ${d.freqTrend}">
-              <span class="material-symbols-outlined">arrow_${d.freqTrend}ward</span>
-            </span>
-          </div>
-          <div style="font-size:22px;font-weight:700;color:var(--text-primary)">${d.humanAssistFreq.split(' ')[0]}</div>
-          <div style="font-size:11px;color:var(--text-muted);margin-top:2px">Per ${d.humanAssistFreq.split(' ').slice(2).join(' ')}</div>
-        </div>
-        <div class="av-metric-card">
-          <div class="av-metric-label">Success Rate</div>
-          <div class="av-metric-number-row" style="margin-bottom:8px">
-            <span class="av-trend ${d.successTrend}">
-              <span class="material-symbols-outlined">arrow_${d.successTrend}ward</span>
-            </span>
-          </div>
-          <div style="font-size:22px;font-weight:700;color:${rateColor}">${d.successRate}</div>
-        </div>
-      </div>`;
-
-    // ── Objective + Insights ──
-    const capsHtml = `
-      <div class="av-caps-label">Capabilities &amp; Scope</div>
-      ${d.capabilities.map(c => `<div class="av-cap-item"><span class="material-symbols-outlined">check_small</span>${c}</div>`).join('')}`;
-
-    const insightsHtml = d.insights.map((ins, i) =>
-      `<div class="av-insight-item"><span class="av-insight-num">${i + 1}</span><span>${ins}</span></div>`
-    ).join('');
-
-    const contentRow = `
-      <div class="av-content-row">
-        <div>
-          <div class="av-col-title">Objective</div>
-          <div class="av-obj-text">${d.objective}</div>
-          ${capsHtml}
-          <button class="av-view-system"><span class="material-symbols-outlined">open_in_new</span>View system prompt</button>
-        </div>
-        <div class="av-insights-card">
-          <div class="av-insights-header"><span class="material-symbols-outlined">lightbulb</span>Insights</div>
-          ${insightsHtml}
-        </div>
-      </div>`;
-
-    // ── Pending Assists table ──
-    const assistRows = d.pendingAssists.map(p => {
-      const tagClass = p.assistType.toLowerCase().replace(' ','');
-      const prioClass = p.priority === 'High' ? 'high' : p.priority === 'Med' ? 'med' : 'low';
-      const prioIcon  = p.priority === 'High' ? 'priority_high' : p.priority === 'Med' ? 'remove' : 'expand_more';
-      return `<tr onclick="openCaseTab('${p.caseId}')">
-        <td><div class="av-case-link"><span class="material-symbols-outlined">folder_open</span>${p.caseId}</div></td>
-        <td><span class="av-assist-tag ${tagClass}">${p.assistType}</span></td>
-        <td><div class="av-priority-cell ${prioClass}"><span class="material-symbols-outlined">${prioIcon}</span>${p.priority}</div></td>
-        <td style="color:var(--text-secondary);max-width:200px">${p.blockReason || '—'}</td>
-        <td style="font-variant-numeric:tabular-nums;color:var(--text-muted)">${p.elapsed || '—'}</td>
-        <td>${p.minMax}</td>
-        <td onclick="event.stopPropagation()">
-          <div class="av-row-actions">
-            <button class="av-row-btn" title="Open case"><span class="material-symbols-outlined">open_in_new</span></button>
-            <button class="av-row-btn" title="More"><span class="material-symbols-outlined">more_horiz</span></button>
-          </div>
-        </td>
-      </tr>`;
-    }).join('');
-
-    const tableHtml = `
-      <div>
-        <div class="av-table-header">
-          <div class="av-table-title">Pending Assists <span style="font-size:13px;font-weight:400;color:var(--text-muted);margin-left:6px">${d.pendingAssists.length}</span></div>
-        </div>
-        ${d.pendingAssists.length > 0 ? `
-        <div class="av-table-wrap">
-        <table class="av-table">
-          <thead><tr>
-            <th>Case</th><th>Assist Needed</th><th>Priority</th><th>Block Reason</th><th>Elapsed</th><th>Min / Max</th><th></th>
-          </tr></thead>
-          <tbody>${assistRows}</tbody>
-        </table>
-        </div>` : `<div class="av-empty"><span class="material-symbols-outlined">check_circle</span>No pending assists — all clear</div>`}
-      </div>`;
-
-    bodyContent = `<div class="av-section-title">Overview</div>
-      ${metricsHtml}${contentRow}${tableHtml}`;
-
-  } else {
-    bodyContent = `<div style="display:flex;align-items:center;justify-content:center;height:100%">
-      <div class="av-stub">
-        <span class="material-symbols-outlined">construction</span>
-        ${tabDefs.find(t=>t.key===tabKey)?.label || tabKey} — coming soon
+      <div class="av-metric-card">
+        <div class="av-metric-label">Human Assist Freq.</div>
+        <div style="font-size:22px;font-weight:700;color:var(--text-primary);margin:8px 0 2px">${d.humanAssistFreq.split(' ')[0]}</div>
+        <div style="font-size:11px;color:var(--text-muted)">Per ${d.humanAssistFreq.split(' ').slice(2).join(' ')}</div>
       </div>
+      <div class="av-metric-card">
+        <div class="av-metric-label">Success Rate</div>
+        <div style="font-size:22px;font-weight:700;color:${rateColor};margin:8px 0 2px">${d.successRate}</div>
+      </div>
+    </div>
+    <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:8px">Objective</div>
+    <div class="av-obj-text">${d.objective}</div>
+    <button class="av-view-system" style="margin-top:10px"><span class="material-symbols-outlined">open_in_new</span>View system prompt</button>
+  `);
+
+  // ── Section: Capabilities ────────────────────────────────────────────────────
+  const caps = d.capabilities_v2 || {};
+  function _capGroup(title, subsections) {
+    return `<div class="av-cap-group">
+      <div class="av-cap-group-title">${title}</div>
+      ${subsections.map(([label, items]) => `
+        <div class="av-cap-sub">
+          <div class="av-cap-sub-label">${label}</div>
+          <ul class="av-cap-list">${items.map(i => `<li>${i}</li>`).join('')}</ul>
+        </div>`).join('')}
     </div>`;
   }
 
+  const capsContent = `
+    ${_capGroup('Triggers', [
+      ['Automated', caps.triggers?.automated || ['Custom Field Changes']],
+      ['Manual',    caps.triggers?.manual    || ['Mentioned', 'Assigned Task']],
+    ])}
+    ${_capGroup('Access', [
+      ['Workspaces Access', caps.access?.workspaces || ['Queue In Line']],
+      ['External Access',   caps.access?.external   || ['Web Search', 'Gmail']],
+    ])}
+    <div class="av-cap-group">
+      <div class="av-cap-group-title">Skills</div>
+      <ul class="av-cap-list">${(caps.skills || ['Tasks And Subtasks','Edit Tasks','Create Tasks','Update Tasks','Comments']).map(s => `<li>${s}</li>`).join('')}</ul>
+    </div>
+    <div class="av-cap-group">
+      <div class="av-cap-group-title">Handover &amp; Escalation</div>
+      <ul class="av-cap-list">${(caps.escalation || ['When A Specific Program Requires Credentials Loggin']).map(e => `<li>${e}</li>`).join('')}</ul>
+    </div>`;
+
+  const capSection = _avSection('capabilities', 'Capabilities', 'Triggers, access, skills and escalation rules', capsContent);
+
+  // ── Utility sidebar (unchanged) ───────────────────────────────────────────────
   const utilSidebarHtml = `
     <div class="utility-sidebar" id="av-util-sidebar">
       <div class="utility-panel" id="av-util-panel">
@@ -5477,7 +5579,89 @@ function renderAgentView(type, tabKey) {
       </div>
     </div>`;
 
-  av.innerHTML = header + `<div class="case-body"><div class="av-body" id="av-content-area">${bodyContent}</div>${utilSidebarHtml}</div>`;
+  av.innerHTML = header + `<div class="case-body"><div class="av-body" id="av-content-area">${queueSection}${overviewSection}${capSection}</div>${utilSidebarHtml}</div>`;
+
+  // Scroll to requested section after render
+  if (tabKey !== 'queue') {
+    requestAnimationFrame(() => scrollToAvSection(tabKey, type));
+  }
+}
+
+function _avSection(key, title, subtitle, content) {
+  return `
+  <div class="case-section" id="av-section-${key}">
+    <div class="case-section-header" onclick="toggleAvSection('${key}')">
+      <div class="case-section-toggle" id="av-toggle-${key}">
+        <span class="material-symbols-outlined">expand_more</span>
+      </div>
+      <div class="case-section-labels">
+        <div class="case-section-title">${title}</div>
+        <div class="case-section-desc">${subtitle}</div>
+      </div>
+      <div class="case-section-actions">
+        <button class="case-section-menu-btn" onclick="event.stopPropagation()">
+          <span class="material-symbols-outlined">more_horiz</span>
+        </button>
+      </div>
+    </div>
+    <div class="case-section-divider"></div>
+    <div class="case-fields" id="av-fields-${key}" style="padding-top:12px">
+      ${content}
+    </div>
+  </div>`;
+}
+
+function toggleAvSection(key) {
+  const fields  = document.getElementById('av-fields-' + key);
+  const toggle  = document.getElementById('av-toggle-' + key);
+  const section = document.getElementById('av-section-' + key);
+  const divider = section?.querySelector('.case-section-divider');
+  if (!fields) return;
+  const isHidden = fields.classList.toggle('hidden');
+  if (toggle)  toggle.classList.toggle('collapsed', isHidden);
+  if (divider) divider.classList.toggle('hidden', isHidden);
+  if (section) section.classList.toggle('minimized', isHidden);
+}
+
+function scrollToAvSection(key, type) {
+  const el = document.getElementById('av-section-' + key);
+  const area = document.getElementById('av-content-area');
+  if (el && area) area.scrollTo({ top: el.offsetTop - 8, behavior: 'smooth' });
+  // Update active tab
+  document.querySelectorAll('.av-nav-tab').forEach(b =>
+    b.classList.toggle('active', b.textContent.toLowerCase().includes(
+      key === 'queue' ? 'queue' : key === 'overview' ? 'overview' : 'capab'
+    ))
+  );
+}
+
+let _avQueueFilter = {};
+function _avFilterQueue(e, filter, type) {
+  e.stopPropagation();
+  _avQueueFilter[type] = filter;
+  e.currentTarget.closest('.av-queue-filters')?.querySelectorAll('.av-queue-pill')
+    .forEach(b => b.classList.toggle('active', b === e.currentTarget));
+  const d = agentDetailData[type];
+  if (!d) return;
+  const rows = d.pendingAssists.filter(p => {
+    if (filter === 'escalated') return p.priority === 'High';
+    if (filter === 'progress')  return p.priority !== 'High';
+    return true;
+  });
+  const tbody = document.querySelector(`#av-queue-tbl-${type} tbody`);
+  if (!tbody) return;
+  tbody.innerHTML = rows.map(p => {
+    const types = Array.isArray(p.assistType) ? p.assistType : [p.assistType];
+    const chips = types.map(t => `<span class="av-assist-tag ${t.toLowerCase().replace(/\s+/g,'')}">${t}</span>`).join(' ');
+    const prioClass = p.priority === 'High' ? 'high' : p.priority === 'Med' ? 'med' : 'low';
+    const prioIcon  = p.priority === 'High' ? 'priority_high' : p.priority === 'Med' ? 'remove' : 'expand_more';
+    return `<tr onclick="openCaseTab('${p.caseId}')">
+      <td><div class="av-case-link"><span class="material-symbols-outlined">folder_open</span>${p.caseId}</div></td>
+      <td><div style="display:flex;gap:4px;flex-wrap:wrap">${chips}</div></td>
+      <td><div class="av-priority-cell ${prioClass}"><span class="material-symbols-outlined">${prioIcon}</span>${p.priority}</div></td>
+      <td style="font-variant-numeric:tabular-nums;color:var(--text-secondary)">${p.minMax}</td>
+    </tr>`;
+  }).join('');
 }
 
 // ── Work Feed ─────────────────────────────────────────────────────────────────
