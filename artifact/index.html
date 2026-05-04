@@ -614,6 +614,7 @@
   .portal-body { flex: 1; min-width: 0; overflow-y: auto; padding: 0; display: flex; flex-direction: column; gap: 0; }
   .portal-content-area { display: flex; flex-direction: column; gap: 8px; flex: 1; min-height: 0; position: relative; }
 
+
   /* ── Header ── */
   .header { display: flex; align-items: center; gap: 24px; flex-shrink: 0; }
   .header h1 { font-size: 18px; font-weight: 600; margin-right: 4px; }
@@ -5373,6 +5374,7 @@ function _showAgentView(type) {
   av.style.display = 'flex';
   renderAgentView(type, 'overview');
   _renderAiDrawerContext();
+  _renderAiFooter();
 }
 
 function _showFleetView() {
@@ -5381,6 +5383,7 @@ function _showFleetView() {
   document.getElementById('agentfleet-page').classList.remove('detail-mode');
   document.getElementById('af-fleet-view').style.display = 'flex';
   _renderAiDrawerContext();
+  _renderAiFooter();
 }
 
 function renderAgentView(type, tabKey) {
@@ -8317,11 +8320,9 @@ function _resetCasey() {
   }
   const empty = document.getElementById('ai-empty');
   if (empty) empty.style.display = '';
-  // Clear footer
-  const footer = document.getElementById('ai-drawer-footer');
-  if (footer) footer.innerHTML = '';
-  // Re-render context pills for the new page
+  // Re-render context pills + footer input for the new page
   _renderAiDrawerContext();
+  _renderAiFooter();
 }
 
 function toggleSearchDrawer() {
@@ -11451,11 +11452,49 @@ function _renderAiFooter() {
     return;
   }
 
-  // Default — floating card with textarea + attach + send/stop
+  // Default — floating card with context pill + textarea + attach + send/stop
+  const _ctxPill = (() => {
+    if (_aiCurrentCase && !_aiContextDismissed) {
+      return `<div class="ai-input-card-ctx">
+        <span class="ai-input-ctx-pill">
+          <span class="material-symbols-outlined" style="font-size:11px">folder_open</span>
+          ${_aiCurrentCase.id}
+          <button onclick="_aiContextDismissed=true;_renderAiDrawerContext();_renderAiFooter()" title="Remove context">×</button>
+        </span>
+      </div>`;
+    }
+    if (activeSection === 'mywork' || activeSection === 'home') {
+      return `<div class="ai-input-card-ctx">
+        <span class="ai-input-ctx-pill">
+          <span class="material-symbols-outlined" style="font-size:11px">home_work</span>
+          My Work
+        </span>
+      </div>`;
+    }
+    if (activeSection === 'agentfleet') {
+      const label = _activeAgentType ? `${_activeAgentType} Agent` : 'Agent Fleet';
+      const icon = _activeAgentType ? 'smart_toy' : 'hub';
+      return `<div class="ai-input-card-ctx">
+        <span class="ai-input-ctx-pill">
+          <span class="material-symbols-outlined" style="font-size:11px">${icon}</span>
+          ${label}
+        </span>
+      </div>`;
+    }
+    return '';
+  })();
+
+  const _placeholder = (() => {
+    if (activeSection === 'mywork' || activeSection === 'home') return 'Ask Casey about your cases…';
+    if (activeSection === 'agentfleet') return _activeAgentType ? `Ask Casey about ${_activeAgentType}…` : 'Ask Casey about agent performance…';
+    return 'Ask anything…';
+  })();
+
   footer.innerHTML = `
     <div class="ai-input-card">
+      ${_ctxPill}
       <textarea class="ai-input-textarea" id="ai-input" rows="2"
-        placeholder="Ask anything…"
+        placeholder="${_placeholder}"
         onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAiMessage()}"></textarea>
       <div class="ai-input-actions">
         <button class="ai-input-attach-btn" title="Attach file"><span class="material-symbols-outlined">attach_file</span></button>
