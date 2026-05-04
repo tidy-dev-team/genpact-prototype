@@ -980,9 +980,9 @@
   }
   .kpi-card.main-kpi { flex: 2.5; }
   .kpi-card.sub-kpi { flex: 1; }
-  .kpi-card .kpi-label { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
-  .kpi-card .kpi-value { font-size: 28px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-  .kpi-card .kpi-value .kpi-label-inline { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+  .kpi-card .kpi-label { font-size: 12px; color: var(--text-secondary); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .kpi-card .kpi-value { font-size: 28px; font-weight: 700; display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .kpi-card .kpi-value .kpi-label-inline { font-size: 13px; font-weight: 500; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
   .progress-bar {
     height: 8px; border-radius: 4px; display: flex; gap: 2px; margin-top: 4px;
   }
@@ -1839,6 +1839,15 @@
     pointer-events: none; opacity: 0.8;
   }
   #case-page.wf-readonly .case-header-right { display: none; }
+  .case-back-btn {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 5px 10px 5px 6px; border-radius: 7px; border: 1px solid var(--border);
+    background: #fff; color: var(--text-secondary); font-size: 12px; font-weight: 500;
+    font-family: inherit; cursor: pointer; flex-shrink: 0; margin-right: 12px;
+    transition: background .12s, color .12s;
+  }
+  .case-back-btn:hover { background: var(--bg-light); color: var(--text-primary); }
+  .case-back-btn .material-symbols-outlined { font-size: 16px; }
   /* Section accordion card */
   .case-section {
     background: #fcfcfc; border: 1px solid #f0f0f0;
@@ -3141,9 +3150,9 @@
   .af-status.awaiting .af-status-dot { background: #f59e0b; }
 
   /* Reason card */
-  .af-reason-card { display: inline-flex; align-items: flex-start; gap: 8px; padding: 6px 10px; border-radius: 7px; border: 1px solid var(--border); background: #fafafa; max-width: 280px; }
-  .af-reason-icon { font-size: 16px; color: var(--text-muted); flex-shrink: 0; margin-top: 1px; }
-  .af-reason-title { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+  .af-reason-card { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 7px; border: 1px solid var(--border); background: #fafafa; max-width: 280px; min-width: 0; overflow: hidden; }
+  .af-reason-icon { font-size: 16px; color: var(--text-muted); flex-shrink: 0; }
+  .af-reason-title { font-size: 12px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
   .af-reason-desc { font-size: 11px; color: var(--text-muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
 
   /* Action buttons */
@@ -3220,11 +3229,12 @@
   .av-table tbody td { padding: 13px 12px; font-size: 13px; color: var(--text-secondary); vertical-align: middle; }
   .av-case-link { display: flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 500; color: var(--text-primary); }
   .av-case-link .material-symbols-outlined { font-size: 14px; color: var(--text-muted); }
-  .av-assist-tag { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+  .av-assist-tag { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; white-space: nowrap; }
   .av-assist-tag.credentials { background: #ede9fe; color: #6d28d9; }
   .av-assist-tag.captcha     { background: #fef3c7; color: #b45309; }
   .av-assist-tag.authorize   { background: #dcfce7; color: #15803d; }
   .av-assist-tag.comparison  { background: #dbeafe; color: #1d4ed8; }
+  .av-assist-tag.compare     { background: #dbeafe; color: #1d4ed8; }
   .av-priority-cell { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; }
   .av-priority-cell.high { color: #b91c1c; }
   .av-priority-cell.med  { color: #b45309; }
@@ -3255,11 +3265,13 @@
   .av-queue-pill.active { background:var(--text-primary); color:#fff; border-color:var(--text-primary); }
 
   /* Queue table (simplified — no block reason / elapsed) */
-  .av-queue-table { width:100%; border-collapse:collapse; }
-  .av-queue-table th { font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.4px; padding:6px 10px; border-bottom:2px solid var(--border); text-align:left; }
-  .av-queue-table td { padding:9px 10px; border-bottom:1px solid var(--border-light); font-size:13px; vertical-align:middle; overflow:hidden; }
+  .av-queue-box { border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+  .av-queue-table { width:100%; border-collapse:collapse; table-layout:fixed; }
+  .av-queue-table th { font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.4px; padding:6px 10px; border-bottom:1px solid var(--border); text-align:left; background:var(--bg-light); }
+  .av-queue-table td { padding:6px 10px; border-bottom:1px solid var(--border-light); font-size:12px; vertical-align:middle; overflow:hidden; white-space:nowrap; }
   .av-queue-table tr:hover td { background:#fafafa; cursor:pointer; }
   .av-queue-table tr:last-child td { border-bottom:none; }
+  .av-queue-table .av-tags-cell { display:flex; gap:4px; align-items:center; flex-wrap:nowrap; overflow:hidden; }
 
   /* Capability sub-sections */
   .av-cap-group { margin-top:16px; }
@@ -3295,6 +3307,88 @@
   /* Stub tabs (Status, Knowledge, etc.) */
   .av-stub { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 10px; color: var(--text-muted); font-size: 13px; }
   .av-stub .material-symbols-outlined { font-size: 36px; color: #d1d5db; }
+
+  /* ── Agent feedback CTA ─────────────────────────────── */
+  .av-fb-cta {
+    display: inline-flex; align-items: center; gap: 7px;
+    margin-top: 16px; padding: 8px 14px; border-radius: 8px;
+    border: 1px dashed #c7d2fe; background: #f5f3ff;
+    color: #4f46e5; font-size: 12px; font-weight: 600;
+    font-family: inherit; cursor: pointer;
+    transition: background .15s, border-color .15s;
+  }
+  .av-fb-cta:hover { background: #ede9fe; border-color: #a5b4fc; }
+  .av-fb-cta .material-symbols-outlined { font-size: 16px; }
+  .av-fb-cta-arrow { margin-left: 2px; font-size: 14px !important; }
+
+  .av-fb-overlay {
+    position: fixed; inset: 0; z-index: 9000;
+    background: rgba(0,0,0,.45); backdrop-filter: blur(2px);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .av-fb-overlay.hidden { display: none; }
+
+  .av-feedback-card {
+    width: 480px; max-width: calc(100vw - 40px);
+    border-radius: 14px; border: 1px solid #e8eaf0; background: #fff;
+    overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.15);
+  }
+  .av-fb-header {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 18px 18px 14px;
+  }
+  .av-fb-close {
+    width: 28px; height: 28px; border-radius: 6px; border: none; background: none;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: var(--text-muted); flex-shrink: 0; margin-left: auto;
+    transition: background .12s;
+  }
+  .av-fb-close:hover { background: var(--bg-light); }
+  .av-fb-close .material-symbols-outlined { font-size: 18px; }
+  .av-fb-icon {
+    width: 34px; height: 34px; border-radius: 8px;
+    background: #eef0ff; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .av-fb-icon .material-symbols-outlined { font-size: 17px; color: #4f46e5; }
+  .av-fb-title { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+  .av-fb-sub   { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+  .av-fb-divider { height: 1px; background: #e8eaf0; margin: 0 18px; }
+  .av-fb-body { padding: 16px 18px 18px; }
+  .av-fb-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 8px; }
+  .av-fb-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .av-fb-chip {
+    padding: 4px 11px; border-radius: 20px; cursor: pointer;
+    border: 1px solid var(--border); background: #fff;
+    font-size: 12px; color: var(--text-secondary);
+    transition: background .12s, border-color .12s, color .12s;
+    user-select: none;
+  }
+  .av-fb-chip.selected { background: #eef0ff; border-color: #a5b4fc; color: #4338ca; font-weight: 500; }
+  .av-fb-textarea {
+    width: 100%; box-sizing: border-box;
+    min-height: 70px; padding: 9px 11px;
+    border: 1px solid var(--border); border-radius: 8px;
+    font-size: 12px; font-family: inherit; color: var(--text-primary);
+    background: #fff; resize: vertical; outline: none; line-height: 1.5;
+    transition: border-color .15s;
+  }
+  .av-fb-textarea::placeholder { color: #b0b3bc; }
+  .av-fb-textarea:focus { border-color: #a5b4fc; }
+  .av-fb-footer { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+  .av-fb-submit {
+    padding: 6px 16px; border-radius: 8px; border: none; cursor: pointer;
+    background: #4f46e5; color: #fff; font-size: 12px; font-weight: 600;
+    font-family: inherit; transition: background .15s;
+  }
+  .av-fb-submit:hover { background: #4338ca; }
+  .av-fb-anon { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+  .av-fb-anon .material-symbols-outlined { font-size: 13px; }
+  .av-fb-success {
+    padding: 18px 16px; display: flex; align-items: center; gap: 10px;
+    font-size: 13px; color: #15803d; font-weight: 500;
+  }
+  .av-fb-success .material-symbols-outlined { font-size: 20px; color: #16a34a; }
 
   /* ── Work Feed page ─────────────────────────────────── */
   .wf-page { display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; background: var(--bg-white); }
@@ -3780,6 +3874,39 @@
     </button>
     <img id="img-lightbox-img" src="" alt="Evidence image">
     <div class="img-lightbox-caption hidden" id="img-lightbox-caption"></div>
+  </div>
+</div>
+
+<!-- Agent feedback modal -->
+<div class="av-fb-overlay hidden" id="av-fb-overlay" onclick="if(event.target===this)closeAvFeedback()">
+  <div class="av-feedback-card" id="av-feedback-modal-card" onclick="event.stopPropagation()">
+    <div class="av-fb-header">
+      <div class="av-fb-icon"><span class="material-symbols-outlined">rate_review</span></div>
+      <div style="flex:1">
+        <div class="av-fb-title">Help improve this agent</div>
+        <div class="av-fb-sub">Share feedback with the developer team — where is the agent falling short or getting things wrong?</div>
+      </div>
+      <button class="av-fb-close" onclick="closeAvFeedback()"><span class="material-symbols-outlined">close</span></button>
+    </div>
+    <div class="av-fb-divider"></div>
+    <div class="av-fb-body" id="av-fb-modal-body">
+      <div class="av-fb-label">What needs improvement?</div>
+      <div class="av-fb-chips" id="av-fb-chips">
+        <span class="av-fb-chip" onclick="toggleAvFbChip(this)">Too many human assists</span>
+        <span class="av-fb-chip" onclick="toggleAvFbChip(this)">Wrong routing decisions</span>
+        <span class="av-fb-chip" onclick="toggleAvFbChip(this)">Accuracy issues</span>
+        <span class="av-fb-chip" onclick="toggleAvFbChip(this)">Missed edge cases</span>
+        <span class="av-fb-chip" onclick="toggleAvFbChip(this)">Slow execution</span>
+        <span class="av-fb-chip" onclick="toggleAvFbChip(this)">Incorrect escalation</span>
+        <span class="av-fb-chip" onclick="toggleAvFbChip(this)">Other</span>
+      </div>
+      <div class="av-fb-label">Additional context</div>
+      <textarea class="av-fb-textarea" id="av-fb-text" placeholder="Describe a specific case or pattern where the agent underperformed…"></textarea>
+      <div class="av-fb-footer">
+        <button class="av-fb-submit" id="av-fb-submit-btn" onclick="submitAvFeedback()">Send feedback</button>
+        <span class="av-fb-anon"><span class="material-symbols-outlined">lock</span>Sent anonymously to the dev team</span>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -5399,8 +5526,8 @@ function renderAgentView(type, tabKey) {
 
   // ── Header ──────────────────────────────────────────────────────────────────
   const tabDefs = [
-    { key: 'queue',        label: 'In Queue'     },
     { key: 'overview',     label: 'Overview'     },
+    { key: 'queue',        label: 'In Queue'     },
     { key: 'capabilities', label: 'Capabilities' },
   ];
   const navTabsHtml = `<div class="av-nav-tabs">` + tabDefs.map(t =>
@@ -5461,9 +5588,10 @@ function renderAgentView(type, tabKey) {
     const prioIcon  = p.priority === 'High' ? 'priority_high' : p.priority === 'Med' ? 'remove' : 'expand_more';
     return `<tr onclick="openCaseTab('${p.caseId}')">
       <td><div class="av-case-link"><span class="material-symbols-outlined">folder_open</span>${p.caseId}</div></td>
-      <td><div style="display:flex;gap:4px;flex-wrap:wrap">${chips}</div></td>
+      <td><div class="av-tags-cell">${chips}</div></td>
       <td><div class="av-priority-cell ${prioClass}"><span class="material-symbols-outlined">${prioIcon}</span>${p.priority}</div></td>
-      <td style="font-variant-numeric:tabular-nums;color:var(--text-secondary)">${p.minMax}</td>
+      <td style="font-variant-numeric:tabular-nums;color:var(--text-secondary);white-space:nowrap">${p.elapsed || '—'}</td>
+      <td style="color:var(--text-secondary);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:0">${p.blockReason || '—'}</td>
     </tr>`;
   }).join('');
 
@@ -5474,13 +5602,14 @@ function renderAgentView(type, tabKey) {
       <button class="av-queue-pill" onclick="_avFilterQueue(event,'progress','${type}')">In progress (${inProgress})</button>
     </div>
     ${queueTotal > 0 ? `
-    <div class="av-table-wrap">
-      <table class="av-queue-table" id="av-queue-tbl-${type}" style="table-layout:fixed">
+    <div class="av-queue-box">
+      <table class="av-queue-table" id="av-queue-tbl-${type}">
         <thead><tr>
-          <th style="width:110px">Case</th>
-          <th>Assist Needed</th>
-          <th style="width:110px">Priority</th>
-          <th style="width:170px">Min/Max Success Time</th>
+          <th style="width:85px">Case</th>
+          <th style="width:160px">Assist Needed</th>
+          <th style="width:80px">Priority</th>
+          <th style="width:100px">Escalated</th>
+          <th>Reason</th>
         </tr></thead>
         <tbody>${queueRows}</tbody>
       </table>
@@ -5523,6 +5652,12 @@ function renderAgentView(type, tabKey) {
     <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:8px">Objective</div>
     <div class="av-obj-text">${d.objective}</div>
     <button class="av-view-system" style="margin-top:10px"><span class="material-symbols-outlined">open_in_new</span>View system prompt</button>
+
+    <button class="av-fb-cta" onclick="openAvFeedback('${type}')">
+      <span class="material-symbols-outlined">rate_review</span>
+      Help improve this agent
+      <span class="av-fb-cta-arrow material-symbols-outlined">arrow_forward</span>
+    </button>
   `);
 
   // ── Section: Capabilities ────────────────────────────────────────────────────
@@ -5584,12 +5719,15 @@ function renderAgentView(type, tabKey) {
       </div>
     </div>`;
 
-  av.innerHTML = header + `<div class="case-body"><div class="av-body" id="av-content-area">${queueSection}${overviewSection}${capSection}</div>${utilSidebarHtml}</div>`;
+  av.innerHTML = header + `<div class="case-body"><div class="av-body" id="av-content-area">${overviewSection}${queueSection}${capSection}</div>${utilSidebarHtml}</div>`;
 
-  // Scroll to requested section after render
-  if (tabKey !== 'queue') {
-    requestAnimationFrame(() => scrollToAvSection(tabKey, type));
-  }
+  // Scroll to requested section after render (overview is first — just reset to top)
+  requestAnimationFrame(() => {
+    const area = document.getElementById('av-content-area');
+    if (!area) return;
+    if (tabKey === 'overview') { area.scrollTop = 0; }
+    else scrollToAvSection(tabKey, type);
+  });
 }
 
 function _avSection(key, title, subtitle, content) {
@@ -5662,11 +5800,55 @@ function _avFilterQueue(e, filter, type) {
     const prioIcon  = p.priority === 'High' ? 'priority_high' : p.priority === 'Med' ? 'remove' : 'expand_more';
     return `<tr onclick="openCaseTab('${p.caseId}')">
       <td><div class="av-case-link"><span class="material-symbols-outlined">folder_open</span>${p.caseId}</div></td>
-      <td><div style="display:flex;gap:4px;flex-wrap:wrap">${chips}</div></td>
+      <td><div class="av-tags-cell">${chips}</div></td>
       <td><div class="av-priority-cell ${prioClass}"><span class="material-symbols-outlined">${prioIcon}</span>${p.priority}</div></td>
-      <td style="font-variant-numeric:tabular-nums;color:var(--text-secondary)">${p.minMax}</td>
+      <td style="font-variant-numeric:tabular-nums;color:var(--text-secondary);white-space:nowrap">${p.elapsed || '—'}</td>
+      <td style="color:var(--text-secondary);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:0">${p.blockReason || '—'}</td>
     </tr>`;
   }).join('');
+}
+
+// ── Agent feedback CTA ────────────────────────────────────────────────────────
+function toggleAvFbChip(el) {
+  el.classList.toggle('selected');
+}
+
+function openAvFeedback(type) {
+  // Reset form state
+  const body = document.getElementById('av-fb-modal-body');
+  if (body) body.innerHTML = `
+    <div class="av-fb-label">What needs improvement?</div>
+    <div class="av-fb-chips" id="av-fb-chips">
+      <span class="av-fb-chip" onclick="toggleAvFbChip(this)">Too many human assists</span>
+      <span class="av-fb-chip" onclick="toggleAvFbChip(this)">Wrong routing decisions</span>
+      <span class="av-fb-chip" onclick="toggleAvFbChip(this)">Accuracy issues</span>
+      <span class="av-fb-chip" onclick="toggleAvFbChip(this)">Missed edge cases</span>
+      <span class="av-fb-chip" onclick="toggleAvFbChip(this)">Slow execution</span>
+      <span class="av-fb-chip" onclick="toggleAvFbChip(this)">Incorrect escalation</span>
+      <span class="av-fb-chip" onclick="toggleAvFbChip(this)">Other</span>
+    </div>
+    <div class="av-fb-label">Additional context</div>
+    <textarea class="av-fb-textarea" id="av-fb-text" placeholder="Describe a specific case or pattern where the agent underperformed…"></textarea>
+    <div class="av-fb-footer">
+      <button class="av-fb-submit" onclick="submitAvFeedback()">Send feedback</button>
+      <span class="av-fb-anon"><span class="material-symbols-outlined">lock</span>Sent anonymously to the dev team</span>
+    </div>`;
+  document.getElementById('av-fb-overlay')?.classList.remove('hidden');
+}
+
+function closeAvFeedback() {
+  document.getElementById('av-fb-overlay')?.classList.add('hidden');
+}
+
+function submitAvFeedback() {
+  const body = document.getElementById('av-fb-modal-body');
+  if (!body) return;
+  body.innerHTML = `
+    <div class="av-fb-success">
+      <span class="material-symbols-outlined">check_circle</span>
+      Thanks! Your feedback has been sent to the developer team.
+    </div>`;
+  setTimeout(closeAvFeedback, 1800);
 }
 
 // ── Work Feed ─────────────────────────────────────────────────────────────────
@@ -10116,6 +10298,18 @@ function renderCasePage(caseId) {
   const casePage = document.getElementById('case-page');
   const isReadOnly = _readOnlyCaseIds.has(cleanIdEarly);
   if (casePage) casePage.classList.toggle('wf-readonly', isReadOnly);
+  // Back button — inject/remove from header left
+  const headerLeft = document.querySelector('#case-page .case-header-left');
+  if (headerLeft) {
+    headerLeft.querySelector('.case-back-btn')?.remove();
+    if (isReadOnly) {
+      const btn = document.createElement('button');
+      btn.className = 'case-back-btn';
+      btn.innerHTML = '<span class="material-symbols-outlined">chevron_left</span>Work Feed';
+      btn.onclick = () => selectTab('home');
+      headerLeft.insertBefore(btn, headerLeft.firstChild);
+    }
+  }
   if (isReadOnly) {
     const area = document.getElementById('case-form-area');
     if (area) {
