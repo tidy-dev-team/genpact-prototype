@@ -1594,7 +1594,7 @@
   .case-meta-sep { width: 1px; height: 32px; background: var(--border); flex-shrink: 0; margin: 0 20px; }
   .case-meta-item { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1; }
   .case-meta-label { font-size: 11px; color: var(--text-muted); line-height: 1; font-family: inherit; font-weight: 400; }
-  .case-stage { display: flex; align-items: center; gap: 6px; }
+  .case-stage { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
   .stage-badge {
     width: 20px; height: 20px; border-radius: 50%;
     background: #1a1a1a; color: #fff;
@@ -8932,6 +8932,7 @@ function renderWorkFeedSolver(caseId) {
   // Render task tabs + body
   _renderWfTaskTabs(caseId);
   _renderWfTaskBody(caseId);
+  _renderWfFetchBtn(caseId);
   _applyWfSolverLock(caseId);
 }
 
@@ -12688,21 +12689,25 @@ document.addEventListener('keydown', e => {
   }
 });
 
-// Cmd+E / Ctrl+E → fetch or return the active case
+// Cmd+J / Ctrl+J → fetch or return (case page or agent assist solver)
 document.addEventListener('keydown', e => {
   const isMeta = e.metaKey || e.ctrlKey;
-  if (isMeta && e.key === 'e') {
+  if (isMeta && e.key === 'j') {
     e.preventDefault();
-    if (_casePageMode !== 'case') return;
+    // Agent Assist solver
+    if (activeSection === 'workfeed' && activeWorkFeedCase) {
+      const fetchedBy = _fetchedCases[activeWorkFeedCase];
+      if (!fetchedBy) fetchCaseFromList(activeWorkFeedCase);
+      else if (fetchedBy === _currentUser) returnCaseFromList(activeWorkFeedCase);
+      return;
+    }
+    // Case page tab
     const caseId = sectionActiveTab[activeSection];
-    if (!caseId) return;
+    if (!caseId || caseId === 'home') return;
     const id = String(caseId).replace(/^#\s*/, '');
     const fetchedBy = _fetchedCases[id];
-    if (!fetchedBy) {
-      fetchCase(caseId);
-    } else if (fetchedBy === _currentUser) {
-      returnCase();
-    }
+    if (!fetchedBy) fetchCase(caseId);
+    else if (fetchedBy === _currentUser) returnCase();
   }
 });
 
@@ -13244,7 +13249,7 @@ function _renderFetchBtn(caseId) {
   const id = String(caseId).replace(/^#\s*/, '');
   const fetchedBy = _fetchedCases[id];
   const isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
-  const kbd = isMac ? 'Cmd+E' : 'Ctrl+E';
+  const kbd = isMac ? 'Cmd+J' : 'Ctrl+J';
   if (!fetchedBy) {
     el.innerHTML = `
       <button class="case-fetch-btn" onclick="fetchCase('${caseId}')">
@@ -13257,8 +13262,8 @@ function _renderFetchBtn(caseId) {
       <div style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-secondary)">
         ${_activeUserAvatarHtml(fetchedBy, 'sm')}
         <span>Fetched by you</span>
-        <button class="case-fetch-btn" style="padding:4px 10px;font-size:11px" onclick="returnCase()">
-          <span class="material-symbols-outlined" style="font-size:13px">undo</span> Return
+        <button class="case-fetch-btn" onclick="returnCase()">
+          <span class="material-symbols-outlined" style="font-size:15px">undo</span> Return
           <span class="case-fetch-shortcut">${kbd}</span>
         </button>
       </div>`;
@@ -13277,16 +13282,18 @@ function _renderWfFetchBtn(caseId) {
   if (!ctrl) return;
   ctrl.innerHTML = '';
   const fetchedBy = _fetchedCases[caseId];
+  const isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+  const kbd = isMac ? 'Cmd+J' : 'Ctrl+J';
   if (!fetchedBy) {
     const btn = document.createElement('button');
-    btn.className = 'wf-solver-fetch-btn';
-    btn.innerHTML = '<span class="material-symbols-outlined">download</span> Fetch case';
+    btn.className = 'case-fetch-btn';
+    btn.innerHTML = `<span class="material-symbols-outlined" style="font-size:15px">download</span> Fetch case <span class="case-fetch-shortcut">${kbd}</span>`;
     btn.onclick = () => fetchCaseFromList(caseId);
     ctrl.appendChild(btn);
   } else if (fetchedBy === _currentUser) {
     const btn = document.createElement('button');
-    btn.className = 'wf-solver-return-btn';
-    btn.innerHTML = '<span class="material-symbols-outlined">undo</span> Return case';
+    btn.className = 'case-fetch-btn';
+    btn.innerHTML = `<span class="material-symbols-outlined" style="font-size:15px">undo</span> Return <span class="case-fetch-shortcut">${kbd}</span>`;
     btn.onclick = () => returnCaseFromList(caseId);
     ctrl.appendChild(btn);
   } else {
