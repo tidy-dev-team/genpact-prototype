@@ -1657,6 +1657,11 @@
   }
   .case-fetch-btn:hover { opacity: 0.8; }
   .case-fetch-btn .material-symbols-outlined { font-size: 16px; }
+  .case-fetch-shortcut {
+    font-size: 10px; font-weight: 400; opacity: 0.65;
+    background: rgba(255,255,255,0.15); border-radius: 4px;
+    padding: 1px 5px; letter-spacing: 0; margin-left: 2px;
+  }
   /* "Fetched by other" badge */
   .case-fetched-badge {
     display: flex; align-items: center; gap: 5px;
@@ -12683,6 +12688,24 @@ document.addEventListener('keydown', e => {
   }
 });
 
+// Cmd+E / Ctrl+E → fetch or return the active case
+document.addEventListener('keydown', e => {
+  const isMeta = e.metaKey || e.ctrlKey;
+  if (isMeta && e.key === 'e') {
+    e.preventDefault();
+    if (_casePageMode !== 'case') return;
+    const caseId = sectionActiveTab[activeSection];
+    if (!caseId) return;
+    const id = String(caseId).replace(/^#\s*/, '');
+    const fetchedBy = _fetchedCases[id];
+    if (!fetchedBy) {
+      fetchCase(caseId);
+    } else if (fetchedBy === _currentUser) {
+      returnCase();
+    }
+  }
+});
+
 // Row checkbox → bulk bar (event delegation)
 document.getElementById('table-body').addEventListener('change', e => {
   if (e.target.type === 'checkbox') {
@@ -13220,11 +13243,14 @@ function _renderFetchBtn(caseId) {
   el.innerHTML = '';
   const id = String(caseId).replace(/^#\s*/, '');
   const fetchedBy = _fetchedCases[id];
+  const isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+  const kbd = isMac ? 'Cmd+E' : 'Ctrl+E';
   if (!fetchedBy) {
     el.innerHTML = `
       <button class="case-fetch-btn" onclick="fetchCase('${caseId}')">
         <span class="material-symbols-outlined" style="font-size:15px">download</span>
         Fetch case
+        <span class="case-fetch-shortcut">${kbd}</span>
       </button>`;
   } else if (fetchedBy === _currentUser) {
     el.innerHTML = `
@@ -13233,6 +13259,7 @@ function _renderFetchBtn(caseId) {
         <span>Fetched by you</span>
         <button class="case-fetch-btn" style="padding:4px 10px;font-size:11px" onclick="returnCase()">
           <span class="material-symbols-outlined" style="font-size:13px">undo</span> Return
+          <span class="case-fetch-shortcut">${kbd}</span>
         </button>
       </div>`;
   } else {
