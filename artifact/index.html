@@ -1619,7 +1619,7 @@
   .case-return-btn .material-symbols-outlined { font-size: 16px; color: var(--text-primary); }
   /* Floating fetch CTA — top of form */
   #case-fetch-float:not(:empty) { flex-shrink: 0; }
-  .case-fetch-float-wrap { padding: 12px 20px 0; display: flex; align-items: center; }
+  .case-fetch-float-wrap { padding: 12px 20px 0; display: flex; align-items: center; justify-content: center; }
   .case-fetch-float-btn {
     width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
     padding: 13px 20px; border-radius: 10px; border: none;
@@ -1631,14 +1631,14 @@
   .case-fetch-float-btn .material-symbols-outlined { font-size: 18px; }
   .case-fetch-float-mine {
     display: inline-flex; align-items: center; gap: 8px;
-    padding: 5px 10px 5px 6px; border-radius: 20px;
-    background: #f0fdf4; border: 1px solid #bbf7d0;
-    font-size: 12px; font-weight: 500; color: #166534;
+    padding: 4px 10px 4px 4px; border-radius: 20px;
+    background: transparent; border: none;
+    font-size: 12px; font-weight: 500; color: var(--text-secondary);
   }
   .case-fetch-float-return {
     display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px;
-    border-radius: 20px; border: 1px solid #86efac; background: #fff;
-    font-size: 11px; font-weight: 600; color: #166534; cursor: pointer; font-family: inherit; margin-left: 4px;
+    border-radius: 20px; border: 1px solid var(--border); background: #fff;
+    font-size: 11px; font-weight: 600; color: var(--text-secondary); cursor: pointer; font-family: inherit; margin-left: 4px;
   }
   .case-fetch-float-return .material-symbols-outlined { font-size: 12px; }
   .case-fetch-float-other {
@@ -4746,6 +4746,7 @@
         </div>
 
         <div class="case-header-right">
+          <div id="case-header-fetch"></div>
           <button class="header-icon" title="Refresh" onclick="renderCasePage(sectionActiveTab[activeSection])">
             <span class="material-symbols-outlined">refresh</span>
           </button>
@@ -4789,8 +4790,6 @@
     <!-- Case Body: form + info panel + utility bar -->
     <div class="case-body">
       <div class="case-form-col">
-        <!-- Floating fetch/status CTA at top of form -->
-        <div id="case-fetch-float"></div>
         <!-- Scrollable form — rendered by renderCaseSections() -->
         <div class="case-form-area" id="case-form-area"></div>
       </div>
@@ -13216,40 +13215,31 @@ function renderCasePage(caseId) {
 
 function _renderFetchBtn(caseId) {
   if (_casePageMode !== 'case') return;
-  const float = document.getElementById('case-fetch-float');
-  if (!float) return;
-  float.innerHTML = '';
+  const el = document.getElementById('case-header-fetch');
+  if (!el) return;
+  el.innerHTML = '';
   const id = String(caseId).replace(/^#\s*/, '');
   const fetchedBy = _fetchedCases[id];
   if (!fetchedBy) {
-    // Not fetched — prominent primary CTA
-    float.innerHTML = `
-      <div class="case-fetch-float-wrap">
-        <button class="case-fetch-float-btn" onclick="fetchCase('${caseId}')">
-          <span class="material-symbols-outlined">download</span>
-          Fetch case to start working
+    el.innerHTML = `
+      <button class="case-fetch-btn" onclick="fetchCase('${caseId}')">
+        <span class="material-symbols-outlined" style="font-size:15px">download</span>
+        Fetch case
+      </button>`;
+  } else if (fetchedBy === _currentUser) {
+    el.innerHTML = `
+      <div style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-secondary)">
+        ${_activeUserAvatarHtml(fetchedBy, 'sm')}
+        <span>Fetched by you</span>
+        <button class="case-fetch-btn" style="padding:4px 10px;font-size:11px" onclick="returnCase()">
+          <span class="material-symbols-outlined" style="font-size:13px">undo</span> Return
         </button>
       </div>`;
-  } else if (fetchedBy === _currentUser) {
-    // Fetched by me — subtle return strip
-    float.innerHTML = `
-      <div class="case-fetch-float-wrap">
-        <div class="case-fetch-float-mine">
-          ${_activeUserAvatarHtml(fetchedBy, 'sm')}
-          <span>Fetched by you</span>
-          <button class="case-fetch-float-return" onclick="returnCase()">
-            <span class="material-symbols-outlined">undo</span> Return
-          </button>
-        </div>
-      </div>`;
   } else {
-    // Fetched by someone else — info strip
-    float.innerHTML = `
-      <div class="case-fetch-float-wrap">
-        <div class="case-fetch-float-other">
-          ${_activeUserAvatarHtml(fetchedBy, 'sm')}
-          <span>In progress by <strong>${fetchedBy}</strong></span>
-        </div>
+    el.innerHTML = `
+      <div style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-secondary)">
+        ${_activeUserAvatarHtml(fetchedBy, 'sm')}
+        <span>In progress by <strong>${fetchedBy}</strong></span>
       </div>`;
   }
 }
