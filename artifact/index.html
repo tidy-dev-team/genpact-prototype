@@ -961,6 +961,27 @@
   }
   .filter-dropdown .label { color: var(--text-muted); font-size: 12px; }
   .filter-dropdown .material-symbols-outlined { font-size: 16px; color: #999; }
+  .filter-dropdown { position: relative; }
+  .filter-dropdown:hover { background: var(--bg-light); border-radius: 6px; }
+  .fd-panel {
+    position: absolute; top: calc(100% + 4px); right: 0; z-index: 200;
+    background: #fff; border: 1px solid var(--border); border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12); min-width: 200px;
+    padding: 6px 0; display: none;
+  }
+  .fd-panel.open { display: block; }
+  .fd-panel-header { padding: 6px 12px 4px; font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; }
+  .fd-item {
+    display: flex; align-items: center; gap: 9px;
+    padding: 7px 12px; font-size: 13px; color: var(--text-primary);
+    cursor: pointer; transition: background .1s;
+  }
+  .fd-item:hover { background: var(--bg-light); }
+  .fd-item input[type="checkbox"] { width: 15px; height: 15px; margin: 0; flex-shrink: 0; accent-color: #1a1a1a; }
+  .fd-divider { height: 1px; background: var(--border); margin: 4px 0; }
+  .fd-footer { padding: 6px 12px; display: flex; gap: 8px; }
+  .fd-footer button { font-size: 12px; color: var(--text-secondary); background: none; border: none; cursor: pointer; padding: 0; }
+  .fd-footer button:hover { color: var(--text-primary); text-decoration: underline; }
 
   .overflow-btn {
     width: 34px; height: 34px;
@@ -1023,7 +1044,7 @@
   }
   .progress-bar .seg[data-tooltip]:hover::after,
   .progress-bar .seg[data-tooltip]:hover::before { opacity: 1; cursor: default; }
-  .kpi-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.kpi-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
   .kpi-dot.dark { background: var(--text-secondary); }
   .kpi-dot.light { background: #ccc; }
 
@@ -1952,6 +1973,11 @@
   #wf-solver-body.locked .wf-captcha-tile {
     pointer-events: none; opacity: 0.7;
   }
+  /* Task panel in case-page tab — locked until fetched */
+  #case-form-area.task-locked .wf-task-resolve-btn,
+  #case-form-area.task-locked .wf-task-dismiss-btn {
+    pointer-events: none; opacity: 0.38; cursor: not-allowed;
+  }
   .case-back-btn {
     display: inline-flex; align-items: center; gap: 4px;
     padding: 5px 10px 5px 6px; border-radius: 7px; border: 1px solid var(--border);
@@ -2821,6 +2847,63 @@
     display: none;
   }
   .notif-overlay.open { display: block; }
+
+  /* ── New Case drawer ── */
+  .newcase-drawer {
+    position: fixed; top: 0; left: var(--sidebar-width);
+    width: 300px; height: 100vh;
+    background: var(--bg-light);
+    z-index: 100;
+    display: flex; flex-direction: column;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+  }
+  .newcase-drawer.open { transform: translateX(0); }
+  .newcase-drawer-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 24px 20px 16px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .newcase-drawer-header .material-symbols-outlined { font-size: 20px; color: var(--text-secondary); }
+  .newcase-drawer-header h2 { font-size: 15px; font-weight: 600; flex: 1; }
+  .newcase-drawer-header button {
+    background: none; border: none; cursor: pointer; padding: 2px;
+    color: var(--text-muted); display: flex; align-items: center;
+  }
+  .newcase-drawer-header button:hover { color: var(--text-primary); }
+  .newcase-drawer-search {
+    padding: 12px 16px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+  }
+  .newcase-drawer-search input {
+    width: 100%; padding: 7px 10px; font-size: 13px;
+    border: 1px solid var(--border); border-radius: 6px;
+    background: #fff; outline: none; box-sizing: border-box;
+  }
+  .newcase-drawer-search input:focus { border-color: #888; }
+  .newcase-drawer-body { flex: 1; overflow-y: auto; padding: 8px 0; }
+  .newcase-wf-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 16px; cursor: pointer;
+    transition: background 0.12s;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .newcase-wf-item:last-child { border-bottom: none; }
+  .newcase-wf-item:hover { background: #ececec; }
+  .newcase-wf-item .material-symbols-outlined {
+    font-size: 18px; color: var(--text-muted); flex-shrink: 0;
+  }
+  .newcase-wf-info { flex: 1; min-width: 0; }
+  .newcase-wf-name { font-size: 13px; font-weight: 500; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .newcase-wf-id { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+  .newcase-wf-arrow { font-size: 16px; color: var(--text-muted); flex-shrink: 0; }
+  .newcase-overlay {
+    position: fixed; top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    z-index: 99; display: none;
+  }
+  .newcase-overlay.open { display: block; }
 
   /* Search drawer */
   .search-drawer {
@@ -3724,8 +3807,9 @@
   #wf-table-view { display: none; flex: 1; min-height: 0; overflow: hidden; flex-direction: column; }
   .wf-tbl { width: 100%; border-collapse: collapse; table-layout: fixed; }
   .wf-tbl thead th { position: sticky; top: 0; background: var(--bg-white); z-index: 2; font-size: 12px; font-weight: 600; color: var(--text-secondary); padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; overflow: hidden; }
-  .wf-tbl tbody td { padding: 11px 16px; font-size: 13px; color: var(--text-primary); border-bottom: 1px solid var(--border-light); vertical-align: middle; overflow: hidden; }
-  .wf-tbl td.row-actions-cell { overflow: visible !important; }
+  .wf-tbl tbody td { padding: 11px 16px; font-size: 13px; color: var(--text-primary); border-bottom: 1px solid var(--border-light); vertical-align: middle; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 0; }
+  .wf-tbl td.row-actions-cell { overflow: visible !important; white-space: nowrap; }
+  .wf-tbl tbody td > * { min-width: 0; }
   .wf-tbl tbody tr { cursor: pointer; transition: background .1s; }
   .wf-tbl tbody tr:hover { background: var(--hover-row); }
   .wf-tbl-case { display: flex; align-items: center; gap: 6px; }
@@ -3734,6 +3818,41 @@
   /* WF Type pill */
   .wf-type-pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 500; white-space: nowrap; border: 1px solid transparent; }
   .wf-type-pill .material-symbols-outlined { font-size: 12px; }
+  .wf-team-pill { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; background: var(--bg-light); border: 1px solid var(--border); color: var(--text-secondary); white-space: nowrap; }
+  .wf-user-cell { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-primary); white-space: nowrap; }
+  .wf-user-cell .wf-card-active-user { flex-shrink: 0; }
+  .wf-muted { font-size: 12px; color: var(--text-muted); }
+  /* WF cell dropdown */
+  .wf-cell-drop { position: fixed; z-index: 900; background: #fff; border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 6px 24px rgba(0,0,0,0.13); min-width: 190px; padding: 5px 0; }
+  .wf-cell-drop.hidden { display: none; }
+  .wf-cell-drop-item { display: flex; align-items: center; gap: 9px; padding: 7px 13px; font-size: 13px; color: var(--text-primary); cursor: pointer; transition: background .1s; }
+  .wf-cell-drop-item:hover { background: var(--bg-light); }
+  .wf-cell-drop-item.active { font-weight: 600; }
+  .wf-cell-drop-item.active::after { content: 'check'; font-family: 'Material Symbols Outlined'; font-size: 15px; margin-left: auto; color: var(--text-secondary); }
+  .wf-cell-drop-divider { height: 1px; background: var(--border); margin: 4px 0; }
+  .wf-cell-drop-unassign { color: var(--text-muted); }
+  td[data-col="team"], td[data-col="assignTo"] { cursor: pointer; }
+  td[data-col="team"]:hover, td[data-col="assignTo"]:hover { background: var(--bg-light) !important; }
+  /* WF column header filter button */
+  .wf-th-filter-btn { flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 4px; border: none; background: none; cursor: pointer; padding: 0; color: var(--text-muted); opacity: 0; transition: opacity 0.1s, background 0.1s; }
+  .wf-th-filter-btn .material-symbols-outlined { font-size: 13px; }
+  thead th[data-col]:hover .wf-th-filter-btn, .wf-th-filter-btn.active { opacity: 1; }
+  .wf-th-filter-btn.active { color: #2563eb; background: #eff6ff; }
+  .wf-th-filter-btn:hover { background: #e5e7eb; }
+  /* WF column filter popover */
+  .wf-col-fpop { position: fixed; z-index: 910; background: #fff; border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 6px 24px rgba(0,0,0,0.14); width: 210px; display: flex; flex-direction: column; max-height: 320px; }
+  .wf-col-fpop.hidden { display: none; }
+  .wf-cfp-search { padding: 8px 10px 6px; border-bottom: 1px solid var(--border-light); }
+  .wf-cfp-search input { width: 100%; box-sizing: border-box; border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; font-size: 12px; outline: none; }
+  .wf-cfp-search input:focus { border-color: #93c5fd; }
+  .wf-cfp-list { overflow-y: auto; flex: 1; padding: 4px 0; }
+  .wf-cfp-item { display: flex; align-items: center; gap: 8px; padding: 6px 12px; font-size: 13px; color: var(--text-primary); cursor: pointer; transition: background 0.1s; }
+  .wf-cfp-item:hover { background: var(--bg-light); }
+  .wf-cfp-item input[type=checkbox] { flex-shrink: 0; cursor: pointer; accent-color: #2563eb; }
+  .wf-cfp-empty { padding: 10px 12px; font-size: 12px; color: var(--text-muted); text-align: center; }
+  .wf-cfp-footer { border-top: 1px solid var(--border-light); padding: 6px 10px; display: flex; justify-content: flex-end; }
+  .wf-cfp-footer button { font-size: 12px; padding: 3px 10px; border: 1px solid var(--border); border-radius: 6px; background: none; cursor: pointer; color: var(--text-secondary); transition: background 0.1s; }
+  .wf-cfp-footer button:hover { background: var(--bg-light); }
   .wf-type-case     { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
   .wf-type-task     { background: #f0fdf4; color: #16a34a; border-color: #bbf7d0; }
   .wf-type-approval { background: #fefce8; color: #ca8a04; border-color: #fde68a; }
@@ -3746,12 +3865,12 @@
   .wf-tbl-priority-dot.high { background: #ef4444; }
   .wf-tbl-priority-dot.medium { background: #f59e0b; }
   .wf-tbl-priority-dot.low { background: #9ca3af; }
-  .wf-tbl-stage { display: flex; flex-direction: column; gap: 2px; }
-  .wf-tbl-stage-top { display: flex; align-items: center; gap: 5px; }
+  .wf-tbl-stage { display: flex; align-items: center; gap: 5px; overflow: hidden; }
+  .wf-tbl-stage-top { display: contents; }
   .wf-tbl-stage-icon { font-size: 13px !important; color: var(--text-muted); flex-shrink: 0; }
-  .wf-tbl-stage-steps { font-size: 11px; font-weight: 600; color: var(--text-muted); }
-  .wf-tbl-stage-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
-  .wf-tbl-stage-desc { font-size: 11px; color: var(--text-muted); padding-left: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 340px; }
+  .wf-tbl-stage-steps { font-size: 11px; font-weight: 600; color: var(--text-muted); flex-shrink: 0; }
+  .wf-tbl-stage-name { font-size: 13px; font-weight: 600; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+  .wf-tbl-stage-desc { display: none; }
   .wf-tbl-status--agent { background:#ede9fe; color:#7c3aed; gap:5px; }
   .wf-tbl-status--complete { background:#dcfce7; color:#16a34a; gap:5px; }
   .wf-tbl-status--active { background:#f0f9ff; color:#0369a1; }
@@ -4107,22 +4226,13 @@
   </div>
   <div class="divider"></div>
   <div class="nav-group">
-    <button class="icon-btn nav-btn" id="notif-btn" title="Notifications" onclick="toggleNotifDrawer()">
-      <span class="material-symbols-outlined">notifications</span>
-    </button>
-    <button class="icon-btn nav-btn" id="search-btn" title="Search" onclick="toggleSearchDrawer()">
-      <span class="material-symbols-outlined">search</span>
-    </button>
-  </div>
-  <div class="divider"></div>
-  <div class="nav-group">
-    <button class="icon-btn nav-btn" id="nav-workfeed" title="Agent Assist" onclick="navSidebar(this,'workfeed')">
+    <button class="icon-btn nav-btn active" id="nav-workfeed" title="Work Feed" onclick="navSidebar(this,'workfeed')">
       <span class="material-symbols-outlined">dynamic_feed</span>
     </button>
-    <button class="icon-btn nav-btn active" id="nav-mywork" title="Cases" onclick="navSidebar(this,'mywork')">
+    <button class="icon-btn nav-btn" id="nav-mywork" title="Cases" onclick="navSidebar(this,'mywork')">
       <span class="material-symbols-outlined">home</span>
     </button>
-    <button class="icon-btn nav-btn" id="nav-allwork" title="All Work" onclick="navSidebar(this,'allwork')">
+    <button class="icon-btn nav-btn" id="nav-allwork" title="Workflows" onclick="navSidebar(this,'allwork')">
       <span class="material-symbols-outlined">grid_view</span>
     </button>
     <button class="icon-btn nav-btn" id="nav-analytics" title="Analytics" onclick="navSidebar(this,'analytics')">
@@ -4140,6 +4250,16 @@
   </div>
   <div class="divider"></div>
   <div class="spacer"></div>
+  <div class="divider"></div>
+  <div class="nav-group">
+    <button class="icon-btn nav-btn" id="newcase-btn" title="New Case" onclick="toggleNewCaseDrawer()">
+      <span class="material-symbols-outlined">add_circle</span>
+    </button>
+    <button class="icon-btn nav-btn" id="search-btn" title="Search" onclick="toggleSearchDrawer()">
+      <span class="material-symbols-outlined">search</span>
+    </button>
+  </div>
+  <div class="divider"></div>
   <div class="nav-group">
     <button class="icon-btn user-avatar-btn" title="Profile">
       <div class="user-avatar-circle">AB</div>
@@ -4245,6 +4365,20 @@
 </div>
 
 <!-- Notification overlay -->
+<!-- New Case overlay + drawer -->
+<div class="newcase-overlay" id="newcase-overlay" onclick="closeNewCaseDrawer()"></div>
+<div class="newcase-drawer" id="newcase-drawer">
+  <div class="newcase-drawer-header">
+    <span class="material-symbols-outlined">add_circle</span>
+    <h2>New Case</h2>
+    <button onclick="closeNewCaseDrawer()"><span class="material-symbols-outlined">close</span></button>
+  </div>
+  <div class="newcase-drawer-search">
+    <input type="text" id="newcase-search-input" placeholder="Search workflows…" oninput="renderNewCaseList(this.value)">
+  </div>
+  <div class="newcase-drawer-body" id="newcase-drawer-body"></div>
+</div>
+
 <div class="notif-overlay" id="notif-overlay" onclick="closeNotifDrawer()"></div>
 
 <!-- Notification drawer -->
@@ -4607,10 +4741,19 @@
         </div>
       </div>
       <div class="toolbar-right">
-        <div class="filter-dropdown">
+        <div class="filter-dropdown" onclick="toggleTeamDropdown(event)">
           <span class="label">Team:</span>
-          <span>All selected</span>
+          <span id="team-dropdown-label">All selected</span>
           <span class="material-symbols-outlined">expand_more</span>
+          <div class="fd-panel" id="team-dropdown-panel" onclick="event.stopPropagation()">
+            <div class="fd-panel-header">Teams</div>
+            <div id="team-dropdown-list"></div>
+            <div class="fd-divider"></div>
+            <div class="fd-footer">
+              <button onclick="teamSelectAll()">Select all</button>
+              <button onclick="teamClearAll()">Clear</button>
+            </div>
+          </div>
         </div>
         <div class="filter-dropdown">
           <span class="label">Status:</span>
@@ -5057,7 +5200,12 @@
     <!-- Header — same .header structure as My Work / Agent Fleet -->
     <div class="header">
       <div class="portal-header-title">
-        <h2>Agent Assist</h2>
+        <h2>Work Feed</h2>
+      </div>
+      <div class="segmented-btn" style="height:30px">
+        <button id="wf-seg-all"   class="active" onclick="setWfSegFilter('all')"   style="font-size:12px;padding:0 14px">All tasks</button>
+        <button id="wf-seg-queue"             onclick="setWfSegFilter('queue')" style="font-size:12px;padding:0 14px">Tasks in queue</button>
+        <button id="wf-seg-on-me"             onclick="setWfSegFilter('on-me')" style="font-size:12px;padding:0 14px">Tasks on me</button>
       </div>
       <div class="header-actions">
         <button class="header-icon active" id="wf-metrics-toggle" title="Toggle metrics"
@@ -5070,28 +5218,44 @@
 
     <!-- Metrics row — same .metrics-row structure as other list pages -->
     <div class="metrics-row" id="wf-metrics-row">
-      <div class="kpi-card main-kpi">
-        <div class="kpi-value">47 <span class="kpi-label-inline">Blocked by AI today</span></div>
-        <div class="progress-bar">
-          <div class="seg seg-dark" style="flex:47" data-tooltip="47 blocked by AI"></div>
-          <div class="seg seg-light" style="flex:95" data-tooltip="95 passed through"></div>
+      <!-- Default KPIs — shown for All tasks / Tasks in queue -->
+      <div id="wf-kpis-default" style="display:contents">
+        <div class="kpi-card sub-kpi">
+          <div class="kpi-label">Total Tasks</div>
+          <div class="kpi-value"><span class="kpi-dot dark"></span> <span id="wf-kpi-total">0</span></div>
+        </div>
+        <div class="kpi-card sub-kpi">
+          <div class="kpi-label">Cases Solved</div>
+          <div class="kpi-value"><span class="kpi-dot dark"></span> <span id="wf-kpi-solved">0</span></div>
+        </div>
+        <div class="kpi-card sub-kpi">
+          <div class="kpi-label">Cases in Progress</div>
+          <div class="kpi-value"><span class="kpi-dot dark"></span> <span id="wf-kpi-progress">0</span></div>
+        </div>
+        <div class="kpi-card sub-kpi">
+          <div class="kpi-label">Cases Unfetched</div>
+          <div class="kpi-value"><span class="kpi-dot light"></span> <span id="wf-kpi-queue">0</span></div>
         </div>
       </div>
-      <div class="kpi-card sub-kpi">
-        <div class="kpi-label">Cases Solved by AI</div>
-        <div class="kpi-value"><span class="kpi-dot dark"></span> 312</div>
-      </div>
-      <div class="kpi-card sub-kpi">
-        <div class="kpi-label">Completed by Me</div>
-        <div class="kpi-value"><span class="kpi-dot dark"></span> 8</div>
-      </div>
-      <div class="kpi-card sub-kpi">
-        <div class="kpi-label">Pending Review</div>
-        <div class="kpi-value"><span class="kpi-dot dark"></span> 23</div>
-      </div>
-      <div class="kpi-card sub-kpi">
-        <div class="kpi-label">AI Interventions</div>
-        <div class="kpi-value"><span class="kpi-dot light"></span> 19</div>
+      <!-- On Me KPIs — shown for Tasks on me -->
+      <div id="wf-kpis-onme" style="display:none;width:100%;gap:12px">
+        <div class="kpi-card main-kpi">
+          <div class="kpi-label">Total tasks on me this week</div>
+          <div class="kpi-value" style="font-size:36px"><span id="wf-kpi-onme-total">0</span> <span class="kpi-label-inline">tasks</span></div>
+          <div class="progress-bar">
+            <div class="seg seg-dark"   id="wf-kpi-onme-seg-completed" style="flex:0"  data-tooltip="Completed"></div>
+            <div class="seg seg-medium" id="wf-kpi-onme-seg-progress"  style="flex:0"  data-tooltip="In Progress"></div>
+            <div class="seg seg-light"  id="wf-kpi-onme-seg-wait"      style="flex:1"  data-tooltip="Wait for me"></div>
+          </div>
+        </div>
+        <div class="kpi-card sub-kpi">
+          <div class="kpi-label">Cases waiting for me</div>
+          <div class="kpi-value" style="font-size:36px"><span class="kpi-dot dark"></span> <span id="wf-kpi-onme-waittoday">0</span></div>
+        </div>
+        <div class="kpi-card sub-kpi">
+          <div class="kpi-label">Cases waiting for me</div>
+          <div class="kpi-value" style="font-size:36px"><span class="kpi-dot dark"></span> <span id="wf-kpi-onme-completedtoday">0</span></div>
+        </div>
       </div>
     </div>
 
@@ -5101,6 +5265,30 @@
       <!-- Persistent toolbar — always visible (same position as My Work toolbar) -->
       <div class="toolbar">
         <div class="toolbar-left">
+          <div class="tb-wrap">
+            <div class="view-btn-wrap">
+              <button class="view-btn-main" id="wf-view-btn-main" onclick="wfToggleViewPicker(event)">
+                <span class="view-name">Default view</span>
+                <span class="material-symbols-outlined view-btn-chevron-icon">expand_more</span>
+              </button>
+              <button class="view-settings-btn" id="wf-view-settings-btn" onclick="wfToggleViewSettings(event)" title="View settings">
+                <span class="material-symbols-outlined">settings</span>
+              </button>
+            </div>
+            <div class="view-picker hidden" id="wf-view-picker">
+              <div class="view-picker-search">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" placeholder="search view" id="wf-view-picker-search">
+              </div>
+              <div id="wf-view-picker-list">
+                <div class="view-picker-item active">
+                  <span class="material-symbols-outlined" style="font-size:15px">table</span>
+                  Default view
+                  <span class="material-symbols-outlined" style="margin-left:auto;font-size:14px">check</span>
+                </div>
+              </div>
+            </div>
+          </div>
           <div class="tb-wrap">
             <button class="toolbar-btn" id="wf-filter-btn" onclick="wfTogglePanel('wf-filter-panel')">
               <span class="material-symbols-outlined">filter_list</span>Filter
@@ -5128,6 +5316,29 @@
             </div>
           </div>
           <div class="tb-wrap">
+            <button class="toolbar-btn" id="wf-display-btn" onclick="wfTogglePanel('wf-display-panel')">
+              <span class="material-symbols-outlined">table_rows</span>Display
+            </button>
+            <div class="dropdown-panel hidden" id="wf-display-panel" style="min-width:200px">
+              <div class="dp-section-label">Row height</div>
+              <button class="display-density-opt active" id="wf-display-opt-default" onclick="wfSetDensity('default')">
+                <span class="material-symbols-outlined">table_rows</span>
+                <span>Default</span>
+                <span class="material-symbols-outlined display-opt-check">check</span>
+              </button>
+              <button class="display-density-opt" id="wf-display-opt-compact" onclick="wfSetDensity('compact')">
+                <span class="material-symbols-outlined">density_small</span>
+                <span>Compact</span>
+                <span class="material-symbols-outlined display-opt-check">check</span>
+              </button>
+              <button class="display-density-opt" id="wf-display-opt-spacious" onclick="wfSetDensity('spacious')">
+                <span class="material-symbols-outlined">density_large</span>
+                <span>Spacious</span>
+                <span class="material-symbols-outlined display-opt-check">check</span>
+              </button>
+            </div>
+          </div>
+          <div class="tb-wrap">
             <button class="toolbar-btn" id="wf-columns-btn" onclick="wfTogglePanel('wf-columns-panel')"><span class="material-symbols-outlined">view_column</span>Columns</button>
             <div class="dropdown-panel hidden" id="wf-columns-panel" style="min-width:280px;left:auto">
               <input type="text" class="dp-search" id="wf-cols-dp-search" placeholder="Search for a property..." oninput="wfColsDpSearch(this.value)">
@@ -5146,13 +5357,28 @@
               </div>
             </div>
           </div>
+          <div class="tb-wrap">
+            <button class="wf-avail-chip" id="wf-avail-chip" onclick="toggleWfAvailFilter()">
+              <span class="material-symbols-outlined">lock_open</span> Available only
+            </button>
+          </div>
         </div>
         <div class="toolbar-right">
+          <div class="filter-dropdown">
+            <span class="label">Team:</span>
+            <span>All selected</span>
+            <span class="material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="filter-dropdown">
+            <span class="label">Status:</span>
+            <span>Active cases</span>
+            <span class="material-symbols-outlined">expand_more</span>
+          </div>
           <div class="view-seg" id="wf-view-seg">
-            <button class="view-seg-btn" id="wf-view-table" title="Table view" onclick="toggleWfMode('table')">
+            <button class="view-seg-btn active" id="wf-view-table" title="Table view" onclick="toggleWfMode('table')">
               <span class="material-symbols-outlined">table</span>
             </button>
-            <button class="view-seg-btn active" id="wf-view-feed" title="Split view" onclick="toggleWfMode('assist')">
+            <button class="view-seg-btn" id="wf-view-feed" title="Split view" onclick="toggleWfMode('assist')">
               <span class="material-symbols-outlined">view_agenda</span>
             </button>
           </div>
@@ -5163,26 +5389,11 @@
       <!-- Active bar — sort / group / filter pills, hidden when empty -->
       <div class="active-bar hidden" id="wf-active-bar"></div>
 
-      <!-- Split view: hidden by default, shown via toggleWfMode('assist') -->
-      <div id="wf-split-view" class="wf-panels" style="display:flex">
+      <!-- Split view: hidden when in table mode (default) -->
+      <div id="wf-split-view" class="wf-panels" style="display:none">
 
         <!-- LEFT: Feed list -->
         <div class="wf-feed">
-          <div class="wf-feed-toolbar">
-            <div class="tb-wrap" style="position:relative">
-              <button class="wf-priority-btn" id="wf-feed-sort-btn" onclick="toggleWfFeedSortPanel()">
-                <span id="wf-feed-sort-label">Priority</span>
-                <span class="material-symbols-outlined">expand_more</span>
-              </button>
-              <div class="dropdown-panel hidden" id="wf-feed-sort-panel" style="min-width:160px;top:calc(100% + 4px);left:0">
-                <div class="dp-item" onclick="setWfFeedSort('priority')"><span class="material-symbols-outlined" style="font-size:14px;margin-right:6px">priority_high</span>Priority</div>
-                <div class="dp-item" onclick="setWfFeedSort('type')"><span class="material-symbols-outlined" style="font-size:14px;margin-right:6px">category</span>Type</div>
-                <div class="dp-item" onclick="setWfFeedSort('status')"><span class="material-symbols-outlined" style="font-size:14px;margin-right:6px">circle</span>Status</div>
-              </div>
-            </div>
-            <div class="wf-feed-spacer"></div>
-            <button class="wf-avail-chip" id="wf-avail-chip" onclick="toggleWfAvailFilter()"><span class="material-symbols-outlined">lock_open</span> Available only</button>
-          </div>
           <div class="wf-feed-list" id="wf-feed-list"></div>
         </div>
 
@@ -5240,7 +5451,7 @@
       </div><!-- /wf-split-view -->
 
       <!-- Table view: default visible state — just the table content, toolbar is above -->
-      <div id="wf-table-view" style="display:none">
+      <div id="wf-table-view" style="display:flex">
         <div class="table-wrapper">
           <table class="wf-tbl">
             <thead id="wf-tbl-thead">
@@ -5255,6 +5466,42 @@
             </thead>
             <tbody id="wf-tbl-tbody"></tbody>
           </table>
+        </div>
+        <!-- WF Pagination bar -->
+        <div class="pagination-bar" id="wf-pagination-bar" style="padding: 8px 16px 6px; border-top: 1px solid var(--border-light);">
+          <div class="pg-items-per-page">
+            <span class="pg-label">Items per page:</span>
+            <span class="pg-value" id="wf-pg-per-page-val">20</span>
+            <button class="pg-chevron-btn" onclick="wfTogglePerPageMenu(event)" title="Change items per page">
+              <span class="material-symbols-outlined">expand_more</span>
+            </button>
+            <div class="pg-per-page-menu hidden" id="wf-pg-per-page-menu">
+              <button class="pg-per-page-opt" onclick="wfChangeItemsPerPage(10)">10</button>
+              <button class="pg-per-page-opt active" onclick="wfChangeItemsPerPage(20)">20</button>
+              <button class="pg-per-page-opt" onclick="wfChangeItemsPerPage(50)">50</button>
+              <button class="pg-per-page-opt" onclick="wfChangeItemsPerPage(100)">100</button>
+            </div>
+          </div>
+          <span class="pg-count" id="wf-pg-count">—</span>
+          <div class="pg-controls" id="wf-pg-controls"></div>
+        </div>
+
+        <!-- WF Bulk action bar -->
+        <div class="bulk-action-bar" id="wf-bulk-bar">
+          <span class="bulk-selected-count" id="wf-bulk-count">0 selected</span>
+          <button class="bulk-unselect-btn" onclick="wfUnselectAll()">Unselect all</button>
+          <div class="bulk-bar-divider"></div>
+          <div class="bulk-actions">
+            <button class="bulk-action-btn" onclick="wfBulkFetch()">
+              <span class="material-symbols-outlined">download</span>Fetch
+            </button>
+            <button class="bulk-action-btn" onclick="wfBulkAssign()">
+              <span class="material-symbols-outlined">person_add</span>Assign
+            </button>
+            <button class="bulk-action-btn" onclick="wfBulkReallocate()">
+              <span class="material-symbols-outlined">group</span>Reallocate
+            </button>
+          </div>
         </div>
       </div><!-- /wf-table-view -->
 
@@ -5278,10 +5525,86 @@
 
   </div><!-- /workfeed-page -->
 
+  <!-- ── Workflows (All Work) Page ── -->
+  <div id="allwork-page" class="portal-content" style="display:none">
+    <div class="header">
+      <div class="portal-header-title">
+        <h2>Workflows</h2>
+      </div>
+      <div class="header-actions">
+        <button class="header-icon active" id="aw-metrics-toggle" title="Toggle metrics"
+          onclick="this.classList.toggle('active'); document.getElementById('aw-metrics-row').classList.toggle('hidden')">
+          <span class="material-symbols-outlined">bar_chart</span>
+        </button>
+        <button class="header-icon" title="Refresh" onclick="renderAllWorkPage()"><span class="material-symbols-outlined">refresh</span></button>
+      </div>
+    </div>
+    <div class="metrics-row" id="aw-metrics-row">
+      <div class="kpi-card sub-kpi">
+        <div class="kpi-label">Total Workflows</div>
+        <div class="kpi-value"><span class="kpi-dot dark"></span> <span id="aw-kpi-total">0</span></div>
+      </div>
+    </div>
+    <div class="portal-content-area">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <div class="tb-wrap">
+            <button class="toolbar-btn" id="aw-filter-btn">
+              <span class="material-symbols-outlined">filter_list</span>Filter
+            </button>
+          </div>
+          <div class="tb-wrap">
+            <button class="toolbar-btn" id="aw-sort-btn">
+              <span class="material-symbols-outlined">swap_vert</span>Sort
+            </button>
+          </div>
+          <div class="tb-wrap">
+            <button class="toolbar-btn" id="aw-display-btn">
+              <span class="material-symbols-outlined">table_rows</span>Display
+            </button>
+          </div>
+          <div class="tb-wrap">
+            <button class="toolbar-btn" id="aw-columns-btn">
+              <span class="material-symbols-outlined">view_column</span>Columns
+            </button>
+          </div>
+        </div>
+      </div>
+      <div id="aw-table-view" style="display:flex; flex:1; min-height:0; overflow:hidden; flex-direction:column;">
+        <div class="table-wrapper">
+          <table class="wf-tbl" id="aw-table">
+            <thead id="aw-tbl-thead">
+              <tr>
+                <th style="width:130px">Workflow ID</th>
+                <th style="width:260px">Workflow Name</th>
+                <th style="width:130px">Created Date</th>
+                <th style="width:130px">Updated Date</th>
+                <th style="width:160px">Owned by</th>
+                <th style="width:0"></th>
+              </tr>
+            </thead>
+            <tbody id="aw-tbl-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div><!-- /allwork-page -->
+
   <!-- Column header context menu -->
   <div class="col-ctx-menu hidden" id="col-ctx-menu"></div>
   <!-- Quick View popover -->
   <div class="qv-popover hidden" id="qv-popover"></div>
+
+  <!-- WF cell dropdown (team / assign-to) -->
+  <div class="wf-cell-drop hidden" id="wf-cell-drop" onclick="event.stopPropagation()">
+    <div class="wf-cell-drop-list" id="wf-cell-drop-list"></div>
+  </div>
+  <!-- WF column header filter popover -->
+  <div class="wf-col-fpop hidden" id="wf-col-fpop" onclick="event.stopPropagation()">
+    <div class="wf-cfp-search"><input id="wf-cfp-search-inp" placeholder="Search…" oninput="_wfCfpSearch(this.value)"></div>
+    <div class="wf-cfp-list" id="wf-cfp-list"></div>
+    <div class="wf-cfp-footer"><button onclick="_wfColFilterClear(_wfColFilterOpen)">Clear filter</button></div>
+  </div>
   </div><!-- /portal-body -->
 
   <!-- AI Drawer (inline, pushes content) -->
@@ -5352,15 +5675,38 @@ let _activeAgentType = null;   // type string when an agent view is open, null o
 let _casePageMode = 'case';   // 'case' | 'agent' — tracks what is rendered in #case-page
 let _casepageTemplate = '';  // Original #case-page innerHTML snapshot; restored before renderCasePage()
 const _currentUser = 'Ben Septer';  // Simulated logged-in user
+const _WF_USERS = ['Ben Septer', 'Sarah Johnson', 'Ahmed Arah', 'Michael Nguyen', 'Priya Nair', 'David Kim', 'Emily Foster', 'Marcus Webb'];
 let _fetchedCases = {               // { caseId: userName } — runtime claim registry
-  '3212-2345':  'Ahmed Arah',       // demo: pre-seeded as fetched by another user
-  '5675-5443':  'Emily Foster',     // demo: pre-seeded as fetched by another user
-  'DED-00124':  'Emily Foster',     // deduction — fetched by team
-  'DED-00109':  'Marcus Webb',      // deduction — fetched by team
-  'DED-00113':  'Priya Nair',       // deduction — fetched by team
-  'DED-00082':  'Ahmed Arah',       // deduction — fetched by team
+  // Fetched by me (Ben Septer)
+  '2947-5839':  'Ben Septer',       // case — fetched by me
+  '1233-9845':  'Ben Septer',       // case — fetched by me
+  '4821-1093':  'Ben Septer',       // case (awaiting) — fetched by me
+  'TASK-001':   'Ben Septer',       // agent task — fetched by me
+  'TASK-004':   'Ben Septer',       // agent task — fetched by me
+  // Fetched by others (Cora)
+  '5675-5443':  'Emily Foster',     // case — fetched by team member
+  '6612-8845':  'Priya Nair',       // case — fetched by team member
+  // '3212-2345' (Ahmed), 'TASK-002' (Michael): assigned but not fetched → Queue
+  // Deduction cases — fetched (actively being worked)
+  'DED-00124':  'Ben Septer',       // eyeball case — fetched by me
+  'DED-00109':  'Ben Septer',       // eyeball case — fetched by me
+  'DED-00113':  'Priya Nair',
+  'DED-00082':  'Ahmed Arah',
+  'DED-00118':  'Ben Septer',       // fetched by me
+  'DED-00088':  'Ben Septer',       // fetched by me
+  'DED-TASK-001': 'Ben Septer',     // agent task — fetched by me
+  // DED-00105, DED-00094, DED-00076: assigned but not fetched → show in Queue
+  // DED-00099: assigned to me but not fetched → shows in Queue + On Me when fetched
+  // DED-TASK-002, DED-TASK-003, DED-TASK-004, DED-TASK-005: assigned but not fetched → Queue
 };
 let _wfAvailableOnly = false;       // feed toolbar "Available only" toggle
+let _wfSegFilter = 'all';           // header segment: 'all' | 'on-me' | 'queue'
+let _wfCurrentPage   = 1;          // pagination: current page
+let _wfItemsPerPage  = 20;         // pagination: rows per page
+let _wfLastTotalPages = 1;         // pagination: cached total pages
+let _wfColFilters = {};             // { colKey: Set<string> } — active column header filters
+let _wfColFilterOpen = null;        // currently open column filter key
+let _wfCfpAllVals = [];             // full value list for the open filter (for search)
 let _wfFeedSortBy           = 'priority';  // feed card sort: 'priority' | 'type' | 'status'
 const _wfTaskItemsExpanded  = {};          // { taskId: bool } — show-all state for items list
 const _wfTaskItemOpen       = {};          // { 'taskId-idx': bool } — per-item open state
@@ -6039,6 +6385,14 @@ document.addEventListener('click', e => {
   }
 });
 
+// Close WF toolbar panels on outside click
+document.addEventListener('click', e => {
+  if (!e.target.closest('#workfeed-page .tb-wrap') && !e.target.closest('#workfeed-page .dropdown-panel')) {
+    _WF_PANELS.forEach(id => document.getElementById(id)?.classList.add('hidden'));
+    document.getElementById('wf-view-picker')?.classList.add('hidden');
+  }
+});
+
 function renderAgentFleetTable() {
   const wrap = document.getElementById('af-table-wrap');
   if (!wrap) return;
@@ -6480,20 +6834,20 @@ function submitAvFeedback() {
 
 // ── Work Feed ─────────────────────────────────────────────────────────────────
 const workFeedData = [
-  { id: '2947-5839', type: 'case', stage: 'Invoice Retrieval', tasks: 4, status: 'intervention', priority: 'High',   stageSteps: '4/6', stageDesc: 'Retrieving invoice documents from vendor portals',      assists: [{label:'Credentials',count:2},{label:'Authorize'},{label:'Compare'}] },
-  { id: '2947-3214', type: 'case', stage: 'AP Matching',        tasks: 3, status: 'running',      priority: 'High',   stageSteps: '2/5', stageDesc: 'Matching invoices against AP ledger records',            assists: [{label:'Captcha'}] },
-  { id: '3212-2345', type: 'case', stage: 'Document Review',    tasks: 6, status: 'running',      priority: 'High',   stageSteps: '3/7', stageDesc: 'Processing and reviewing document batch',               assists: [{label:'Credentials'},{label:'Compare'},{label:'Authorize'}] },
-  { id: '1233-9845', type: 'case', stage: 'OCR Processing',     tasks: 1, status: 'running',      priority: 'High',   stageSteps: '4/4', stageDesc: 'Running OCR batch on document queue',                  assists: [{label:'Credentials'},{label:'Comparison'}] },
-  { id: '2337-3312', type: 'case', stage: 'Classification',     tasks: 4, status: 'running',      priority: 'Medium', stageSteps: '2/6', stageDesc: 'Classifying documents using AI pipeline',               assists: [{label:'Authorize'},{label:'Credentials'}] },
-  { id: '5675-5443', type: 'case', stage: 'Invoice Retrieval',  tasks: 5, status: 'running',      priority: 'Low',    stageSteps: '3/5', stageDesc: 'Retrieving supplementary vendor invoices',              assists: [{label:'Captcha'}] },
-  { id: '2947-5432', type: 'case', stage: 'Document Signing',   tasks: 2, status: 'running',      priority: 'Low',    stageSteps: '1/6', stageDesc: 'Preparing documents for digital signing',              assists: [{label:'Compare'},{label:'Credentials'}] },
-  { id: '4821-1093', type: 'case', stage: 'Comparison',         tasks: 3, status: 'awaiting',     priority: 'Medium', stageSteps: '2/5', stageDesc: 'Comparing datasets for cross-portal analysis',         assists: [{label:'Credentials'},{label:'Compare'}] },
-  { id: '7734-2201', type: 'case', stage: 'AP Review',          tasks: 1, status: 'running',      priority: 'Low',    stageSteps: '3/4', stageDesc: 'Finalizing AP review and preparing submission',         assists: [{label:'Credentials'}] },
-  { id: '6612-8845', type: 'case', stage: 'Invoice Retrieval',  tasks: 7, status: 'running',      priority: 'High',   stageSteps: '2/6', stageDesc: 'Large invoice retrieval across vendor portals',        assists: [{label:'Credentials',count:4},{label:'Captcha',count:3}] },
-  { id: '3301-7729', type: 'case', stage: 'Document Review',    tasks: 2, status: 'running',      priority: 'Medium', stageSteps: '4/7', stageDesc: 'Quality checking document review batch',               assists: [{label:'Credentials',count:2}] },
-  { id: '9102-4456', type: 'case', stage: 'OCR Processing',     tasks: 4, status: 'running',      priority: 'Medium', stageSteps: '2/4', stageDesc: 'OCR batch processing and validation',                  assists: [{label:'Credentials',count:2},{label:'Authorize',count:2}] },
-  { id: '8803-1124', type: 'case', stage: 'Classification',     tasks: 1, status: 'running',      priority: 'Low',    stageSteps: '1/6', stageDesc: 'Running classification batch on document queue',       assists: [{label:'Credentials'}] },
-  { id: '5541-0032', type: 'case', stage: 'AP Matching',        tasks: 5, status: 'running',      priority: 'High',   stageSteps: '3/5', stageDesc: 'Reconciling invoices against purchase order records', assists: [{label:'Credentials',count:3},{label:'Compare',count:2}] },
+  { id: '2947-5839', type: 'case', stage: 'Invoice Retrieval', tasks: 4, status: 'intervention', priority: 'High',   stageSteps: '4/6', stageDesc: 'Retrieving invoice documents from vendor portals',      assists: [{label:'Credentials',count:2},{label:'Authorize'},{label:'Compare'}],   team: 'Analytics Team',  assignTo: 'Sarah Johnson'  },
+  { id: '2947-3214', type: 'case', stage: 'AP Matching',        tasks: 3, status: 'running',      priority: 'High',   stageSteps: '2/5', stageDesc: 'Matching invoices against AP ledger records',            assists: [{label:'Captcha'}],                                                     team: 'Deductions Team', assignTo: 'Ahmed Arah'     },
+  { id: '3212-2345', type: 'case', stage: 'Document Review',    tasks: 6, status: 'running',      priority: 'High',   stageSteps: '3/7', stageDesc: 'Processing and reviewing document batch',               assists: [{label:'Credentials'},{label:'Compare'},{label:'Authorize'}],           team: 'OCR Team',        assignTo: 'Michael Nguyen' },
+  { id: '1233-9845', type: 'case', stage: 'OCR Processing',     tasks: 1, status: 'running',      priority: 'High',   stageSteps: '4/4', stageDesc: 'Running OCR batch on document queue',                  assists: [{label:'Credentials'},{label:'Comparison'}],                           team: 'OCR Team',        assignTo: 'Priya Nair'    },
+  { id: '2337-3312', type: 'case', stage: 'Classification',     tasks: 4, status: 'running',      priority: 'Medium', stageSteps: '2/6', stageDesc: 'Classifying documents using AI pipeline',               assists: [{label:'Authorize'},{label:'Credentials'}],                             team: 'Analytics Team',  assignTo: 'David Kim'     },
+  { id: '5675-5443', type: 'case', stage: 'Invoice Retrieval',  tasks: 5, status: 'running',      priority: 'Low',    stageSteps: '3/5', stageDesc: 'Retrieving supplementary vendor invoices',              assists: [{label:'Captcha'}],                                                     team: 'Disputes Team',   assignTo: 'Sarah Johnson' },
+  { id: '2947-5432', type: 'case', stage: 'Document Signing',   tasks: 2, status: 'running',      priority: 'Low',    stageSteps: '1/6', stageDesc: 'Preparing documents for digital signing',              assists: [{label:'Compare'},{label:'Credentials'}],                               team: 'Compliance Team', assignTo: 'Ahmed Arah'    },
+  { id: '4821-1093', type: 'case', stage: 'Comparison',         tasks: 3, status: 'awaiting',     priority: 'Medium', stageSteps: '2/5', stageDesc: 'Comparing datasets for cross-portal analysis',         assists: [{label:'Credentials'},{label:'Compare'}],                               team: 'Analytics Team',  assignTo: null            },
+  { id: '7734-2201', type: 'case', stage: 'AP Review',          tasks: 1, status: 'running',      priority: 'Low',    stageSteps: '3/4', stageDesc: 'Finalizing AP review and preparing submission',         assists: [{label:'Credentials'}],                                                 team: 'Deductions Team', assignTo: 'Michael Nguyen'},
+  { id: '6612-8845', type: 'case', stage: 'Invoice Retrieval',  tasks: 7, status: 'running',      priority: 'High',   stageSteps: '2/6', stageDesc: 'Large invoice retrieval across vendor portals',        assists: [{label:'Credentials',count:4},{label:'Captcha',count:3}],               team: 'OCR Team',        assignTo: 'Priya Nair'    },
+  { id: '3301-7729', type: 'case', stage: 'Document Review',    tasks: 2, status: 'running',      priority: 'Medium', stageSteps: '4/7', stageDesc: 'Quality checking document review batch',               assists: [{label:'Credentials',count:2}],                                         team: 'Analytics Team',  assignTo: 'David Kim'     },
+  { id: '9102-4456', type: 'case', stage: 'OCR Processing',     tasks: 4, status: 'running',      priority: 'Medium', stageSteps: '2/4', stageDesc: 'OCR batch processing and validation',                  assists: [{label:'Credentials',count:2},{label:'Authorize',count:2}],             team: 'OCR Team',        assignTo: null            },
+  { id: '8803-1124', type: 'case', stage: 'Classification',     tasks: 1, status: 'running',      priority: 'Low',    stageSteps: '1/6', stageDesc: 'Running classification batch on document queue',       assists: [{label:'Credentials'}],                                                 team: 'Disputes Team',   assignTo: 'Sarah Johnson' },
+  { id: '5541-0032', type: 'case', stage: 'AP Matching',        tasks: 5, status: 'running',      priority: 'High',   stageSteps: '3/5', stageDesc: 'Reconciling invoices against purchase order records', assists: [{label:'Credentials',count:3},{label:'Compare',count:2}],               team: 'Compliance Team', assignTo: 'Ahmed Arah'    },
 ];
 
 // General tasks — agent assistance requests, not tied to any case
@@ -6502,32 +6856,32 @@ const generalTasksData = [
     need: 'Login credentials', needIcon: 'key',
     summary: 'Blocked on 3 vendor portals — credentials required to continue retrieval',
     items: ['Global-Tech supplier portal', 'Apex Solutions login', 'DocuVault Pro access'],
-    priority: 'High', status: 'failed', createdAt: '2h ago' },
+    priority: 'High', status: 'failed', createdAt: '2h ago', team: 'Analytics Team',  assignTo: 'Sarah Johnson'  },
   { id: 'TASK-002', type: 'task', agent: 'Retriever Agent', agentIcon: 'cloud_download',
     need: 'Access permission', needIcon: 'lock_open',
     summary: 'Insufficient permissions to read from 2 internal shared drives',
     items: ['Finance / Q1 Invoices (read access)', 'Procurement / PO Archive (read access)'],
-    priority: 'High', status: 'failed', createdAt: '3h ago' },
+    priority: 'High', status: 'failed', createdAt: '3h ago', team: 'Deductions Team', assignTo: 'Ahmed Arah'     },
   { id: 'TASK-003', type: 'task', agent: 'Classifier Agent', agentIcon: 'category',
     need: 'Classification rule', needIcon: 'rule',
     summary: 'Encountered 2 unknown document types with no matching classification rule',
     items: ['Document type: "Customs Declaration Form"', 'Document type: "Multi-party Invoice"'],
-    priority: 'Medium', status: 'failed', createdAt: '4h ago' },
+    priority: 'Medium', status: 'failed', createdAt: '4h ago', team: 'OCR Team',       assignTo: 'Michael Nguyen'},
   { id: 'TASK-004', type: 'task', agent: 'Classifier Agent', agentIcon: 'category',
     need: 'Human review', needIcon: 'rate_review',
     summary: 'Confidence below threshold on 5 documents — human labelling required',
     items: ['INV-2024-0098 (42% confidence)', 'INV-2024-0102 (38%)', 'PO-887 (29%)', '+ 2 more'],
-    priority: 'Medium', status: 'pending', createdAt: '5h ago' },
+    priority: 'Medium', status: 'pending', createdAt: '5h ago', team: 'OCR Team',       assignTo: 'Priya Nair'   },
   { id: 'TASK-005', type: 'task', agent: 'Signer Agent', agentIcon: 'draw',
     need: 'Re-authentication', needIcon: 'login',
     summary: 'DocuSign integration token expired — re-auth needed to resume signing queue',
     items: ['DocuSign OAuth token expired', '7 documents awaiting signature'],
-    priority: 'High', status: 'failed', createdAt: '6h ago' },
+    priority: 'High', status: 'failed', createdAt: '6h ago', team: 'Compliance Team', assignTo: 'David Kim'     },
   { id: 'TASK-006', type: 'task', agent: 'Comparer Agent', agentIcon: 'compare',
     need: 'Manual decision', needIcon: 'help',
     summary: 'Detected potential duplicate invoices that require human judgement to resolve',
     items: ['Invoice #2024-441 vs #2024-398 (94% similarity)', 'Invoice #2024-512 vs #2024-489 (88%)'],
-    priority: 'Low', status: 'pending', createdAt: '1d ago' },
+    priority: 'Low', status: 'pending', createdAt: '1d ago', team: 'Disputes Team',  assignTo: null            },
 ];
 let activeWorkFeedCase = '2947-5839';
 
@@ -7015,90 +7369,105 @@ const _deductionWfData = [
     stage: 'Eyeball Review', tasks: 2, status: 'intervention', priority: 'High',
     amount: '$12,450.00', stageSteps: '2/4', subtitle: 'Walmart Inc. · OS&D',
     customerSign: true, carrierSign: true, stc: false,
-    stageDesc: 'OCR data extracted — human verification required', assists: [{label:'Eyeball',count:2}] },
+    stageDesc: 'OCR data extracted — human verification required', assists: [{label:'Eyeball',count:2}],
+    team: 'Deductions Team', assignTo: 'Emily Foster' },
   { id: 'DED-00109', type: 'case', retailer: 'Amazon Retail', deductionType: 'Price Discrepancy',
     invoiceNo: 'INV-72941', poNo: 'PO-881203', claimDate: '03/22/2024',
     stage: 'Eyeball Review', tasks: 1, status: 'intervention', priority: 'High',
     amount: '$5,870.50', stageSteps: '2/4', subtitle: 'Amazon Retail · Price Discrepancy',
     customerSign: true, carrierSign: false, stc: false,
-    stageDesc: 'Invoice extraction needs review before validation', assists: [{label:'Eyeball',count:1}] },
+    stageDesc: 'Invoice extraction needs review before validation', assists: [{label:'Eyeball',count:1}],
+    team: 'Deductions Team', assignTo: 'Marcus Webb' },
   { id: 'DED-00082', type: 'case', retailer: 'Safeway Inc.', deductionType: 'Tax/Freight Mismatch',
     invoiceNo: 'INV-66120', poNo: 'PO-773910', claimDate: '04/01/2024',
     stage: 'Eyeball Review', tasks: 3, status: 'intervention', priority: 'Medium',
     amount: '$9,250.00', stageSteps: '2/4', subtitle: 'Safeway Inc. · Tax/Freight Mismatch',
     customerSign: false, carrierSign: true, stc: false,
-    stageDesc: 'POD and invoice OCR require verification', assists: [{label:'Eyeball',count:3}] },
+    stageDesc: 'POD and invoice OCR require verification', assists: [{label:'Eyeball',count:3}],
+    team: 'Disputes Team', assignTo: 'Ahmed Arah' },
   // Deduction Validation stage
   { id: 'DED-00118', type: 'case', retailer: 'Target Corporation', deductionType: 'OS&D',
     invoiceNo: 'INV-79302', poNo: 'PO-187445', claimDate: '03/18/2024',
     stage: 'Deduction Validation', tasks: 1, status: 'intervention', priority: 'High',
     amount: '$8,230.50', stageSteps: '3/4', subtitle: 'Target Corporation · OS&D',
     customerSign: true, carrierSign: true, stc: true,
-    stageDesc: 'Analyst review required for final determination', assists: [{label:'Validate',count:1}] },
+    stageDesc: 'Analyst review required for final determination', assists: [{label:'Validate',count:1}],
+    team: 'Deductions Team', assignTo: 'Ben Septer' },
   { id: 'DED-00105', type: 'case', retailer: 'Home Depot', deductionType: 'OS&D',
     invoiceNo: 'INV-71882', poNo: 'PO-229048', claimDate: '03/28/2024',
     stage: 'Deduction Validation', tasks: 1, status: 'intervention', priority: 'High',
     amount: '$19,450.00', stageSteps: '3/4', subtitle: 'Home Depot · OS&D',
     customerSign: true, carrierSign: false, stc: true,
-    stageDesc: 'Shortage analysis ready for analyst determination', assists: [{label:'Validate',count:1}] },
+    stageDesc: 'Shortage analysis ready for analyst determination', assists: [{label:'Validate',count:1}],
+    team: 'Deductions Team', assignTo: 'Sarah Johnson' },
   { id: 'DED-00088', type: 'case', retailer: 'Publix Super Markets', deductionType: 'Price Discrepancy',
     invoiceNo: 'INV-64509', poNo: 'PO-559820', claimDate: '03/30/2024',
     stage: 'Deduction Validation', tasks: 1, status: 'intervention', priority: 'Medium',
     amount: '$14,100.00', stageSteps: '3/4', subtitle: 'Publix Super Markets · Price Discrepancy',
     customerSign: false, carrierSign: false, stc: true,
-    stageDesc: 'Pricing discrepancy validation pending analyst review', assists: [{label:'Validate',count:1}] },
+    stageDesc: 'Pricing discrepancy validation pending analyst review', assists: [{label:'Validate',count:1}],
+    team: 'Disputes Team', assignTo: 'Ben Septer' },
   // Billback stage (approved — notification ready to send)
   { id: 'DED-00113', type: 'case', retailer: 'Costco Wholesale', deductionType: 'OS&D',
     invoiceNo: 'INV-75844', poNo: 'PO-412093', claimDate: '03/20/2024',
     stage: 'Credit Memo / Billback', tasks: 1, status: 'intervention', priority: 'High',
     amount: '$31,200.00', stageSteps: '4/4', subtitle: 'Costco Wholesale · OS&D',
     customerSign: true, carrierSign: true, stc: true,
-    stageDesc: 'Deduction approved — credit memo ready to send', assists: [{label:'Credit Memo',count:1}] },
+    stageDesc: 'Deduction approved — credit memo ready to send', assists: [{label:'Credit Memo',count:1}],
+    team: 'Deductions Team', assignTo: 'Priya Nair' },
   { id: 'DED-00094', type: 'case', retailer: 'CVS Health', deductionType: 'Duplicate Billing',
     invoiceNo: 'INV-68831', poNo: 'PO-348820', claimDate: '03/25/2024',
     stage: 'Credit Memo / Billback', tasks: 1, status: 'intervention', priority: 'Medium',
     amount: '$6,790.00', stageSteps: '4/4', subtitle: 'CVS Health · Duplicate Billing',
     customerSign: true, carrierSign: true, stc: false,
-    stageDesc: 'Approved deduction ready for client notification', assists: [{label:'Credit Memo',count:1}] },
+    stageDesc: 'Approved deduction ready for client notification', assists: [{label:'Credit Memo',count:1}],
+    team: 'Compliance Team', assignTo: 'David Kim' },
   { id: 'DED-00076', type: 'case', retailer: "Sam's Club", deductionType: 'RTV',
     invoiceNo: 'INV-59902', poNo: 'PO-280043', claimDate: '04/05/2024',
     stage: 'Credit Memo / Billback', tasks: 1, status: 'awaiting', priority: 'Low',
     amount: '$22,630.00', stageSteps: '4/4', subtitle: "Sam's Club · RTV",
     customerSign: false, carrierSign: true, stc: false,
-    stageDesc: 'Awaiting final sign-off before credit memo is sent', assists: [{label:'Credit Memo',count:1}] },
+    stageDesc: 'Awaiting final sign-off before credit memo is sent', assists: [{label:'Credit Memo',count:1}],
+    team: 'Disputes Team', assignTo: 'Michael Nguyen' },
   // Document Collection (automated, no HITL yet)
   { id: 'DED-00099', type: 'case', retailer: 'Kroger Co.', deductionType: 'Wrong Product',
     invoiceNo: 'INV-70129', poNo: 'PO-301982', claimDate: '03/26/2024',
     stage: 'Document Collection', tasks: 0, status: 'running', priority: 'Medium',
     amount: '$3,420.00', stageSteps: '1/4', subtitle: 'Kroger Co. · Wrong Product',
     customerSign: false, carrierSign: false, stc: false,
-    stageDesc: 'Retrieving POD and backup files from vendor portals', assists: [] },
+    stageDesc: 'Retrieving POD and backup files from vendor portals', assists: [],
+    team: 'Analytics Team', assignTo: 'Ben Septer' },
   // ── Global agent tasks (not linked to a specific case) ───────────────────
   { id: 'DED-TASK-001', type: 'task', agent: 'OCR Agent', agentIcon: 'document_scanner',
     need: 'Low confidence fields', needIcon: 'warning',
     summary: '14 invoices flagged below 70% OCR confidence — manual field correction required before validation can proceed',
     items: ['INV-84209 (Walmart Inc.) — 61% confidence', 'INV-77043 (Target Corp.) — 58% confidence', 'INV-91228 (Home Depot) — 64% confidence', 'INV-66120 (Safeway Inc.) — 67% confidence', 'INV-72941 (Amazon Retail) — 59% confidence', 'INV-81034 (Kroger Co.) — 63% confidence', 'INV-88290 (Walgreens) — 55% confidence', 'INV-70129 (CVS Health) — 68% confidence', 'INV-93041 (Publix) — 62% confidence', 'INV-44821 (Costco Wholesale) — 57% confidence', 'INV-58820 (BJ\'s Wholesale) — 66% confidence', 'INV-39102 (Rite Aid) — 64% confidence', 'INV-51847 (Dollar General) — 60% confidence', 'INV-29471 (Target Corp.) — 58% confidence'],
-    priority: 'High', status: 'failed', createdAt: '1h ago' },
+    priority: 'High', status: 'failed', createdAt: '1h ago',
+    team: 'OCR Team', assignTo: 'Ben Septer' },
   { id: 'DED-TASK-002', type: 'task', agent: 'Deduction Classifier', agentIcon: 'category',
     need: 'New deduction type', needIcon: 'rule',
     summary: '3 claims submitted with deduction type "Indirect Freight" which has no existing validation rule — rule definition needed',
     items: ['DED-00291 — Albertsons — $4,100.00', 'DED-00304 — Walgreens — $2,870.00', 'DED-00318 — Rite Aid — $1,950.00'],
-    priority: 'High', status: 'failed', createdAt: '2h ago' },
+    priority: 'High', status: 'failed', createdAt: '2h ago',
+    team: 'Deductions Team', assignTo: 'Sarah Johnson' },
   { id: 'DED-TASK-003', type: 'task', agent: 'Dispute Agent', agentIcon: 'gavel',
     need: 'Escalation approval', needIcon: 'approval',
     summary: '2 high-value disputes exceed auto-approval threshold ($25K) and require manager sign-off before counter-claim is filed',
     items: ['DED-00211 — Costco Wholesale — $38,400.00', 'DED-00229 — BJ\'s Wholesale — $29,750.00'],
-    priority: 'High', status: 'pending', createdAt: '3h ago' },
+    priority: 'High', status: 'pending', createdAt: '3h ago',
+    team: 'Disputes Team', assignTo: 'Ahmed Arah' },
   { id: 'DED-TASK-004', type: 'task', agent: 'POD Retriever', agentIcon: 'cloud_download',
     need: 'Portal credentials', needIcon: 'key',
     summary: 'Blocked on 2 retailer portals — credentials expired or revoked, cannot retrieve proof-of-delivery documents',
     items: ['Kroger Supplier Hub — session expired', 'Albertsons Connect — 403 Forbidden'],
-    priority: 'Medium', status: 'failed', createdAt: '4h ago' },
+    priority: 'Medium', status: 'failed', createdAt: '4h ago',
+    team: 'Compliance Team', assignTo: 'Ben Septer' },
   { id: 'DED-TASK-005', type: 'task', agent: 'Settlement Agent', agentIcon: 'payments',
     need: 'Remittance mapping', needIcon: 'link',
     summary: '9 remittance files received with deduction codes that don\'t map to any internal reason type — requires code table update',
     items: ['Code "FR-441" — unknown (5 occurrences)', 'Code "DM-09B" — unknown (3 occurrences)', 'Code "RP-220" — unknown (1 occurrence)'],
-    priority: 'Medium', status: 'pending', createdAt: '5h ago' },
+    priority: 'Medium', status: 'pending', createdAt: '5h ago',
+    team: 'Analytics Team', assignTo: 'Michael Nguyen' },
 ];
 
 const _deductionWfTasks = {
@@ -7385,7 +7754,7 @@ const _deductionTeamData = [
   { id: 'DED-00145', name: 'Albertsons',           created: '04/10/2024', due: '04/17/2024', tier: 'Mid-Market', assignees: ['Michael Torres'], overflow: 0, status: 'completed',    stage: 'Deduction Validation',     priority: 'Medium', fetchedBy: 'Portal',    client: 'Duplicate Billing',  reasonType: 'Duplicate Billing'  },
 ];
 
-let wfTableMode = false;
+let wfTableMode = true;
 const _wfTableStatuses = {}; // caseId → 'awaiting' | 'agent-taking-care' | 'complete'
 
 function _wfTableStatusHtml(caseId) {
@@ -7397,6 +7766,7 @@ function _wfTableStatusHtml(caseId) {
 
 function _updateWfTableStatus(caseId, status) {
   _wfTableStatuses[caseId] = status;
+  _wfUpdateKPIs();
   if (!wfTableMode) return;
   const row = document.querySelector(`#wf-tbl-tbody tr[data-case="${caseId}"]`);
   if (row) row.cells[1].innerHTML = _wfTableStatusHtml(caseId);
@@ -7404,15 +7774,20 @@ function _updateWfTableStatus(caseId, status) {
 
 function toggleWfMode(mode) {
   wfTableMode = (mode === 'table');
-  const splitView = document.getElementById('wf-split-view');
-  const tableView = document.getElementById('wf-table-view');
-  const feedBtn   = document.getElementById('wf-view-feed');
-  const tableBtn  = document.getElementById('wf-view-table');
-  const aiDrawer  = document.getElementById('ai-drawer');
-  if (splitView) splitView.style.display = wfTableMode ? 'none' : '';
-  if (tableView) tableView.style.display = wfTableMode ? 'flex' : 'none';
-  if (feedBtn)  feedBtn.classList.toggle('active', !wfTableMode);
-  if (tableBtn) tableBtn.classList.toggle('active',  wfTableMode);
+  const splitView  = document.getElementById('wf-split-view');
+  const tableView  = document.getElementById('wf-table-view');
+  const feedBtn    = document.getElementById('wf-view-feed');
+  const tableBtn   = document.getElementById('wf-view-table');
+  const aiDrawer   = document.getElementById('ai-drawer');
+  const groupWrap  = document.getElementById('wf-group-btn')?.closest('.tb-wrap');
+  const colsWrap   = document.getElementById('wf-columns-btn')?.closest('.tb-wrap');
+  if (splitView)  splitView.style.display  = wfTableMode ? 'none' : '';
+  if (tableView)  tableView.style.display  = wfTableMode ? 'flex' : 'none';
+  if (feedBtn)    feedBtn.classList.toggle('active',  !wfTableMode);
+  if (tableBtn)   tableBtn.classList.toggle('active',  wfTableMode);
+  // Hide Group + Columns controls in split/feed view — not relevant
+  if (groupWrap)  groupWrap.style.display  = wfTableMode ? '' : 'none';
+  if (colsWrap)   colsWrap.style.display   = wfTableMode ? '' : 'none';
   // Hide AI drawer in table mode; leave it closed in split mode (user opens manually)
   if (aiDrawer && wfTableMode) aiDrawer.classList.remove('open');
   if (wfTableMode) { renderWfTableHeader(); renderWorkFeedTable(); }
@@ -7442,8 +7817,19 @@ function _wfFilteredData() {
   let data = [...cases, ...extras].sort((a, b) =>
     (_WF_PRIORITY_ORDER[a.priority] ?? 3) - (_WF_PRIORITY_ORDER[b.priority] ?? 3)
   );
+  if (_wfSegFilter === 'on-me') {
+    data = data.filter(c => _fetchedCases[c.id] === _currentUser);
+  } else if (_wfSegFilter === 'queue') {
+    data = data.filter(c => !_fetchedCases[c.id]);
+  }
+  // 'all' → no segment filter
   if (_wfAvailableOnly) data = data.filter(c => !_fetchedCases[c.id] || _fetchedCases[c.id] === _currentUser);
-  // Apply field filters
+  // Apply column header filters
+  Object.entries(_wfColFilters).forEach(([col, vals]) => {
+    if (!vals || vals.size === 0) return;
+    data = data.filter(c => vals.has(_getWfCellRawVal(c, col)));
+  });
+  // Apply field filters (toolbar filter bar)
   wfFilterFields.forEach(f => {
     if (!f.value) return;
     const q = f.value.toLowerCase();
@@ -7452,12 +7838,216 @@ function _wfFilteredData() {
   return data;
 }
 
+// Returns the raw string value for a WF row + column (used by column filters)
+function _getWfCellRawVal(c, col) {
+  switch (col) {
+    case 'type':      return c.type === 'task' ? 'Agent task' : 'Case task';
+    case 'id':        return c.id || '';
+    case 'status':    return c.type === 'task' ? (c.status || '') : (_wfTableStatuses[c.id] || c.status || 'awaiting');
+    case 'assists':   return c.type === 'task' ? (c.need || '') : ((c.assists||[]).map(a=>a.label).join(', ') || '');
+    case 'priority':  return c.priority || '';
+    case 'stage':     return c.type === 'task' ? (c.agent || '') : (c.stage || '');
+    case 'team':      return c.team || '';
+    case 'assignTo':  return c.assignTo || '';
+    case 'fetchedBy': return _fetchedCases[c.id] || '';
+    default:          return '';
+  }
+}
+
+// Open the column filter popover for a given column th
+function _openWfColFilter(th, colKey) {
+  if (_wfColFilterOpen === colKey) { _closeWfColFilter(); return; }
+  _closeWfColFilter();
+  _wfColFilterOpen = colKey;
+  // Collect distinct values from full unfiltered dataset
+  const isDeduction = typeof activeSolution !== 'undefined' && activeSolution === 'deduction';
+  const allData = [..._activeWfCases(), ...(isDeduction ? [] : generalTasksData)];
+  const vals = [...new Set(allData.map(c => _getWfCellRawVal(c, colKey)).filter(Boolean))].sort();
+  _wfCfpAllVals = vals;
+  _wfCfpRender(vals, colKey);
+  // Position below th
+  const rect = th.getBoundingClientRect();
+  const pop  = document.getElementById('wf-col-fpop');
+  pop.style.left = Math.min(rect.left, window.innerWidth - 220) + 'px';
+  pop.style.top  = (rect.bottom + 3) + 'px';
+  pop.classList.remove('hidden');
+  document.getElementById('wf-cfp-search-inp').value = '';
+  document.getElementById('wf-cfp-search-inp').focus();
+}
+function _closeWfColFilter() {
+  document.getElementById('wf-col-fpop')?.classList.add('hidden');
+  _wfColFilterOpen = null;
+}
+function _wfCfpRender(vals, colKey) {
+  const active = _wfColFilters[colKey] || new Set();
+  const list   = document.getElementById('wf-cfp-list');
+  if (!vals.length) { list.innerHTML = '<div class="wf-cfp-empty">No values</div>'; return; }
+  list.innerHTML = '';
+  vals.forEach(v => {
+    const label = document.createElement('label');
+    label.className = 'wf-cfp-item';
+    const cb = document.createElement('input');
+    cb.type    = 'checkbox';
+    cb.checked = active.has(v);
+    cb.addEventListener('change', () => _wfColFilterToggle(colKey, v, cb.checked));
+    const txt = document.createElement('span');
+    txt.textContent = v;
+    label.appendChild(cb);
+    label.appendChild(txt);
+    list.appendChild(label);
+  });
+}
+function _wfCfpSearch(q) {
+  const filtered = q ? _wfCfpAllVals.filter(v => v.toLowerCase().includes(q.toLowerCase())) : _wfCfpAllVals;
+  _wfCfpRender(filtered, _wfColFilterOpen);
+}
+function _wfColFilterToggle(colKey, val, checked) {
+  if (!_wfColFilters[colKey]) _wfColFilters[colKey] = new Set();
+  if (checked) _wfColFilters[colKey].add(val);
+  else         _wfColFilters[colKey].delete(val);
+  if (_wfColFilters[colKey].size === 0) delete _wfColFilters[colKey];
+  renderWfTableHeader();
+  renderWorkFeedTable();
+}
+function _wfColFilterClear(colKey) {
+  delete _wfColFilters[colKey];
+  _closeWfColFilter();
+  renderWfTableHeader();
+  renderWorkFeedTable();
+}
+
 function toggleWfAvailFilter() {
   _wfAvailableOnly = !_wfAvailableOnly;
   const chip = document.getElementById('wf-avail-chip');
   if (chip) chip.classList.toggle('active', _wfAvailableOnly);
   renderWorkFeedList();
   if (wfTableMode) renderWorkFeedTable();
+}
+
+function setWfSegFilter(val) {
+  _wfSegFilter = val;
+  ['all', 'on-me', 'queue'].forEach(k => {
+    const btn = document.getElementById(`wf-seg-${k}`);
+    if (btn) btn.classList.toggle('active', k === val);
+  });
+  // Team: visible in All + In Queue; Assign to: visible in All only
+  if (val === 'all')    { wfHiddenCols.delete('team'); wfHiddenCols.delete('assignTo'); }
+  if (val === 'queue')  { wfHiddenCols.delete('team'); wfHiddenCols.add('assignTo'); }
+  if (val === 'on-me')  { wfHiddenCols.add('team');    wfHiddenCols.add('assignTo'); }
+  _wfCurrentPage = 1;
+  _wfUpdateKPIs();
+  renderWorkFeedList();
+  if (wfTableMode) { renderWfTableHeader(); renderWorkFeedTable(); }
+}
+
+// ── WF Bulk actions ───────────────────────────────────────────────────────────
+function wfUpdateBulkBar() {
+  const allCbs    = document.querySelectorAll('#wf-tbl-tbody .wf-row-cb');
+  const checked   = document.querySelectorAll('#wf-tbl-tbody .wf-row-cb:checked');
+  const n         = checked.length;
+  const bar       = document.getElementById('wf-bulk-bar');
+  const cnt       = document.getElementById('wf-bulk-count');
+  const sa        = document.getElementById('wf-select-all');
+  if (bar) bar.classList.toggle('visible', n > 0);
+  if (cnt) cnt.textContent = `${n} selected`;
+  if (sa) {
+    sa.checked       = n > 0 && n === allCbs.length;
+    sa.indeterminate = n > 0 && n < allCbs.length;
+  }
+}
+function wfToggleAll(cb) {
+  document.querySelectorAll('#wf-tbl-tbody .wf-row-cb').forEach(c => c.checked = cb.checked);
+  wfUpdateBulkBar();
+}
+function wfUnselectAll() {
+  document.querySelectorAll('#wf-tbl-tbody .wf-row-cb').forEach(c => c.checked = false);
+  const sa = document.getElementById('wf-select-all');
+  if (sa) { sa.checked = false; sa.indeterminate = false; }
+  wfUpdateBulkBar();
+}
+function wfBulkFetch() {
+  const ids = [...document.querySelectorAll('#wf-tbl-tbody .wf-row-cb:checked')].map(cb => cb.value);
+  ids.forEach(id => { if (!_fetchedCases[id]) _fetchedCases[id] = _currentUser; });
+  wfUnselectAll();
+  renderWorkFeedTable();
+  renderWorkFeedList();
+}
+function wfBulkAssign()      { /* placeholder — open assignee picker for selected rows */ }
+function wfBulkReallocate()  { /* placeholder — reallocate selected to team */ }
+
+// ── WF cell dropdown (Team / Assign to) ───────────────────────────────────────
+let _wfCellDropTarget = null; // { rowId, col }
+
+function _openWfCellDrop(td, rowId, col) {
+  _wfCellDropTarget = { rowId, col };
+  const drop = document.getElementById('wf-cell-drop');
+  const list = document.getElementById('wf-cell-drop-list');
+  if (!drop || !list) return;
+
+  const row = [...workFeedData, ...generalTasksData].find(c => c.id === rowId);
+  if (!row) return;
+
+  if (col === 'team') {
+    list.innerHTML = TEAMS.map(t => `
+      <div class="wf-cell-drop-item ${row.team === t.label ? 'active' : ''}"
+           onclick="_wfCellSet('${rowId}','team','${t.label}')">
+        <span class="wf-team-pill" style="pointer-events:none">${t.label}</span>
+      </div>`).join('');
+  } else if (col === 'assignTo') {
+    list.innerHTML =
+      `<div class="wf-cell-drop-item wf-cell-drop-unassign ${!row.assignTo ? 'active' : ''}"
+            onclick="_wfCellSet('${rowId}','assignTo',null)">
+         <span style="font-size:18px;width:24px;text-align:center;color:#ccc">—</span> Unassigned
+       </div>
+       <div class="wf-cell-drop-divider"></div>` +
+      _WF_USERS.map(u => `
+        <div class="wf-cell-drop-item ${row.assignTo === u ? 'active' : ''}"
+             onclick="_wfCellSet('${rowId}','assignTo','${u}')">
+          ${_activeUserAvatarHtml(u, 'sm')}
+          <span>${u === _currentUser ? u + ' (you)' : u}</span>
+        </div>`).join('');
+  }
+
+  const rect = td.getBoundingClientRect();
+  drop.classList.remove('hidden');
+  // Position below the cell, aligned left
+  const dropW = 210;
+  let left = rect.left;
+  if (left + dropW > window.innerWidth - 8) left = window.innerWidth - dropW - 8;
+  drop.style.top  = (rect.bottom + 4) + 'px';
+  drop.style.left = left + 'px';
+}
+
+function _wfCellSet(rowId, col, val) {
+  const all = [...workFeedData, ...generalTasksData];
+  const row = all.find(c => c.id === rowId);
+  if (row) row[col] = val;
+  document.getElementById('wf-cell-drop')?.classList.add('hidden');
+  _wfCellDropTarget = null;
+  if (wfTableMode) renderWorkFeedTable(); else renderWorkFeedList();
+}
+
+function _closeWfCellDrop() {
+  document.getElementById('wf-cell-drop')?.classList.add('hidden');
+  _wfCellDropTarget = null;
+}
+
+// Close cell dropdown + column filter popover on outside click
+document.addEventListener('click', e => {
+  if (!e.target.closest('#wf-cell-drop')) _closeWfCellDrop();
+  if (!e.target.closest('#wf-col-fpop') && !e.target.closest('.wf-th-filter-btn')) _closeWfColFilter();
+});
+
+function wfSetDensity(d) {
+  const tw = document.querySelector('#wf-table-view .table-wrapper');
+  if (tw) {
+    tw.classList.toggle('density-compact',  d === 'compact');
+    tw.classList.toggle('density-spacious', d === 'spacious');
+  }
+  ['default','compact','spacious'].forEach(k => {
+    document.getElementById(`wf-display-opt-${k}`)?.classList.toggle('active', k === d);
+  });
+  document.getElementById('wf-display-panel')?.classList.add('hidden');
 }
 
 function toggleWfFeedSortPanel() {
@@ -7489,7 +8079,7 @@ function _wfActiveCols() {
 }
 
 // ── WF Toolbar panels ─────────────────────────────────────────────────────────
-const _WF_PANELS = ['wf-filter-panel','wf-sort-panel','wf-group-panel','wf-columns-panel'];
+const _WF_PANELS = ['wf-filter-panel','wf-sort-panel','wf-group-panel','wf-display-panel','wf-columns-panel'];
 
 function wfTogglePanel(panelId) {
   _WF_PANELS.forEach(id => { if (id !== panelId) document.getElementById(id)?.classList.add('hidden'); });
@@ -7569,26 +8159,34 @@ function wfAddSortRule(key) {
   wfa.sortRules.push({ field: key || '', dir: 'asc' });
   wfSortEditorOpen = true;
   wfTogglePanel('wf-sort-panel');
-  wfRenderActiveBar(); renderWfTableHeader(); if (wfTableMode) renderWorkFeedTable();
+  wfRenderActiveBar(); renderWfTableHeader(); if (wfTableMode) renderWorkFeedTable(); else renderWorkFeedList();
 }
 function wfRemoveSortRule(i) {
   const wfa = _wfActiveCols();
   wfa.sortRules.splice(i, 1);
   if (!wfa.sortRules.length) wfSortEditorOpen = false;
-  wfRenderActiveBar(); renderWfTableHeader(); if (wfTableMode) renderWorkFeedTable();
+  wfRenderActiveBar(); renderWfTableHeader(); if (wfTableMode) renderWorkFeedTable(); else renderWorkFeedList();
 }
 function wfSetSortField(i, key) {
   _wfActiveCols().sortRules[i].field = key;
-  wfRenderActiveBar(); renderWfTableHeader(); if (wfTableMode) renderWorkFeedTable();
+  wfRenderActiveBar(); renderWfTableHeader(); if (wfTableMode) renderWorkFeedTable(); else renderWorkFeedList();
 }
 function wfSetSortDir(i, dir) {
   _wfActiveCols().sortRules[i].dir = dir;
-  wfRenderActiveBar(); renderWfTableHeader(); if (wfTableMode) renderWorkFeedTable();
+  wfRenderActiveBar(); renderWfTableHeader(); if (wfTableMode) renderWorkFeedTable(); else renderWorkFeedList();
 }
 function wfClearAllSorts() {
   const wfa = _wfActiveCols();
   wfa.sortRules.length = 0; wfSortEditorOpen = false;
-  wfRenderActiveBar(); renderWfTableHeader(); if (wfTableMode) renderWorkFeedTable();
+  wfRenderActiveBar(); renderWfTableHeader(); if (wfTableMode) renderWorkFeedTable(); else renderWorkFeedList();
+}
+function wfResetAll() {
+  wfFilterFields = []; wfActiveFilterPopover = null;
+  _wfActiveCols().sortRules.length = 0; wfSortEditorOpen = false;
+  wfGroupField = null;
+  wfRenderFilterPanel(); wfRenderSortPanel();
+  wfRenderActiveBar(); renderWfTableHeader();
+  if (wfTableMode) renderWorkFeedTable(); else renderWorkFeedList();
 }
 function wfToggleSortEditor(event) {
   event && event.stopPropagation();
@@ -7737,13 +8335,24 @@ function wfRenderActiveBar() {
         </button>
       </div>` : '';
     html += `<div class="filter-pill ${isEmpty ? 'empty' : ''}" onclick="wfOpenFilterPopover('${f.field}', event)">
-      <span class="fp-field">${col.label}</span>
-      ${!isEmpty ? `<span class="fp-sep">·</span><span class="fp-value">${f.value}</span>` : ''}
-      <button class="fp-x" onclick="event.stopPropagation();wfRemoveFilterField('${f.field}')">&times;</button>
+      ${f.value ? `<span style="color:#888;margin-right:2px">${col.label}:</span>${f.value}` : col.label}
+      <button class="pill-x" onclick="event.stopPropagation();wfRemoveFilterField('${f.field}')">&times;</button>
       ${popoverHtml}
     </div>`;
   });
+  // Action buttons — always visible when bar is shown
+  html += `<button class="filter-bar-add" onclick="wfTogglePanel('wf-filter-panel');event.stopPropagation()">
+    <span class="material-symbols-outlined">add</span>Filter
+  </button>
+  <div class="filter-bar-divider"></div>
+  <button class="filter-bar-reset" onclick="wfResetAll()">
+    <span class="material-symbols-outlined">refresh</span>Reset
+  </button>`;
   bar.innerHTML = html;
+  if (wfActiveFilterPopover) {
+    const input = bar.querySelector('.fp-input');
+    if (input) { input.focus(); input.setSelectionRange(input.value.length, input.value.length); }
+  }
 }
 
 function renderWfColumnsPanel(search) {
@@ -7831,13 +8440,18 @@ function renderWfTableHeader() {
   const thead = document.getElementById('wf-tbl-thead');
   if (!thead) return;
   const { order, hidden, widths, sortRules, pinnedCols } = _wfActiveCols();
+  const checkboxTh = document.createElement('th');
+  checkboxTh.style.cssText = 'width:36px;min-width:36px;padding:0 8px;text-align:center';
+  checkboxTh.innerHTML = `<input type="checkbox" id="wf-select-all" onclick="wfToggleAll(this)">`;
   _buildTableHead(thead, order, hidden, widths, {
     resizeFn:        'startWfColResize',
     sortRules,
     pinnedCols,
     colMenuFn:       'openWfColMenu',
     trailingThStyle: 'width:0;min-width:0;padding:0;border:none',
+    checkboxTh,
   });
+  // Column filter buttons removed — filtering via column context menu instead
 }
 
 function applyWfColWidths() {
@@ -7891,8 +8505,8 @@ function _renderWfCaseCellContent(c, key) {
   switch (key) {
     case 'type': {
       const cfg = {
-        case:     { icon: 'inventory_2',  label: 'Case',     cls: 'wf-type-case'     },
-        task:     { icon: 'task_alt',     label: 'Task',     cls: 'wf-type-task'     },
+        case:     { icon: 'inventory_2',  label: 'Case task',  cls: 'wf-type-case'     },
+        task:     { icon: 'task_alt',     label: 'Agent task', cls: 'wf-type-task'     },
         approval: { icon: 'approval',     label: 'Approval', cls: 'wf-type-approval' },
         review:   { icon: 'rate_review',  label: 'Review',   cls: 'wf-type-review'   },
       }[c.type] || { icon: 'circle',      label: c.type || '—', cls: '' };
@@ -7903,11 +8517,9 @@ function _renderWfCaseCellContent(c, key) {
         ? `<div class="wf-tbl-case"><span class="material-symbols-outlined">task_alt</span><span class="wf-tbl-case-id">${c.id}</span></div>`
         : `<div class="wf-tbl-case"><span class="material-symbols-outlined">inventory_2</span><span class="wf-tbl-case-id">${c.id}</span></div>`;
     case 'status':
-      return _fetchedCases[c.id]
-        ? `<span class="wf-tbl-status wf-tbl-status--active">On Progress</span>${_activeUserAvatarHtml(_fetchedCases[c.id])}`
-        : (isTask
-            ? `<span class="wf-tbl-status wf-tbl-status--${c.status}">${c.status}</span>`
-            : _wfTableStatusHtml(c.id));
+      return isTask
+        ? `<span class="wf-tbl-status wf-tbl-status--${c.status}">${c.status}</span>`
+        : _wfTableStatusHtml(c.id);
     case 'assists':
       if (isTask) {
         // For tasks: show the "need" pill in place of assists
@@ -7928,6 +8540,18 @@ function _renderWfCaseCellContent(c, key) {
         return `<div class="wf-tbl-stage"><div class="wf-tbl-stage-top"><span class="material-symbols-outlined wf-tbl-stage-icon">${c.agentIcon || 'smart_toy'}</span><span class="wf-tbl-stage-name">${c.agent || ''}</span></div><div class="wf-tbl-stage-desc">${c.summary || ''}</div></div>`;
       }
       return `<div class="wf-tbl-stage"><div class="wf-tbl-stage-top"><span class="material-symbols-outlined wf-tbl-stage-icon">auto_awesome_mosaic</span><span class="wf-tbl-stage-steps">${c.stageSteps || ''}</span><span class="wf-tbl-stage-name">${c.stage}</span></div><div class="wf-tbl-stage-desc">${c.stageDesc || ''}</div></div>`;
+    case 'team':
+      return c.team ? `<span class="wf-team-pill">${c.team}</span>` : '<span class="wf-muted">—</span>';
+    case 'assignTo':
+      return c.assignTo
+        ? `<span class="wf-user-cell">${_activeUserAvatarHtml(c.assignTo, 'sm')}<span>${c.assignTo.split(' ')[0]}</span></span>`
+        : '<span class="wf-muted">Unassigned</span>';
+    case 'fetchedBy': {
+      const fb = _fetchedCases[c.id];
+      return fb
+        ? `<span class="wf-user-cell">${_activeUserAvatarHtml(fb, 'sm')}<span>${fb === _currentUser ? 'You' : fb.split(' ')[0]}</span></span>`
+        : '<span class="wf-muted">—</span>';
+    }
     default: return '';
   }
 }
@@ -7937,9 +8561,7 @@ function _renderWfTaskCellContent(c, key) {
     case 'agent':
       return `<div class="wf-tbl-agent-cell"><div class="wf-tbl-agent-icon"><span class="material-symbols-outlined">${c.agentIcon}</span></div><span class="wf-tbl-agent-name">${c.agent}</span></div>`;
     case 'status':
-      return _fetchedCases[c.id]
-        ? `<span class="wf-tbl-status wf-tbl-status--active">On Progress</span>${_activeUserAvatarHtml(_fetchedCases[c.id])}`
-        : `<span class="wf-tbl-status wf-tbl-status--${c.status}">${c.status}</span>`;
+      return `<span class="wf-tbl-status wf-tbl-status--${c.status}">${c.status}</span>`;
     case 'need':
       return `<span class="wf-tbl-need-pill"><span class="material-symbols-outlined">${c.needIcon}</span>${c.need}</span>`;
     case 'priority':
@@ -7973,22 +8595,42 @@ function renderWorkFeedTable() {
 
   function _rowHtml(c) {
     const isTask = c.type === 'task';
-    const cells = visibleCols.map(col =>
-      `<td data-col="${col.key}">${_renderWfCaseCellContent(c, col.key)}</td>`
-    ).join('');
+    const _editCols = new Set(['team','assignTo']);
+    const cells = visibleCols.map(col => {
+      const extra = _editCols.has(col.key)
+        ? ` onclick="event.stopPropagation();_openWfCellDrop(this,'${c.id}','${col.key}')"`
+        : '';
+      return `<td data-col="${col.key}"${extra}>${_renderWfCaseCellContent(c, col.key)}</td>`;
+    }).join('');
+    const _fetchedBy = _fetchedCases[c.id];
+    const _fetchedByMe = _fetchedBy === _currentUser;
+    const _fetchedByOthers = _fetchedBy && !_fetchedByMe;
+    // Fetched by me or unfetched → open full form in tab (unfetched shows Fetch button in header)
+    // Fetched by others → default solver behaviour (read-only access via row action)
+    const _rowClick = !_fetchedByOthers ? `openWfCaseTab('${c.id}')` : `selectWorkFeedCase('${c.id}')`;
     const actionsHtml = isTask
       ? `${_wfRowFetchBtn(c.id)}
          <button class="row-action-btn" onclick="event.stopPropagation()"><span class="material-symbols-outlined">check_circle</span><span>Resolve</span></button>
          <button class="row-action-btn" onclick="event.stopPropagation()"><span class="material-symbols-outlined">close</span><span>Dismiss</span></button>`
-      : `<button class="row-action-btn" onclick="openWfCaseReadOnly('${c.id}')"><span class="material-symbols-outlined">open_in_new</span><span>Read case</span></button>
+      : `${_fetchedByOthers ? `<button class="row-action-btn" onclick="openWfCaseReadOnly('${c.id}')"><span class="material-symbols-outlined">open_in_new</span><span>Read case</span></button>` : ''}
          ${_wfRowFetchBtn(c.id)}
          <button class="row-action-btn" onclick="_wfAskCaseyToSolve('${c.id}')"><span class="material-symbols-outlined">auto_awesome</span><span>Ask Casey</span></button>
          <button class="row-action-btn" onclick="openWfQuickActions('${c.id}')"><span class="material-symbols-outlined">bolt</span><span>Quick actions</span></button>`;
-    return `<tr data-case="${c.id}" onclick="selectWorkFeedCase('${c.id}')">
+    return `<tr data-case="${c.id}" onclick="${_rowClick}">
+      <td style="width:36px;padding:0 8px;text-align:center" onclick="event.stopPropagation()">
+        <input type="checkbox" class="wf-row-cb" value="${c.id}" onchange="wfUpdateBulkBar()">
+      </td>
       ${cells}
       <td class="row-actions-cell" onclick="event.stopPropagation()"><div class="row-actions">${actionsHtml}</div></td>
     </tr>`;
   }
+
+  // Pagination — clamp page, render bar, slice data
+  const _wfTotal = data.length;
+  const _wfMaxPage = Math.max(1, Math.ceil(_wfTotal / _wfItemsPerPage));
+  if (_wfCurrentPage > _wfMaxPage) _wfCurrentPage = _wfMaxPage;
+  _wfRenderPagination(_wfTotal);
+  data = data.slice((_wfCurrentPage - 1) * _wfItemsPerPage, _wfCurrentPage * _wfItemsPerPage);
 
   // Apply group-by
   if (wfGroupField) {
@@ -7998,7 +8640,7 @@ function renderWorkFeedTable() {
       if (!groups.has(key)) groups.set(key, []);
       groups.get(key).push(c);
     });
-    const colSpan = visibleCols.length + 1;
+    const colSpan = visibleCols.length + 2; // +1 actions, +1 checkbox
     tbody.innerHTML = [...groups.entries()].map(([groupVal, rows]) =>
       `<tr class="group-header-row"><td colspan="${colSpan}" class="group-header-cell">
         <span class="material-symbols-outlined" style="font-size:13px;vertical-align:middle;margin-right:4px">label</span>${groupVal}
@@ -8010,6 +8652,11 @@ function renderWorkFeedTable() {
   }
 
   if (typeof applyWfFreezeStyles === 'function') applyWfFreezeStyles();
+  // Reset bulk bar after re-render (rows rebuilt, all unchecked)
+  const wfBulkBarEl = document.getElementById('wf-bulk-bar');
+  if (wfBulkBarEl) wfBulkBarEl.classList.remove('visible');
+  const wfSa = document.getElementById('wf-select-all');
+  if (wfSa) { wfSa.checked = false; wfSa.indeterminate = false; }
 }
 
 function _wfAskCaseyToSolve(caseId) {
@@ -8737,7 +9384,97 @@ function _submitWfPartialApproval(caseId) {
   showToast(`Partial approval of ${amount} submitted`);
 }
 
+function _wfUpdateKPIs() {
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  const isOnMe = _wfSegFilter === 'on-me';
+  const defaultGrp = document.getElementById('wf-kpis-default');
+  const onMeGrp    = document.getElementById('wf-kpis-onme');
+  if (defaultGrp) defaultGrp.style.display = isOnMe ? 'none' : 'contents';
+  if (onMeGrp)    onMeGrp.style.display    = isOnMe ? 'flex'  : 'none';
+
+  const allCases = _activeWfCases();
+
+  if (!isOnMe) {
+    // Demo numbers — would come from backend in production
+    set('wf-kpi-total',    600);
+    set('wf-kpi-solved',   431);
+    set('wf-kpi-progress', 32);
+    set('wf-kpi-queue',    150);
+  } else {
+    // Demo numbers — would come from backend in production
+    const total      = 140;
+    const completed  = 105;
+    const inProgress = 0;
+    const waitForMe  = 35;
+    // Progress bar flex values
+    const setFlex = (id, val) => { const el = document.getElementById(id); if (el) el.style.flex = String(Math.max(val, 0)); };
+    setFlex('wf-kpi-onme-seg-completed', completed);
+    setFlex('wf-kpi-onme-seg-progress',  inProgress);
+    setFlex('wf-kpi-onme-seg-wait',      Math.max(waitForMe, 1));
+    set('wf-kpi-onme-total',          total);
+    set('wf-kpi-onme-waittoday',      waitForMe);
+    set('wf-kpi-onme-completedtoday', waitForMe);
+  }
+}
+
+// ── Work Feed pagination ──────────────────────────────────────────────────────
+function _wfRenderPagination(totalItems) {
+  const totalPages = Math.max(1, Math.ceil(totalItems / _wfItemsPerPage));
+  _wfLastTotalPages = totalPages;
+  const start = totalItems === 0 ? 0 : (_wfCurrentPage - 1) * _wfItemsPerPage + 1;
+  const end   = Math.min(_wfCurrentPage * _wfItemsPerPage, totalItems);
+  const countEl = document.getElementById('wf-pg-count');
+  const valEl   = document.getElementById('wf-pg-per-page-val');
+  if (countEl) countEl.textContent = totalItems === 0 ? '0 of 0' : `${start}–${end} of ${totalItems}`;
+  if (valEl)   valEl.textContent   = _wfItemsPerPage;
+  document.querySelectorAll('#wf-pg-per-page-menu .pg-per-page-opt').forEach(btn => {
+    btn.classList.toggle('active', parseInt(btn.textContent) === _wfItemsPerPage);
+  });
+  const first = _wfCurrentPage === 1;
+  const last  = _wfCurrentPage === totalPages;
+  const pages = buildPageSequence(_wfCurrentPage, totalPages);
+  const controls = document.getElementById('wf-pg-controls');
+  if (!controls) return;
+  controls.innerHTML =
+    `<button class="pg-nav-btn" onclick="wfGoToPage(1)" ${first?'disabled':''} title="First page">
+       <span class="material-symbols-outlined">first_page</span>
+     </button>
+     <button class="pg-nav-btn" onclick="wfGoToPage(${_wfCurrentPage-1})" ${first?'disabled':''} title="Previous">
+       <span class="material-symbols-outlined">chevron_left</span>
+     </button>
+     ${pages.map(p => p === '...'
+       ? `<button class="pg-ellipsis" disabled><span class="material-symbols-outlined">more_horiz</span></button>`
+       : `<button class="pg-page-btn${p===_wfCurrentPage?' active':''}" onclick="wfGoToPage(${p})">${p}</button>`
+     ).join('')}
+     <button class="pg-nav-btn" onclick="wfGoToPage(${_wfCurrentPage+1})" ${last?'disabled':''} title="Next">
+       <span class="material-symbols-outlined">chevron_right</span>
+     </button>
+     <button class="pg-nav-btn" onclick="wfGoToPage(${totalPages})" ${last?'disabled':''} title="Last page">
+       <span class="material-symbols-outlined">last_page</span>
+     </button>`;
+}
+
+function wfGoToPage(page) {
+  if (page < 1 || page > _wfLastTotalPages) return;
+  _wfCurrentPage = page;
+  renderWorkFeedTable();
+}
+
+function wfChangeItemsPerPage(n) {
+  _wfItemsPerPage  = n;
+  _wfCurrentPage   = 1;
+  const menu = document.getElementById('wf-pg-per-page-menu');
+  if (menu) menu.classList.add('hidden');
+  renderWorkFeedTable();
+}
+
+function wfTogglePerPageMenu(e) {
+  e.stopPropagation();
+  document.getElementById('wf-pg-per-page-menu').classList.toggle('hidden');
+}
+
 function renderWorkFeedPage() {
+  _wfUpdateKPIs();
   if (wfTableMode) {
     renderWfTableHeader();
     renderWorkFeedTable();
@@ -8748,17 +9485,95 @@ function renderWorkFeedPage() {
   }
 }
 
+function renderAllWorkPage() {
+  const el = document.getElementById('aw-kpi-total');
+  if (el) el.textContent = _activeWorkflows().length;
+  renderAllWorkTable();
+}
+function renderAllWorkTable() {
+  const tbody = document.getElementById('aw-tbl-tbody');
+  if (!tbody) return;
+  const data = _activeWorkflows();
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted);font-size:13px">No workflows found</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = data.map(w => `
+    <tr>
+      <td data-col="wfId">${w.wfId}</td>
+      <td data-col="wfName">${w.wfName}</td>
+      <td data-col="createdDate">${w.createdDate}</td>
+      <td data-col="updatedDate">${w.updatedDate}</td>
+      <td data-col="ownedBy">${w.ownedBy ? `<span class="wf-user-cell">${_activeUserAvatarHtml(w.ownedBy,'sm')}<span>${w.ownedBy}</span></span>` : '<span class="wf-muted">—</span>'}</td>
+      <td class="row-actions-cell"></td>
+    </tr>`).join('');
+}
+
+function renderWorkflowsTable() {
+  const tbody = document.getElementById('wf-tbl-tbody');
+  if (!tbody) return;
+  const data = _activeWorkflows();
+  // Apply any active column header filters
+  let rows = [...data];
+  Object.entries(_wfColFilters).forEach(([col, vals]) => {
+    if (!vals || vals.size === 0) return;
+    rows = rows.filter(w => vals.has(w[col] || ''));
+  });
+  // Apply sort rules
+  const { sortRules } = _wfActiveCols();
+  if (sortRules && sortRules.length) {
+    rows.sort((a, b) => {
+      for (const r of sortRules) {
+        const av = a[r.field] != null ? String(a[r.field]) : '';
+        const bv = b[r.field] != null ? String(b[r.field]) : '';
+        const n  = av.localeCompare(bv, undefined, { numeric: true });
+        if (n !== 0) return r.dir === 'asc' ? n : -n;
+      }
+      return 0;
+    });
+  }
+  const { order, hidden } = _wfActiveCols();
+  const visibleCols = order.filter(c => !hidden.has(c.key));
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="${visibleCols.length + 1}" style="text-align:center;padding:40px;color:var(--text-muted);font-size:13px">No workflows found</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map(w => {
+    const cells = visibleCols.map(col => {
+      let content = '';
+      if (col.key === 'ownedBy') {
+        content = w.ownedBy
+          ? `<span class="wf-user-cell">${_activeUserAvatarHtml(w.ownedBy, 'sm')}<span>${w.ownedBy}</span></span>`
+          : '<span class="wf-muted">—</span>';
+      } else {
+        content = w[col.key] != null ? String(w[col.key]) : '—';
+      }
+      return `<td data-col="${col.key}">${content}</td>`;
+    }).join('');
+    const checkTd = `<td style="padding:0 8px;text-align:center;vertical-align:middle"><input type="checkbox" class="wf-row-cb" data-id="${w.wfId}"></td>`;
+    return `<tr>${checkTd}${cells}<td class="row-actions-cell"></td></tr>`;
+  }).join('');
+}
+
 function renderWorkFeedList() {
   const list = document.getElementById('wf-feed-list');
   if (!list) return;
   let data = (typeof _wfFilteredData === 'function') ? [..._wfFilteredData()] : [...workFeedData];
-  // Apply feed sort
-  if (_wfFeedSortBy === 'type') {
-    data.sort((a, b) => (_WF_TYPE_ORDER[a.type] ?? 9) - (_WF_TYPE_ORDER[b.type] ?? 9));
-  } else if (_wfFeedSortBy === 'status') {
-    data.sort((a, b) => (a.status || '').localeCompare(b.status || ''));
+  // Apply toolbar sort rules when set, otherwise default card ordering
+  const { sortRules: _feedSortRules } = _wfActiveCols();
+  if (_feedSortRules && _feedSortRules.length) {
+    data.sort((a, b) => {
+      for (const r of _feedSortRules) {
+        if (!r.field) continue;
+        const av = a[r.field] != null ? String(a[r.field]) : '';
+        const bv = b[r.field] != null ? String(b[r.field]) : '';
+        const n  = av.localeCompare(bv, undefined, { numeric: true });
+        if (n !== 0) return r.dir === 'asc' ? n : -n;
+      }
+      return 0;
+    });
   } else {
-    // default: tasks first, then priority (High → Medium → Low) within each group
+    // default: tasks first, then priority (High → Medium → Low)
     data.sort((a, b) => {
       const aTask = a.type === 'task' ? 0 : 1;
       const bTask = b.type === 'task' ? 0 : 1;
@@ -8876,8 +9691,8 @@ function _renderWfTaskSolver(task) {
       <div class="wf-task-panel-items" id="wf-task-items-${task.id}">${itemsHtml}</div>
       ${toggleHtml}
       <div class="wf-task-panel-actions">
-        <button class="wf-task-resolve-btn"><span class="material-symbols-outlined">check_circle</span> Mark as resolved</button>
-        <button class="wf-task-dismiss-btn"><span class="material-symbols-outlined">close</span> Dismiss</button>
+        <button class="wf-task-resolve-btn" onclick="_resolveWfTask('${task.id}','solver')"><span class="material-symbols-outlined">check_circle</span> Mark as resolved</button>
+        <button class="wf-task-dismiss-btn" onclick="_dismissWfTask('${task.id}','solver')"><span class="material-symbols-outlined">close</span> Dismiss</button>
       </div>
     </div>`;
   _applyWfSolverLock(task.id);
@@ -9927,7 +10742,161 @@ const queueData = [
   { id: '# 200541', name: 'perf_monitoring',    created: 'Mar 18, 2026', due: 'Apr 03, 2026', tier: 'Tier 2', assignees: ['Priya Patel', 'Jake Moreno'], overflow: '+2', status: 'completed',   stage: 'Closed',         fetchedBy: 'Webhook', client: 'GlobalBank' },
 ];
 
-let currentTab = 'assigned';
+// ── Operation Cases — all cases in the solution (large dataset) ──
+const _operationData = [
+  { id: '# 300001', name: 'AMAZON',        created: 'Jan 02, 2026', due: 'Feb 02, 2026', tier: 'Tier 1', assignees: ['Ben Septer'],                  overflow: '',   status: 'On progress', stage: 'Review',         fetchedBy: 'API',     client: 'Amazon Inc' },
+  { id: '# 300002', name: 'WALMART',       created: 'Jan 03, 2026', due: 'Feb 03, 2026', tier: 'Tier 1', assignees: ['Ahmed Arah'],                  overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: 'Webhook', client: 'Walmart Corp' },
+  { id: '# 300003', name: 'TARGET',        created: 'Jan 04, 2026', due: 'Feb 04, 2026', tier: 'Tier 2', assignees: ['Emily Foster'],                overflow: '',   status: 'Stuck',       stage: 'Escalated',      fetchedBy: 'Manual',  client: 'Target Corp' },
+  { id: '# 300004', name: 'COSTCO',        created: 'Jan 05, 2026', due: 'Feb 05, 2026', tier: 'Tier 1', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Costco' },
+  { id: '# 300005', name: 'KROGER',        created: 'Jan 06, 2026', due: 'Feb 06, 2026', tier: 'Tier 3', assignees: ['Sara Klein'],                  overflow: '',   status: 'completed',   stage: 'Closed',         fetchedBy: 'API',     client: 'Kroger' },
+  { id: '# 300006', name: 'WHOLE FOODS',   created: 'Jan 07, 2026', due: 'Feb 07, 2026', tier: 'Tier 2', assignees: ['Tom Reeves'],                  overflow: '',   status: 'On progress', stage: 'Pending Review', fetchedBy: 'Import',  client: 'Whole Foods' },
+  { id: '# 300007', name: 'SAFEWAY',       created: 'Jan 08, 2026', due: 'Feb 08, 2026', tier: 'Tier 1', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Safeway' },
+  { id: '# 300008', name: 'CVS HEALTH',    created: 'Jan 09, 2026', due: 'Feb 09, 2026', tier: 'Tier 2', assignees: ['Liam Chen'],                   overflow: '',   status: 'On progress', stage: 'Review',         fetchedBy: 'API',     client: 'CVS Health' },
+  { id: '# 300009', name: 'WALGREENS',     created: 'Jan 10, 2026', due: 'Feb 10, 2026', tier: 'Tier 3', assignees: ['Nora Vidal'],                  overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: 'Webhook', client: 'Walgreens' },
+  { id: '# 300010', name: 'HOME DEPOT',    created: 'Jan 11, 2026', due: 'Feb 11, 2026', tier: 'Tier 1', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Home Depot' },
+  { id: '# 300011', name: "MACY'S",        created: 'Jan 12, 2026', due: 'Feb 12, 2026', tier: 'Tier 2', assignees: ['Jake Moreno'],                 overflow: '',   status: 'Stuck',       stage: 'Escalated',      fetchedBy: 'Manual',  client: "Macy's" },
+  { id: '# 300012', name: 'BEST BUY',      created: 'Jan 13, 2026', due: 'Feb 13, 2026', tier: 'Tier 1', assignees: ['Priya Patel', 'Ben Septer'],   overflow: '+1', status: 'On progress', stage: 'Review',         fetchedBy: 'API',     client: 'Best Buy' },
+  { id: '# 300013', name: 'LOWES',         created: 'Jan 14, 2026', due: 'Feb 14, 2026', tier: 'Tier 3', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: "Lowe's" },
+  { id: '# 300014', name: 'PUBLIX',        created: 'Jan 15, 2026', due: 'Feb 15, 2026', tier: 'Tier 2', assignees: ['David Ellis'],                 overflow: '',   status: 'completed',   stage: 'Closed',         fetchedBy: 'Import',  client: 'Publix' },
+  { id: '# 300015', name: 'DOLLAR GENERAL',created: 'Jan 16, 2026', due: 'Feb 16, 2026', tier: 'Tier 1', assignees: ['Ahmed Arah', 'Emily Foster'],  overflow: '+1', status: 'On progress', stage: 'Pending Review', fetchedBy: 'Webhook', client: 'Dollar General' },
+  { id: '# 300016', name: 'DOLLAR TREE',   created: 'Jan 17, 2026', due: 'Feb 17, 2026', tier: 'Tier 2', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Dollar Tree' },
+  { id: '# 300017', name: 'ALDI',          created: 'Jan 18, 2026', due: 'Feb 18, 2026', tier: 'Tier 3', assignees: ['Sara Klein'],                  overflow: '',   status: 'Stuck',       stage: 'Escalated',      fetchedBy: 'API',     client: 'ALDI' },
+  { id: '# 300018', name: 'TRADER JOES',   created: 'Jan 19, 2026', due: 'Feb 19, 2026', tier: 'Tier 1', assignees: ['Tom Reeves', 'Jake Moreno'],   overflow: '',   status: 'pending',     stage: 'Review',         fetchedBy: 'Manual',  client: "Trader Joe's" },
+  { id: '# 300019', name: 'NORDSTROM',     created: 'Jan 20, 2026', due: 'Feb 20, 2026', tier: 'Tier 2', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Nordstrom' },
+  { id: '# 300020', name: 'GAP',           created: 'Jan 21, 2026', due: 'Feb 21, 2026', tier: 'Tier 1', assignees: ['Liam Chen', 'Nora Vidal'],     overflow: '+1', status: 'On progress', stage: 'Review',         fetchedBy: 'API',     client: 'Gap Inc' },
+  { id: '# 300021', name: 'H&M',           created: 'Jan 22, 2026', due: 'Feb 22, 2026', tier: 'Tier 3', assignees: ['Priya Patel'],                 overflow: '',   status: 'completed',   stage: 'Closed',         fetchedBy: 'Import',  client: 'H&M Group' },
+  { id: '# 300022', name: 'ZARA',          created: 'Jan 23, 2026', due: 'Feb 23, 2026', tier: 'Tier 2', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Zara' },
+  { id: '# 300023', name: 'NIKE',          created: 'Jan 24, 2026', due: 'Feb 24, 2026', tier: 'Tier 1', assignees: ['Ben Septer', 'David Ellis'],   overflow: '',   status: 'On progress', stage: 'Escalated',      fetchedBy: 'Webhook', client: 'Nike Inc' },
+  { id: '# 300024', name: 'ADIDAS',        created: 'Jan 25, 2026', due: 'Feb 25, 2026', tier: 'Tier 2', assignees: ['Ahmed Arah'],                  overflow: '',   status: 'Stuck',       stage: 'Pending Review', fetchedBy: 'API',     client: 'Adidas AG' },
+  { id: '# 300025', name: 'UNDER ARMOUR',  created: 'Jan 26, 2026', due: 'Feb 26, 2026', tier: 'Tier 3', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Under Armour' },
+  { id: '# 300026', name: 'APPLE',         created: 'Jan 27, 2026', due: 'Feb 27, 2026', tier: 'Tier 1', assignees: ['Emily Foster', 'Sara Klein'],  overflow: '+2', status: 'On progress', stage: 'Review',         fetchedBy: 'API',     client: 'Apple Inc' },
+  { id: '# 300027', name: 'SAMSUNG',       created: 'Jan 28, 2026', due: 'Feb 28, 2026', tier: 'Tier 2', assignees: ['Tom Reeves'],                  overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: 'Manual',  client: 'Samsung' },
+  { id: '# 300028', name: 'LG ELECTRONICS',created: 'Jan 29, 2026', due: 'Mar 01, 2026', tier: 'Tier 1', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'LG Electronics' },
+  { id: '# 300029', name: 'SONY',          created: 'Jan 30, 2026', due: 'Mar 02, 2026', tier: 'Tier 3', assignees: ['Jake Moreno', 'Liam Chen'],    overflow: '',   status: 'completed',   stage: 'Closed',         fetchedBy: 'Import',  client: 'Sony Corp' },
+  { id: '# 300030', name: 'MICROSOFT',     created: 'Jan 31, 2026', due: 'Mar 03, 2026', tier: 'Tier 1', assignees: ['Nora Vidal', 'Ben Septer'],    overflow: '+1', status: 'On progress', stage: 'Escalated',      fetchedBy: 'API',     client: 'Microsoft Corp' },
+  { id: '# 300031', name: 'GOOGLE',        created: 'Feb 01, 2026', due: 'Mar 04, 2026', tier: 'Tier 2', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Google LLC' },
+  { id: '# 300032', name: 'ORACLE',        created: 'Feb 02, 2026', due: 'Mar 05, 2026', tier: 'Tier 1', assignees: ['Priya Patel', 'Ahmed Arah'],   overflow: '',   status: 'Stuck',       stage: 'Pending Review', fetchedBy: 'Webhook', client: 'Oracle Corp' },
+  { id: '# 300033', name: 'SAP',           created: 'Feb 03, 2026', due: 'Mar 06, 2026', tier: 'Tier 3', assignees: ['David Ellis'],                 overflow: '',   status: 'On progress', stage: 'Review',         fetchedBy: 'API',     client: 'SAP SE' },
+  { id: '# 300034', name: 'SALESFORCE',    created: 'Feb 04, 2026', due: 'Mar 07, 2026', tier: 'Tier 2', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Salesforce Inc' },
+  { id: '# 300035', name: 'IBM',           created: 'Feb 05, 2026', due: 'Mar 08, 2026', tier: 'Tier 1', assignees: ['Emily Foster', 'Tom Reeves'],  overflow: '+1', status: 'completed',   stage: 'Closed',         fetchedBy: 'Manual',  client: 'IBM Corp' },
+  { id: '# 300036', name: 'INTEL',         created: 'Feb 06, 2026', due: 'Mar 09, 2026', tier: 'Tier 2', assignees: ['Sara Klein'],                  overflow: '',   status: 'On progress', stage: 'Review',         fetchedBy: 'Import',  client: 'Intel Corp' },
+  { id: '# 300037', name: 'AMD',           created: 'Feb 07, 2026', due: 'Mar 10, 2026', tier: 'Tier 3', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'AMD' },
+  { id: '# 300038', name: 'NVIDIA',        created: 'Feb 08, 2026', due: 'Mar 11, 2026', tier: 'Tier 1', assignees: ['Jake Moreno', 'Liam Chen'],    overflow: '+2', status: 'Stuck',       stage: 'Escalated',      fetchedBy: 'API',     client: 'NVIDIA Corp' },
+  { id: '# 300039', name: 'CISCO',         created: 'Feb 09, 2026', due: 'Mar 12, 2026', tier: 'Tier 2', assignees: ['Ben Septer'],                  overflow: '',   status: 'On progress', stage: 'Pending Review', fetchedBy: 'Webhook', client: 'Cisco Systems' },
+  { id: '# 300040', name: 'DELL',          created: 'Feb 10, 2026', due: 'Mar 13, 2026', tier: 'Tier 1', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Dell Technologies' },
+  { id: '# 300041', name: 'HP INC',        created: 'Feb 11, 2026', due: 'Mar 14, 2026', tier: 'Tier 3', assignees: ['Nora Vidal', 'Ahmed Arah'],    overflow: '',   status: 'completed',   stage: 'Closed',         fetchedBy: 'API',     client: 'HP Inc' },
+  { id: '# 300042', name: 'LENOVO',        created: 'Feb 12, 2026', due: 'Mar 15, 2026', tier: 'Tier 2', assignees: ['Priya Patel'],                 overflow: '',   status: 'On progress', stage: 'Review',         fetchedBy: 'Manual',  client: 'Lenovo Group' },
+  { id: '# 300043', name: 'CANON',         created: 'Feb 13, 2026', due: 'Mar 16, 2026', tier: 'Tier 1', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Canon Inc' },
+  { id: '# 300044', name: 'PHILIPS',       created: 'Feb 14, 2026', due: 'Mar 17, 2026', tier: 'Tier 2', assignees: ['David Ellis', 'Emily Foster'], overflow: '+1', status: 'Stuck',       stage: 'Escalated',      fetchedBy: 'Import',  client: 'Philips NV' },
+  { id: '# 300045', name: 'SIEMENS',       created: 'Feb 15, 2026', due: 'Mar 18, 2026', tier: 'Tier 3', assignees: ['Tom Reeves'],                  overflow: '',   status: 'On progress', stage: 'Pending Review', fetchedBy: 'API',     client: 'Siemens AG' },
+  { id: '# 300046', name: 'BOSCH',         created: 'Feb 16, 2026', due: 'Mar 19, 2026', tier: 'Tier 1', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Bosch GmbH' },
+  { id: '# 300047', name: 'GENERAL ELECTRIC', created: 'Feb 17, 2026', due: 'Mar 20, 2026', tier: 'Tier 2', assignees: ['Sara Klein', 'Ben Septer'],  overflow: '',   status: 'completed',   stage: 'Closed',         fetchedBy: 'Webhook', client: 'GE Corp' },
+  { id: '# 300048', name: '3M COMPANY',    created: 'Feb 18, 2026', due: 'Mar 21, 2026', tier: 'Tier 1', assignees: ['Jake Moreno'],                 overflow: '',   status: 'On progress', stage: 'Review',         fetchedBy: 'API',     client: '3M Company' },
+  { id: '# 300049', name: 'HONEYWELL',     created: 'Feb 19, 2026', due: 'Mar 22, 2026', tier: 'Tier 3', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Honeywell Inc' },
+  { id: '# 300050', name: 'CATERPILLAR',   created: 'Feb 20, 2026', due: 'Mar 23, 2026', tier: 'Tier 2', assignees: ['Liam Chen', 'Nora Vidal'],     overflow: '+1', status: 'Stuck',       stage: 'Escalated',      fetchedBy: 'Manual',  client: 'Caterpillar Inc' },
+  { id: '# 300051', name: 'DEERE & CO',    created: 'Feb 21, 2026', due: 'Mar 24, 2026', tier: 'Tier 1', assignees: ['Ahmed Arah'],                  overflow: '',   status: 'On progress', stage: 'Review',         fetchedBy: 'Import',  client: 'Deere & Co' },
+  { id: '# 300052', name: 'FORD MOTOR',    created: 'Feb 22, 2026', due: 'Mar 25, 2026', tier: 'Tier 2', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Ford Motor Co' },
+  { id: '# 300053', name: 'GENERAL MOTORS',created: 'Feb 23, 2026', due: 'Mar 26, 2026', tier: 'Tier 3', assignees: ['Priya Patel', 'David Ellis'],  overflow: '',   status: 'completed',   stage: 'Closed',         fetchedBy: 'API',     client: 'GM Corp' },
+  { id: '# 300054', name: 'TOYOTA',        created: 'Feb 24, 2026', due: 'Mar 27, 2026', tier: 'Tier 1', assignees: ['Emily Foster'],                overflow: '',   status: 'pending',     stage: 'Pending Review', fetchedBy: 'Webhook', client: 'Toyota Motor' },
+  { id: '# 300055', name: 'BMW',           created: 'Feb 25, 2026', due: 'Mar 28, 2026', tier: 'Tier 2', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'BMW AG' },
+  { id: '# 300056', name: 'MERCEDES',      created: 'Feb 26, 2026', due: 'Mar 29, 2026', tier: 'Tier 1', assignees: ['Tom Reeves', 'Sara Klein'],    overflow: '',   status: 'On progress', stage: 'Review',         fetchedBy: 'API',     client: 'Mercedes-Benz' },
+  { id: '# 300057', name: 'VOLKSWAGEN',    created: 'Feb 27, 2026', due: 'Mar 30, 2026', tier: 'Tier 3', assignees: ['Jake Moreno'],                 overflow: '',   status: 'Stuck',       stage: 'Escalated',      fetchedBy: 'Manual',  client: 'Volkswagen AG' },
+  { id: '# 300058', name: 'HONDA',         created: 'Feb 28, 2026', due: 'Mar 31, 2026', tier: 'Tier 2', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Honda Motor' },
+  { id: '# 300059', name: 'HYUNDAI',       created: 'Mar 01, 2026', due: 'Apr 01, 2026', tier: 'Tier 1', assignees: ['Liam Chen', 'Ben Septer'],     overflow: '+1', status: 'On progress', stage: 'Pending Review', fetchedBy: 'Import',  client: 'Hyundai Motor' },
+  { id: '# 300060', name: 'KIA',           created: 'Mar 02, 2026', due: 'Apr 02, 2026', tier: 'Tier 2', assignees: ['Nora Vidal'],                  overflow: '',   status: 'completed',   stage: 'Closed',         fetchedBy: 'API',     client: 'Kia Corp' },
+  { id: '# 300061', name: 'JOHNSON & JOHNSON', created: 'Mar 03, 2026', due: 'Apr 03, 2026', tier: 'Tier 1', assignees: [],                           overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'J&J Corp' },
+  { id: '# 300062', name: 'PFIZER',        created: 'Mar 04, 2026', due: 'Apr 04, 2026', tier: 'Tier 3', assignees: ['Ahmed Arah', 'Priya Patel'],   overflow: '',   status: 'On progress', stage: 'Review',         fetchedBy: 'Webhook', client: 'Pfizer Inc' },
+  { id: '# 300063', name: 'MERCK',         created: 'Mar 05, 2026', due: 'Apr 05, 2026', tier: 'Tier 2', assignees: ['David Ellis'],                 overflow: '',   status: 'Stuck',       stage: 'Escalated',      fetchedBy: 'API',     client: 'Merck & Co' },
+  { id: '# 300064', name: 'ABBVIE',        created: 'Mar 06, 2026', due: 'Apr 06, 2026', tier: 'Tier 1', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'AbbVie Inc' },
+  { id: '# 300065', name: 'BRISTOL-MYERS', created: 'Mar 07, 2026', due: 'Apr 07, 2026', tier: 'Tier 2', assignees: ['Emily Foster', 'Tom Reeves'],  overflow: '+2', status: 'On progress', stage: 'Pending Review', fetchedBy: 'Manual',  client: 'BMS Corp' },
+  { id: '# 300066', name: 'ELI LILLY',     created: 'Mar 08, 2026', due: 'Apr 08, 2026', tier: 'Tier 3', assignees: ['Sara Klein'],                  overflow: '',   status: 'completed',   stage: 'Closed',         fetchedBy: 'Import',  client: 'Eli Lilly & Co' },
+  { id: '# 300067', name: 'AMGEN',         created: 'Mar 09, 2026', due: 'Apr 09, 2026', tier: 'Tier 1', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Amgen Inc' },
+  { id: '# 300068', name: 'GILEAD',        created: 'Mar 10, 2026', due: 'Apr 10, 2026', tier: 'Tier 2', assignees: ['Jake Moreno', 'Liam Chen'],    overflow: '+1', status: 'On progress', stage: 'Review',         fetchedBy: 'API',     client: 'Gilead Sciences' },
+  { id: '# 300069', name: 'BIOGEN',        created: 'Mar 11, 2026', due: 'Apr 11, 2026', tier: 'Tier 1', assignees: ['Nora Vidal'],                  overflow: '',   status: 'Stuck',       stage: 'Escalated',      fetchedBy: 'Webhook', client: 'Biogen Inc' },
+  { id: '# 300070', name: 'REGENERON',     created: 'Mar 12, 2026', due: 'Apr 12, 2026', tier: 'Tier 3', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Regeneron' },
+  { id: '# 300071', name: 'PROCTER & GAMBLE', created: 'Mar 13, 2026', due: 'Apr 13, 2026', tier: 'Tier 1', assignees: ['Ben Septer', 'Ahmed Arah'],  overflow: '',   status: 'On progress', stage: 'Pending Review', fetchedBy: 'API',     client: 'P&G Corp' },
+  { id: '# 300072', name: 'UNILEVER',      created: 'Mar 14, 2026', due: 'Apr 14, 2026', tier: 'Tier 2', assignees: ['Priya Patel'],                 overflow: '',   status: 'pending',     stage: 'Review',         fetchedBy: 'Manual',  client: 'Unilever PLC' },
+  { id: '# 300073', name: 'COLGATE',       created: 'Mar 15, 2026', due: 'Apr 15, 2026', tier: 'Tier 3', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Colgate-Palmolive' },
+  { id: '# 300074', name: 'KIMBERLY-CLARK',created: 'Mar 16, 2026', due: 'Apr 16, 2026', tier: 'Tier 1', assignees: ['David Ellis', 'Emily Foster'], overflow: '+1', status: 'completed',   stage: 'Closed',         fetchedBy: 'Import',  client: 'Kimberly-Clark' },
+  { id: '# 300075', name: 'HENKEL',        created: 'Mar 17, 2026', due: 'Apr 17, 2026', tier: 'Tier 2', assignees: ['Tom Reeves'],                  overflow: '',   status: 'On progress', stage: 'Review',         fetchedBy: 'API',     client: 'Henkel AG' },
+  { id: '# 300076', name: 'CLOROX',        created: 'Mar 18, 2026', due: 'Apr 18, 2026', tier: 'Tier 1', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Clorox Co' },
+  { id: '# 300077', name: "KRAFT HEINZ",   created: 'Mar 19, 2026', due: 'Apr 19, 2026', tier: 'Tier 3', assignees: ['Sara Klein', 'Jake Moreno'],   overflow: '',   status: 'Stuck',       stage: 'Escalated',      fetchedBy: 'Webhook', client: 'Kraft Heinz' },
+  { id: '# 300078', name: 'GENERAL MILLS', created: 'Mar 20, 2026', due: 'Apr 20, 2026', tier: 'Tier 2', assignees: ['Liam Chen'],                   overflow: '',   status: 'On progress', stage: 'Pending Review', fetchedBy: 'API',     client: 'General Mills' },
+  { id: '# 300079', name: "KELLOGG'S",     created: 'Mar 21, 2026', due: 'Apr 21, 2026', tier: 'Tier 1', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: "Kellogg's" },
+  { id: '# 300080', name: "CAMPBELL'S",    created: 'Mar 22, 2026', due: 'Apr 22, 2026', tier: 'Tier 2', assignees: ['Nora Vidal', 'Ben Septer'],    overflow: '+1', status: 'completed',   stage: 'Closed',         fetchedBy: 'Manual',  client: "Campbell's" },
+  { id: '# 300081', name: 'CONAGRA',       created: 'Mar 23, 2026', due: 'Apr 23, 2026', tier: 'Tier 3', assignees: ['Ahmed Arah'],                  overflow: '',   status: 'On progress', stage: 'Review',         fetchedBy: 'Import',  client: 'Conagra Brands' },
+  { id: '# 300082', name: 'HORMEL FOODS',  created: 'Mar 24, 2026', due: 'Apr 24, 2026', tier: 'Tier 1', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Hormel Foods' },
+  { id: '# 300083', name: 'TYSON FOODS',   created: 'Mar 25, 2026', due: 'Apr 25, 2026', tier: 'Tier 2', assignees: ['Priya Patel', 'David Ellis'],  overflow: '',   status: 'Stuck',       stage: 'Escalated',      fetchedBy: 'API',     client: 'Tyson Foods' },
+  { id: '# 300084', name: 'SYSCO',         created: 'Mar 26, 2026', due: 'Apr 26, 2026', tier: 'Tier 1', assignees: ['Emily Foster'],                overflow: '',   status: 'On progress', stage: 'Pending Review', fetchedBy: 'Webhook', client: 'Sysco Corp' },
+  { id: '# 300085', name: 'US FOODS',      created: 'Mar 27, 2026', due: 'Apr 27, 2026', tier: 'Tier 3', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'US Foods' },
+  { id: '# 300086', name: 'SODEXO',        created: 'Mar 28, 2026', due: 'Apr 28, 2026', tier: 'Tier 2', assignees: ['Tom Reeves', 'Sara Klein'],    overflow: '+1', status: 'completed',   stage: 'Closed',         fetchedBy: 'API',     client: 'Sodexo' },
+  { id: '# 300087', name: 'ARAMARK',       created: 'Mar 29, 2026', due: 'Apr 29, 2026', tier: 'Tier 1', assignees: ['Jake Moreno'],                 overflow: '',   status: 'On progress', stage: 'Review',         fetchedBy: 'Manual',  client: 'Aramark Corp' },
+  { id: '# 300088', name: 'COMPASS GROUP', created: 'Mar 30, 2026', due: 'Apr 30, 2026', tier: 'Tier 2', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Compass Group' },
+  { id: '# 300089', name: 'FEDEX',         created: 'Mar 31, 2026', due: 'May 01, 2026', tier: 'Tier 1', assignees: ['Liam Chen', 'Nora Vidal'],     overflow: '',   status: 'Stuck',       stage: 'Escalated',      fetchedBy: 'Import',  client: 'FedEx Corp' },
+  { id: '# 300090', name: 'UPS',           created: 'Apr 01, 2026', due: 'May 02, 2026', tier: 'Tier 3', assignees: ['Ben Septer'],                  overflow: '',   status: 'On progress', stage: 'Pending Review', fetchedBy: 'API',     client: 'UPS Inc' },
+  { id: '# 300091', name: 'DHL',           created: 'Apr 02, 2026', due: 'May 03, 2026', tier: 'Tier 2', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'DHL Group' },
+  { id: '# 300092', name: 'MAERSK',        created: 'Apr 03, 2026', due: 'May 04, 2026', tier: 'Tier 1', assignees: ['Ahmed Arah', 'Priya Patel'],   overflow: '+1', status: 'completed',   stage: 'Closed',         fetchedBy: 'Webhook', client: 'Maersk Group' },
+  { id: '# 300093', name: 'CARGILL',       created: 'Apr 04, 2026', due: 'May 05, 2026', tier: 'Tier 3', assignees: ['David Ellis'],                 overflow: '',   status: 'On progress', stage: 'Review',         fetchedBy: 'API',     client: 'Cargill Inc' },
+  { id: '# 300094', name: 'ADM',           created: 'Apr 05, 2026', due: 'May 06, 2026', tier: 'Tier 2', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'ADM Corp' },
+  { id: '# 300095', name: 'BUNGE',         created: 'Apr 06, 2026', due: 'May 07, 2026', tier: 'Tier 1', assignees: ['Emily Foster', 'Tom Reeves'],  overflow: '',   status: 'Stuck',       stage: 'Escalated',      fetchedBy: 'Manual',  client: 'Bunge Ltd' },
+  { id: '# 300096', name: 'LOUIS DREYFUS', created: 'Apr 07, 2026', due: 'May 08, 2026', tier: 'Tier 2', assignees: ['Sara Klein'],                  overflow: '',   status: 'On progress', stage: 'Pending Review', fetchedBy: 'Import',  client: 'Louis Dreyfus' },
+  { id: '# 300097', name: 'VITERRA',       created: 'Apr 08, 2026', due: 'May 09, 2026', tier: 'Tier 3', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Viterra Inc' },
+  { id: '# 300098', name: 'GLENCORE',      created: 'Apr 09, 2026', due: 'May 10, 2026', tier: 'Tier 1', assignees: ['Jake Moreno', 'Liam Chen'],    overflow: '+2', status: 'completed',   stage: 'Closed',         fetchedBy: 'API',     client: 'Glencore PLC' },
+  { id: '# 300099', name: 'TRAFIGURA',     created: 'Apr 10, 2026', due: 'May 11, 2026', tier: 'Tier 2', assignees: ['Nora Vidal'],                  overflow: '',   status: 'On progress', stage: 'Review',         fetchedBy: 'Webhook', client: 'Trafigura Group' },
+  { id: '# 300100', name: 'VITOL',         created: 'Apr 11, 2026', due: 'May 12, 2026', tier: 'Tier 1', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Vitol Group' },
+  { id: '# 300101', name: 'SHELL',         created: 'Apr 12, 2026', due: 'May 13, 2026', tier: 'Tier 3', assignees: ['Ben Septer', 'Ahmed Arah'],    overflow: '',   status: 'Stuck',       stage: 'Escalated',      fetchedBy: 'API',     client: 'Shell PLC' },
+  { id: '# 300102', name: 'BP',            created: 'Apr 13, 2026', due: 'May 14, 2026', tier: 'Tier 2', assignees: ['Priya Patel'],                 overflow: '',   status: 'On progress', stage: 'Pending Review', fetchedBy: 'Manual',  client: 'BP PLC' },
+  { id: '# 300103', name: 'CHEVRON',       created: 'Apr 14, 2026', due: 'May 15, 2026', tier: 'Tier 1', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Chevron Corp' },
+  { id: '# 300104', name: 'EXXONMOBIL',    created: 'Apr 15, 2026', due: 'May 16, 2026', tier: 'Tier 2', assignees: ['David Ellis', 'Emily Foster'], overflow: '+1', status: 'completed',   stage: 'Closed',         fetchedBy: 'Import',  client: 'ExxonMobil Corp' },
+  { id: '# 300105', name: 'TOTALENERGIES', created: 'Apr 16, 2026', due: 'May 17, 2026', tier: 'Tier 3', assignees: ['Tom Reeves'],                  overflow: '',   status: 'On progress', stage: 'Review',         fetchedBy: 'API',     client: 'TotalEnergies SE' },
+  { id: '# 300106', name: 'EQUINOR',       created: 'Apr 17, 2026', due: 'May 18, 2026', tier: 'Tier 1', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Equinor ASA' },
+  { id: '# 300107', name: 'PETROBRAS',     created: 'Apr 18, 2026', due: 'May 19, 2026', tier: 'Tier 2', assignees: ['Sara Klein', 'Jake Moreno'],   overflow: '',   status: 'Stuck',       stage: 'Escalated',      fetchedBy: 'Webhook', client: 'Petrobras' },
+  { id: '# 300108', name: 'ARAMCO',        created: 'Apr 19, 2026', due: 'May 20, 2026', tier: 'Tier 1', assignees: ['Liam Chen'],                   overflow: '',   status: 'On progress', stage: 'Pending Review', fetchedBy: 'API',     client: 'Saudi Aramco' },
+  { id: '# 300109', name: 'ENBRIDGE',      created: 'Apr 20, 2026', due: 'May 21, 2026', tier: 'Tier 3', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Enbridge Inc' },
+  { id: '# 300110', name: 'WILLIAMS COS',  created: 'Apr 21, 2026', due: 'May 22, 2026', tier: 'Tier 2', assignees: ['Nora Vidal', 'Ben Septer'],    overflow: '+1', status: 'completed',   stage: 'Closed',         fetchedBy: 'Manual',  client: 'Williams Cos' },
+  { id: '# 300111', name: 'JPMORGAN',      created: 'Apr 22, 2026', due: 'May 23, 2026', tier: 'Tier 1', assignees: ['Ahmed Arah'],                  overflow: '',   status: 'On progress', stage: 'Review',         fetchedBy: 'Import',  client: 'JPMorgan Chase' },
+  { id: '# 300112', name: 'BANK OF AMERICA',created: 'Apr 23, 2026', due: 'May 24, 2026', tier: 'Tier 2', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Bank of America' },
+  { id: '# 300113', name: 'WELLS FARGO',   created: 'Apr 24, 2026', due: 'May 25, 2026', tier: 'Tier 3', assignees: ['Priya Patel', 'David Ellis'],  overflow: '',   status: 'Stuck',       stage: 'Escalated',      fetchedBy: 'API',     client: 'Wells Fargo' },
+  { id: '# 300114', name: 'CITIGROUP',     created: 'Apr 25, 2026', due: 'May 26, 2026', tier: 'Tier 1', assignees: ['Emily Foster'],                overflow: '',   status: 'On progress', stage: 'Pending Review', fetchedBy: 'Webhook', client: 'Citigroup Inc' },
+  { id: '# 300115', name: 'GOLDMAN SACHS', created: 'Apr 26, 2026', due: 'May 27, 2026', tier: 'Tier 2', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Goldman Sachs' },
+  { id: '# 300116', name: 'MORGAN STANLEY',created: 'Apr 27, 2026', due: 'May 28, 2026', tier: 'Tier 1', assignees: ['Tom Reeves', 'Sara Klein'],    overflow: '+2', status: 'completed',   stage: 'Closed',         fetchedBy: 'API',     client: 'Morgan Stanley' },
+  { id: '# 300117', name: 'BLACKROCK',     created: 'Apr 28, 2026', due: 'May 29, 2026', tier: 'Tier 3', assignees: ['Jake Moreno'],                 overflow: '',   status: 'On progress', stage: 'Review',         fetchedBy: 'Manual',  client: 'BlackRock Inc' },
+  { id: '# 300118', name: 'VANGUARD',      created: 'Apr 29, 2026', due: 'May 30, 2026', tier: 'Tier 2', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Vanguard Group' },
+  { id: '# 300119', name: 'FIDELITY',      created: 'Apr 30, 2026', due: 'May 31, 2026', tier: 'Tier 1', assignees: ['Liam Chen', 'Nora Vidal'],     overflow: '',   status: 'Stuck',       stage: 'Escalated',      fetchedBy: 'Import',  client: 'Fidelity Investments' },
+  { id: '# 300120', name: 'AMERICAN EXPRESS', created: 'May 01, 2026', due: 'Jun 01, 2026', tier: 'Tier 2', assignees: ['Ben Septer'],                overflow: '',   status: 'On progress', stage: 'Pending Review', fetchedBy: 'API',     client: 'AmEx Corp' },
+  { id: '# 300121', name: 'VISA',          created: 'May 02, 2026', due: 'Jun 02, 2026', tier: 'Tier 1', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Visa Inc' },
+  { id: '# 300122', name: 'MASTERCARD',    created: 'May 03, 2026', due: 'Jun 03, 2026', tier: 'Tier 3', assignees: ['Ahmed Arah', 'Priya Patel'],   overflow: '+1', status: 'completed',   stage: 'Closed',         fetchedBy: 'Webhook', client: 'Mastercard Inc' },
+  { id: '# 300123', name: 'PAYPAL',        created: 'May 04, 2026', due: 'Jun 04, 2026', tier: 'Tier 2', assignees: ['David Ellis'],                 overflow: '',   status: 'On progress', stage: 'Review',         fetchedBy: 'API',     client: 'PayPal Holdings' },
+  { id: '# 300124', name: 'STRIPE',        created: 'May 05, 2026', due: 'Jun 05, 2026', tier: 'Tier 1', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Stripe Inc' },
+  { id: '# 300125', name: 'SQUARE',        created: 'May 06, 2026', due: 'Jun 06, 2026', tier: 'Tier 2', assignees: ['Emily Foster', 'Tom Reeves'],  overflow: '',   status: 'Stuck',       stage: 'Escalated',      fetchedBy: 'Manual',  client: 'Block Inc' },
+  { id: '# 300126', name: 'INTUIT',        created: 'May 07, 2026', due: 'Jun 07, 2026', tier: 'Tier 3', assignees: ['Sara Klein'],                  overflow: '',   status: 'On progress', stage: 'Pending Review', fetchedBy: 'Import',  client: 'Intuit Inc' },
+  { id: '# 300127', name: 'SERVICENOW',    created: 'May 08, 2026', due: 'Jun 08, 2026', tier: 'Tier 1', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'ServiceNow Inc' },
+  { id: '# 300128', name: 'WORKDAY',       created: 'May 09, 2026', due: 'Jun 09, 2026', tier: 'Tier 2', assignees: ['Jake Moreno', 'Liam Chen'],    overflow: '+1', status: 'completed',   stage: 'Closed',         fetchedBy: 'API',     client: 'Workday Inc' },
+  { id: '# 300129', name: 'ZENDESK',       created: 'May 10, 2026', due: 'Jun 10, 2026', tier: 'Tier 1', assignees: ['Nora Vidal'],                  overflow: '',   status: 'On progress', stage: 'Review',         fetchedBy: 'Webhook', client: 'Zendesk Inc' },
+  { id: '# 300130', name: 'HUBSPOT',       created: 'May 11, 2026', due: 'Jun 11, 2026', tier: 'Tier 3', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'HubSpot Inc' },
+  { id: '# 300131', name: 'SHOPIFY',       created: 'May 12, 2026', due: 'Jun 12, 2026', tier: 'Tier 2', assignees: ['Ben Septer', 'Ahmed Arah'],    overflow: '',   status: 'Stuck',       stage: 'Escalated',      fetchedBy: 'API',     client: 'Shopify Inc' },
+  { id: '# 300132', name: 'TWILIO',        created: 'May 13, 2026', due: 'Jun 13, 2026', tier: 'Tier 1', assignees: ['Priya Patel'],                 overflow: '',   status: 'On progress', stage: 'Pending Review', fetchedBy: 'Manual',  client: 'Twilio Inc' },
+  { id: '# 300133', name: 'DATADOG',       created: 'May 14, 2026', due: 'Jun 14, 2026', tier: 'Tier 2', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Datadog Inc' },
+  { id: '# 300134', name: 'SNOWFLAKE',     created: 'May 15, 2026', due: 'Jun 15, 2026', tier: 'Tier 3', assignees: ['David Ellis', 'Emily Foster'], overflow: '+2', status: 'completed',   stage: 'Closed',         fetchedBy: 'Import',  client: 'Snowflake Inc' },
+  { id: '# 300135', name: 'DATABRICKS',    created: 'May 16, 2026', due: 'Jun 16, 2026', tier: 'Tier 1', assignees: ['Tom Reeves'],                  overflow: '',   status: 'On progress', stage: 'Review',         fetchedBy: 'API',     client: 'Databricks Inc' },
+  { id: '# 300136', name: 'PALANTIR',      created: 'May 17, 2026', due: 'Jun 17, 2026', tier: 'Tier 2', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Palantir Technologies' },
+  { id: '# 300137', name: 'C3.AI',         created: 'May 18, 2026', due: 'Jun 18, 2026', tier: 'Tier 3', assignees: ['Sara Klein', 'Jake Moreno'],   overflow: '',   status: 'Stuck',       stage: 'Escalated',      fetchedBy: 'Webhook', client: 'C3.ai Inc' },
+  { id: '# 300138', name: 'VEEVA SYSTEMS', created: 'May 19, 2026', due: 'Jun 19, 2026', tier: 'Tier 1', assignees: ['Liam Chen'],                   overflow: '',   status: 'On progress', stage: 'Pending Review', fetchedBy: 'API',     client: 'Veeva Systems' },
+  { id: '# 300139', name: 'EPIC SYSTEMS',  created: 'May 20, 2026', due: 'Jun 20, 2026', tier: 'Tier 2', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Epic Systems' },
+  { id: '# 300140', name: 'CERNER',        created: 'May 21, 2026', due: 'Jun 21, 2026', tier: 'Tier 1', assignees: ['Nora Vidal', 'Ben Septer'],    overflow: '+1', status: 'completed',   stage: 'Closed',         fetchedBy: 'Manual',  client: 'Cerner Corp' },
+  { id: '# 300141', name: 'MEDITECH',      created: 'May 22, 2026', due: 'Jun 22, 2026', tier: 'Tier 3', assignees: ['Ahmed Arah'],                  overflow: '',   status: 'On progress', stage: 'Review',         fetchedBy: 'Import',  client: 'MEDITECH' },
+  { id: '# 300142', name: 'CHANGE HEALTHCARE', created: 'May 23, 2026', due: 'Jun 23, 2026', tier: 'Tier 2', assignees: [],                          overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Change Healthcare' },
+  { id: '# 300143', name: 'OPTUM',         created: 'May 24, 2026', due: 'Jun 24, 2026', tier: 'Tier 1', assignees: ['Priya Patel', 'David Ellis'],  overflow: '',   status: 'Stuck',       stage: 'Escalated',      fetchedBy: 'API',     client: 'Optum Inc' },
+  { id: '# 300144', name: 'AETNA',         created: 'May 25, 2026', due: 'Jun 25, 2026', tier: 'Tier 2', assignees: ['Emily Foster'],                overflow: '',   status: 'On progress', stage: 'Pending Review', fetchedBy: 'Webhook', client: 'Aetna Inc' },
+  { id: '# 300145', name: 'CIGNA',         created: 'May 26, 2026', due: 'Jun 26, 2026', tier: 'Tier 3', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Cigna Corp' },
+  { id: '# 300146', name: 'HUMANA',        created: 'May 27, 2026', due: 'Jun 27, 2026', tier: 'Tier 1', assignees: ['Tom Reeves', 'Sara Klein'],    overflow: '+1', status: 'completed',   stage: 'Closed',         fetchedBy: 'API',     client: 'Humana Inc' },
+  { id: '# 300147', name: 'ANTHEM',        created: 'May 28, 2026', due: 'Jun 28, 2026', tier: 'Tier 2', assignees: ['Jake Moreno'],                 overflow: '',   status: 'On progress', stage: 'Review',         fetchedBy: 'Manual',  client: 'Anthem Inc' },
+  { id: '# 300148', name: 'CENTENE',       created: 'May 29, 2026', due: 'Jun 29, 2026', tier: 'Tier 1', assignees: [],                              overflow: '',   status: 'pending',     stage: 'Intake',         fetchedBy: '',        client: 'Centene Corp' },
+  { id: '# 300149', name: 'MOLINA HEALTHCARE', created: 'May 30, 2026', due: 'Jun 30, 2026', tier: 'Tier 3', assignees: ['Liam Chen', 'Nora Vidal'],  overflow: '',  status: 'Stuck',       stage: 'Escalated',      fetchedBy: 'Import',  client: 'Molina Healthcare' },
+  { id: '# 300150', name: 'UNITEDHEALTH',  created: 'May 31, 2026', due: 'Jul 01, 2026', tier: 'Tier 2', assignees: ['Ben Septer'],                  overflow: '',   status: 'On progress', stage: 'Pending Review', fetchedBy: 'API',     client: 'UnitedHealth Group' },
+];
+
+let currentTab = 'operation';
 
 // ── Column definitions ──
 const COLS = [
@@ -9965,6 +10934,7 @@ function getRowValue(row, key) {
   if (key === 'fetchedBy')   return row.fetchedBy   || '';
   if (key === 'client')      return row.client      || '';
   if (key === 'reasonType')  return row.reasonType  || '';
+  if (key === 'allocated')   return (row.assignees && row.assignees.length > 0 && row.assignees[0]) ? 'yes' : 'no';
   return '';
 }
 
@@ -10008,14 +10978,43 @@ let frozenCol      = null; // key of the rightmost frozen column (all cols left 
 let pinnedCols     = new Set(); // keys of pinned columns (always appear first in colOrder)
 let colWidths      = {}; // {key: pixelWidth} — inline style overrides for resized columns
 
+// ── Workflows portal data ─────────────────────────────────────────────────
+const _workflowsCoraData = [
+  { wfId: 'WF-001', wfName: 'Invoice End-to-End Processing',   createdDate: '2024-01-15', updatedDate: '2024-03-20', ownedBy: 'Ben Septer'      },
+  { wfId: 'WF-002', wfName: 'Exception Handling Pipeline',     createdDate: '2024-01-22', updatedDate: '2024-03-18', ownedBy: 'Sarah Johnson'   },
+  { wfId: 'WF-003', wfName: 'Matching & Reconciliation',       createdDate: '2024-02-01', updatedDate: '2024-04-05', ownedBy: 'Ahmed Arah'      },
+  { wfId: 'WF-004', wfName: 'Customer Onboarding Automation',  createdDate: '2024-02-14', updatedDate: '2024-03-30', ownedBy: 'Priya Nair'      },
+  { wfId: 'WF-005', wfName: 'Credit Hold Processing',          createdDate: '2024-02-28', updatedDate: '2024-04-10', ownedBy: 'Michael Nguyen'  },
+  { wfId: 'WF-006', wfName: 'Remittance Capture & Posting',    createdDate: '2024-03-05', updatedDate: '2024-04-12', ownedBy: 'Ben Septer'      },
+  { wfId: 'WF-007', wfName: 'Dispute Resolution Workflow',     createdDate: '2024-03-10', updatedDate: '2024-04-15', ownedBy: 'David Kim'       },
+  { wfId: 'WF-008', wfName: 'Short-pay Recovery',              createdDate: '2024-03-18', updatedDate: '2024-04-18', ownedBy: 'Sarah Johnson'   },
+];
+const _workflowsDedData = [
+  { wfId: 'WF-DED-001', wfName: 'Deduction Validation Pipeline',  createdDate: '2024-01-10', updatedDate: '2024-03-25', ownedBy: 'Emily Foster'    },
+  { wfId: 'WF-DED-002', wfName: 'OCR Document Processing',        createdDate: '2024-01-20', updatedDate: '2024-03-28', ownedBy: 'Ben Septer'      },
+  { wfId: 'WF-DED-003', wfName: 'Credit Memo Generation',         createdDate: '2024-02-05', updatedDate: '2024-04-02', ownedBy: 'Priya Nair'      },
+  { wfId: 'WF-DED-004', wfName: 'Dispute Resolution',             createdDate: '2024-02-12', updatedDate: '2024-04-08', ownedBy: 'Marcus Webb'     },
+  { wfId: 'WF-DED-005', wfName: 'Settlement Automation',          createdDate: '2024-02-20', updatedDate: '2024-04-11', ownedBy: 'Ahmed Arah'      },
+  { wfId: 'WF-DED-006', wfName: 'POD Retrieval Workflow',         createdDate: '2024-03-01', updatedDate: '2024-04-14', ownedBy: 'Ben Septer'      },
+  { wfId: 'WF-DED-007', wfName: 'Short-pay Analysis',             createdDate: '2024-03-08', updatedDate: '2024-04-17', ownedBy: 'David Kim'       },
+  { wfId: 'WF-DED-008', wfName: 'Remittance Reconciliation',      createdDate: '2024-03-15', updatedDate: '2024-04-20', ownedBy: 'Sarah Johnson'   },
+];
+function _activeWorkflows() {
+  return (typeof activeSolution !== 'undefined' && activeSolution === 'deduction')
+    ? _workflowsDedData : _workflowsCoraData;
+}
+
 // ── Work Feed column definitions ──
 const WF_CASE_COLS = [
-  {key:'type',     label:'Type'},
-  {key:'id',       label:'Case'},
-  {key:'status',   label:'Status'},
-  {key:'assists',  label:'Assists Needed'},
-  {key:'priority', label:'Priority'},
-  {key:'stage',    label:'Stage'},
+  {key:'type',      label:'Type'},
+  {key:'id',        label:'Task ID'},
+  {key:'status',    label:'Status'},
+  {key:'assists',   label:'Assists Needed'},
+  {key:'priority',  label:'Priority'},
+  {key:'stage',     label:'Stage'},
+  {key:'team',      label:'Team'},
+  {key:'assignTo',  label:'Assign to'},
+  {key:'fetchedBy', label:'Fetched by'},
 ];
 const WF_TASK_COLS = [
   {key:'agent',    label:'Agent'},
@@ -10042,6 +11041,18 @@ let wfGroupField     = null;            // active group-by field for WF table
 let wfFilterFields        = [];         // [{field, value}]
 let wfActiveFilterPopover = null;
 let wfSortEditorOpen      = false;
+
+// Close WF filter popover / sort editor on outside click
+document.addEventListener('click', e => {
+  let changed = false;
+  if (wfActiveFilterPopover && !e.target.closest('#wf-active-bar .filter-pill')) {
+    wfActiveFilterPopover = null; changed = true;
+  }
+  if (wfSortEditorOpen && !e.target.closest('.sort-pill') && !e.target.closest('.sort-editor')) {
+    wfSortEditorOpen = false; changed = true;
+  }
+  if (changed) wfRenderActiveBar();
+});
 let wfSortDragIdx         = null;
 
 // Shared col-context-menu dispatch: 'mw' | 'wf' | 'af'
@@ -10388,6 +11399,54 @@ function resetAll() {
   applyAndRender();
 }
 
+// ── Team dropdown ─────────────────────────────────────────────────────────────
+const TEAMS = [
+  { id: 'analytics',  label: 'Analytics Team'  },
+  { id: 'ocr',        label: 'OCR Team'         },
+  { id: 'deductions', label: 'Deductions Team'  },
+  { id: 'disputes',   label: 'Disputes Team'    },
+  { id: 'compliance', label: 'Compliance Team'  },
+];
+let _selectedTeams = new Set(TEAMS.map(t => t.id)); // all selected by default
+
+function _renderTeamList() {
+  const list = document.getElementById('team-dropdown-list');
+  if (!list) return;
+  list.innerHTML = TEAMS.map(t => `
+    <div class="fd-item" onclick="teamToggle('${t.id}')">
+      <input type="checkbox" ${_selectedTeams.has(t.id) ? 'checked' : ''} onclick="event.stopPropagation();teamToggle('${t.id}')">
+      ${t.label}
+    </div>`).join('');
+}
+function _syncTeamLabel() {
+  const lbl = document.getElementById('team-dropdown-label');
+  if (!lbl) return;
+  if (_selectedTeams.size === TEAMS.length) { lbl.textContent = 'All selected'; return; }
+  if (_selectedTeams.size === 0)            { lbl.textContent = 'None';         return; }
+  if (_selectedTeams.size === 1)            { lbl.textContent = TEAMS.find(t => _selectedTeams.has(t.id))?.label; return; }
+  lbl.textContent = `${_selectedTeams.size} teams`;
+}
+function toggleTeamDropdown(e) {
+  e && e.stopPropagation();
+  const panel = document.getElementById('team-dropdown-panel');
+  if (!panel) return;
+  const opening = !panel.classList.contains('open');
+  // close all other fd-panels first
+  document.querySelectorAll('.fd-panel.open').forEach(p => p.classList.remove('open'));
+  if (opening) { panel.classList.add('open'); _renderTeamList(); }
+}
+function teamToggle(id) {
+  if (_selectedTeams.has(id)) _selectedTeams.delete(id); else _selectedTeams.add(id);
+  _renderTeamList(); _syncTeamLabel();
+}
+function teamSelectAll() { TEAMS.forEach(t => _selectedTeams.add(t.id)); _renderTeamList(); _syncTeamLabel(); }
+function teamClearAll()  { _selectedTeams.clear(); _renderTeamList(); _syncTeamLabel(); }
+
+// Close team (and any fd-panel) on outside click
+document.addEventListener('click', () => {
+  document.querySelectorAll('.fd-panel.open').forEach(p => p.classList.remove('open'));
+});
+
 // ── Group ──
 let groupPickerOpen = false;
 let hideEmptyGroups = false;
@@ -10407,7 +11466,7 @@ function renderGroupPanel() {
   }
 
   const col  = COLS.find(c => c.key === groupField);
-  const data = currentTab === 'assigned' ? assignedData : queueData;
+  const data = currentTab === 'operation' ? _operationData : currentTab === 'assigned' ? assignedData : queueData;
   // Use custom order if set, else alphabetical
   const allVals = groupOrder.length
     ? groupOrder
@@ -10495,7 +11554,7 @@ function updateGroupBtn() {
 function setGroupField(key) {
   groupField = key;
   groupPickerOpen = false;
-  const data = currentTab === 'assigned' ? assignedData : queueData;
+  const data = currentTab === 'operation' ? _operationData : currentTab === 'assigned' ? assignedData : queueData;
   groupOrder = [...new Set(data.map(r => getRowValue(r, groupField)))].sort();
   hiddenGroups.clear();
   updateGroupBtn();
@@ -10781,9 +11840,11 @@ function applyAndRender() {
   if (typeof activeSolution !== 'undefined' && activeSolution === 'deduction') {
     if (currentTab === 'started')   data = [..._deductionStartedData];
     else if (currentTab === 'team') data = [..._deductionTeamData];
-    else                            data = [..._deductionStartedData, ..._deductionTeamData]; // operation
+    else                            data = [..._operationData]; // operation — all cases
   } else {
-    data = currentTab === 'assigned' ? assignedData : queueData;
+    data = currentTab === 'operation' ? [..._operationData]
+         : currentTab === 'assigned'  ? [...assignedData]
+         : [...queueData];
   }
 
   // AI quick-wins pre-filter — show only the 3 AI-selected cases
@@ -11029,20 +12090,31 @@ function toggleMetrics() {
 }
 
 function updateKPIs(filteredData) {
-  const total      = filteredData.length;
-  const _s = r => (r.status || '').toLowerCase();
-  const completed  = filteredData.filter(r => _s(r) === 'completed').length;
-  const stuck      = filteredData.filter(r => _s(r) === 'stuck' || _s(r) === 'intervention').length;
-  const onProgress = filteredData.filter(r => _s(r) === 'on progress' || _s(r) === 'running').length;
-  const waiting    = filteredData.filter(r => _s(r) === 'pending' || _s(r) === 'awaiting').length;
+  let total, completed, stuck, onProgress, waiting;
 
-  document.getElementById('kpi-total').textContent      = total;
-  const _kpiLabels = { assigned: 'Assigned Cases', queue: 'Cases in Queue', started: 'My Cases', team: 'Team Cases', operation: 'All Cases' };
+  if (currentTab === 'operation') {
+    // Large-scale hardcoded numbers for the full operation view
+    total      = 2642;
+    completed  = 891;
+    onProgress = 743;
+    stuck      = 311;
+    waiting    = 697;
+  } else {
+    const _s = r => (r.status || '').toLowerCase();
+    total      = filteredData.length;
+    completed  = filteredData.filter(r => _s(r) === 'completed').length;
+    stuck      = filteredData.filter(r => _s(r) === 'stuck' || _s(r) === 'intervention').length;
+    onProgress = filteredData.filter(r => _s(r) === 'on progress' || _s(r) === 'running').length;
+    waiting    = filteredData.filter(r => _s(r) === 'pending' || _s(r) === 'awaiting').length;
+  }
+
+  document.getElementById('kpi-total').textContent      = total.toLocaleString();
+  const _kpiLabels = { assigned: 'Assigned Cases', queue: 'Cases in Queue', started: 'My Cases', team: 'Team Cases', operation: 'Operation Cases' };
   document.getElementById('kpi-tab-label').textContent  = _kpiLabels[currentTab] || 'Cases';
-  document.getElementById('kpi-completed').textContent  = completed;
-  document.getElementById('kpi-stuck').textContent      = stuck;
-  document.getElementById('kpi-onprogress').textContent = onProgress;
-  document.getElementById('kpi-waiting').textContent    = waiting;
+  document.getElementById('kpi-completed').textContent  = completed.toLocaleString();
+  document.getElementById('kpi-stuck').textContent      = stuck.toLocaleString();
+  document.getElementById('kpi-onprogress').textContent = onProgress.toLocaleString();
+  document.getElementById('kpi-waiting').textContent    = waiting.toLocaleString();
 
   // Progress bar: completed (dark) | on-progress (medium) | stuck+pending (light)
   const active  = onProgress + stuck;
@@ -11054,9 +12126,9 @@ function updateKPIs(filteredData) {
   segCompleted.style.flex = completed || '0.001';
   segProgress.style.flex  = active    || '0.001';
   segWaiting.style.flex   = passive   || '0.001';
-  segCompleted.dataset.tooltip = `Completed: ${completed}`;
-  segProgress.dataset.tooltip  = `On Progress: ${active}`;
-  segWaiting.dataset.tooltip   = `Waiting: ${passive}`;
+  segCompleted.dataset.tooltip = `Completed: ${completed.toLocaleString()}`;
+  segProgress.dataset.tooltip  = `On Progress: ${active.toLocaleString()}`;
+  segWaiting.dataset.tooltip   = `Waiting: ${passive.toLocaleString()}`;
 }
 
 function toggleAll(checkbox) {
@@ -11156,11 +12228,65 @@ function togglePerPageMenu(e) {
   document.getElementById('pg-per-page-menu').classList.toggle('hidden');
 }
 
-// Close per-page menu on outside click
+// Close per-page menus on outside click
 document.addEventListener('click', () => {
   const menu = document.getElementById('pg-per-page-menu');
   if (menu) menu.classList.add('hidden');
+  const wfMenu = document.getElementById('wf-pg-per-page-menu');
+  if (wfMenu) wfMenu.classList.add('hidden');
 });
+
+// ── New Case drawer ──────────────────────────────────────────────────────────
+let newCaseOpen = false;
+
+function renderNewCaseList(search) {
+  search = (search || '').toLowerCase().trim();
+  // Show workflows relevant to the active solution
+  const _wfRows = typeof _activeWorkflows === 'function' ? _activeWorkflows() : [];
+  const filtered = search
+    ? _wfRows.filter(w => w.wfName.toLowerCase().includes(search) || w.wfId.toLowerCase().includes(search))
+    : _wfRows;
+  const body = document.getElementById('newcase-drawer-body');
+  if (!body) return;
+  if (!filtered.length) {
+    body.innerHTML = `<div style="padding:24px 16px;text-align:center;color:var(--text-muted);font-size:13px">No workflows found</div>`;
+    return;
+  }
+  body.innerHTML = filtered.map(w => `
+    <div class="newcase-wf-item" onclick="showToast('Opening ${w.wfName}…',{type:'info'});closeNewCaseDrawer()">
+      <span class="material-symbols-outlined">account_tree</span>
+      <div class="newcase-wf-info">
+        <div class="newcase-wf-name">${w.wfName}</div>
+        <div class="newcase-wf-id">${w.wfId}</div>
+      </div>
+      <span class="material-symbols-outlined newcase-wf-arrow">chevron_right</span>
+    </div>`).join('');
+}
+
+function toggleNewCaseDrawer() {
+  newCaseOpen = !newCaseOpen;
+  document.getElementById('newcase-drawer').classList.toggle('open', newCaseOpen);
+  document.getElementById('newcase-overlay').classList.toggle('open', newCaseOpen);
+  document.getElementById('newcase-btn').classList.toggle('active', newCaseOpen);
+  if (newCaseOpen) {
+    // close other drawers
+    if (searchOpen) toggleSearchDrawer();
+    if (notifOpen) closeNotifDrawer();
+    // reset search & populate list
+    const inp = document.getElementById('newcase-search-input');
+    if (inp) inp.value = '';
+    renderNewCaseList('');
+    setTimeout(() => document.getElementById('newcase-search-input')?.focus(), 120);
+  }
+}
+
+function closeNewCaseDrawer() {
+  if (!newCaseOpen) return;
+  newCaseOpen = false;
+  document.getElementById('newcase-drawer').classList.remove('open');
+  document.getElementById('newcase-overlay').classList.remove('open');
+  document.getElementById('newcase-btn').classList.remove('active');
+}
 
 let notifOpen = false;
 const _aiMessages = [];
@@ -11364,7 +12490,19 @@ const VIEWS = {
       hiddenCols: ['stage','fetchedBy','client'],
       sortRules: [],
       filterFields: [],
-    }
+    },
+    {
+      id: 'allocated', name: 'Allocated view', icon: 'assignment_ind',
+      hiddenCols: ['stage','fetchedBy','client'],
+      sortRules: [],
+      filterFields: [{ field: 'allocated', value: 'yes' }],
+    },
+    {
+      id: 'unallocated', name: 'Unallocated view', icon: 'assignment_late',
+      hiddenCols: ['stage','fetchedBy','client'],
+      sortRules: [],
+      filterFields: [{ field: 'allocated', value: 'no' }],
+    },
   ],
 };
 
@@ -11419,9 +12557,11 @@ function _syncDisplayBtn() {
 
 function _splitData() {
   if (typeof activeSolution !== 'undefined' && activeSolution === 'deduction') {
-    return [...(_deductionStartedData || []), ...(_deductionTeamData || [])];
+    return [..._operationData];
   }
-  return currentTab === 'assigned' ? assignedData : queueData;
+  return currentTab === 'operation' ? [..._operationData]
+       : currentTab === 'assigned'  ? [...assignedData]
+       : [...queueData];
 }
 
 function setViewMode(mode) {
@@ -11481,6 +12621,16 @@ function openSplitCaseInTab() {
   if (!splitActiveCaseId) return;
   // selectTab will exit split mode (moves #case-page back to .portal-body) and render the case full-page
   openCaseTab(splitActiveCaseId);
+}
+
+function wfToggleViewPicker(e) {
+  if (e) e.stopPropagation();
+  const picker = document.getElementById('wf-view-picker');
+  if (picker) picker.classList.toggle('hidden');
+}
+function wfToggleViewSettings(e) {
+  if (e) e.stopPropagation();
+  // placeholder — view settings for Work Feed
 }
 
 function toggleViewPicker(e) {
@@ -11724,26 +12874,21 @@ const SOLUTIONS = {
     name: 'Cora Orchestration',
     icon: 'view_comfy_alt',
     filters: [
-      { key: 'assigned', label: 'Cases Assign to me' },
-      { key: 'queue',    label: 'Cases in queue'     },
+      { key: 'operation', label: 'Operation cases' },
     ]
   },
   'deduction': {
     name: 'Deduction',
     icon: 'calculate',
     filters: [
-      { key: 'started',   label: 'Assign to me'         },
-      { key: 'team',      label: 'My Team Cases'         },
-      { key: 'operation', label: 'My operation Cases'    },
+      { key: 'operation', label: 'Operation cases' },
     ]
   },
   'collections': {
     name: 'Collections',
     icon: 'payments',
     filters: [
-      { key: 'active',   label: 'Active Cases'    },
-      { key: 'pending',  label: 'Pending Review'  },
-      { key: 'closed',   label: 'Closed'          },
+      { key: 'operation', label: 'Operation cases' },
     ]
   },
 };
@@ -11789,7 +12934,7 @@ function _updateSolutionAvatar() {
 }
 
 // Nav items that only exist in Cora Orchestration
-const _CORA_ONLY_NAV = ['tasks-btn', 'nav-allwork'];
+const _CORA_ONLY_NAV = ['tasks-btn'];
 
 function _syncSolutionNav() {
   const isCora = activeSolution === 'cora-orchestration';
@@ -11797,10 +12942,7 @@ function _syncSolutionNav() {
     const el = document.getElementById(id);
     if (el) el.style.display = isCora ? '' : 'none';
   });
-  // If leaving cora while allwork is active, go back to mywork
-  if (!isCora && activeSection === 'allwork') {
-    navSidebar(document.getElementById('nav-mywork'), 'mywork');
-  }
+  // Workflows (allwork) is available in all solutions — no redirect needed
   // Close tasks drawer if switching away from cora
   if (!isCora && tasksOpen) closeTasksDrawer();
 }
@@ -11856,24 +12998,24 @@ document.addEventListener('click', function(e) {
 // ── Per-section tab state ──
 const SECTION_META = {
   mywork:    { icon: 'home',      label: 'Cases',     subtitle: 'Your assigned cases and queue' },
-  allwork:   { icon: 'grid_view', label: 'All Work',  subtitle: 'All cases across the solution' },
+  allwork:   { icon: 'dynamic_feed', label: 'Workflows', subtitle: 'Manage and view all workflows' },
   analytics: { icon: 'bar_chart', label: 'Analytics', subtitle: 'Performance metrics and reporting'     },
   archive:   { icon: 'archive',   label: 'Archive',   subtitle: 'Closed and historical cases'           },
 };
 
 const sectionTabs = {
   mywork:     [{ id: 'home', label: 'Cases',        icon: 'home',         home: true }],
-  allwork:    [{ id: 'home', label: 'All Work',    icon: 'grid_view',    home: true }],
+  allwork:    [{ id: 'home', label: 'Workflows',  icon: 'dynamic_feed', home: true }],
   analytics:  [{ id: 'home', label: 'Analytics',  icon: 'bar_chart',    home: true }],
   archive:    [{ id: 'home', label: 'Archive',     icon: 'archive',      home: true }],
   agentfleet: [{ id: 'home', label: 'Agent Fleet', icon: 'smart_toy',   home: true }],
-  workfeed:   [{ id: 'home', label: 'Agent Assist', icon: 'dynamic_feed', home: true }],
+  workfeed:   [{ id: 'home', label: 'Work Feed', icon: 'dynamic_feed', home: true }],
 };
 
 // Which tab is selected per section
 const sectionActiveTab = { mywork: 'home', allwork: 'home', analytics: 'home', archive: 'home', agentfleet: 'home', workfeed: 'home' };
 
-let activeSection = 'mywork';
+let activeSection = 'workfeed';
 let recentTabs = [];
 
 function renderTopbarTabs() {
@@ -12042,7 +13184,8 @@ function closeTab(e, id) {
   renderTopbarTabs();
 }
 
-const OOS_SECTIONS = { analytics: { icon: 'bar_chart', label: 'Analytics' }, archive: { icon: 'archive', label: 'Archive' }, allwork: { icon: 'grid_view', label: 'All Work' } };
+const OOS_SECTIONS = { analytics: { icon: 'bar_chart', label: 'Analytics' }, archive: { icon: 'archive', label: 'Archive' } };
+// allwork (Workflows) is handled as a dedicated page — not an OOS placeholder
 
 function _showOosState(section) {
   const meta = OOS_SECTIONS[section];
@@ -12076,6 +13219,8 @@ function navSidebar(el, section) {
     document.getElementById('empty-state').classList.remove('visible');
     _hideOosState();
     if (wfPage) wfPage.style.display = 'none';
+    const awPageAf = document.getElementById('allwork-page');
+    if (awPageAf) awPageAf.style.display = 'none';
     // If agent detail was occupying #case-page, clear it
     if (_casePageMode === 'agent') {
       document.getElementById('case-page').classList.add('hidden');
@@ -12111,7 +13256,26 @@ function navSidebar(el, section) {
     document.getElementById('empty-state').classList.remove('visible');
     _hideOosState();
     if (afPage) afPage.style.display = 'none';
+    const awPageWf = document.getElementById('allwork-page');
+    if (awPageWf) awPageWf.style.display = 'none';
     if (wfPage) { wfPage.style.display = 'flex'; renderWorkFeedPage(); }
+    closeSearchIfOpen();
+    return;
+  }
+
+  // Workflows (All Work) — dedicated full-page
+  if (target === 'allwork') {
+    activeSection = target;
+    _syncNavActive();
+    _updatePageTitle();
+    renderTopbarTabs();
+    document.getElementById('portal-content').classList.add('hidden');
+    document.getElementById('empty-state').classList.remove('visible');
+    _hideOosState();
+    if (wfPage) wfPage.style.display = 'none';
+    if (afPage) afPage.style.display = 'none';
+    const awPage = document.getElementById('allwork-page');
+    if (awPage) { awPage.style.display = 'flex'; renderAllWorkPage(); }
     closeSearchIfOpen();
     return;
   }
@@ -12124,6 +13288,8 @@ function navSidebar(el, section) {
   // Hide standalone pages when navigating away
   if (afPage) afPage.style.display = 'none';
   if (wfPage) wfPage.style.display = 'none';
+  const awPage2 = document.getElementById('allwork-page');
+  if (awPage2) awPage2.style.display = 'none';
 
   // If already in this section and on a case → go home
   if (activeSection === target && sectionActiveTab[target] !== 'home') {
@@ -12262,7 +13428,7 @@ function _openColMenuCommon(e, colKey) {
     ? `<button class="col-ctx-item" onclick="colCtxUnfreeze()"><span class="material-symbols-outlined">border_clear</span>Unfreeze column</button>`
     : `<button class="col-ctx-item" onclick="colCtxFreeze()"><span class="material-symbols-outlined">border_left</span>Freeze column</button>`;
 
-  const filterByBtn = _colCtxTable === 'mw'
+  const filterByBtn = (_colCtxTable === 'mw' || _colCtxTable === 'wf')
     ? `<button class="col-ctx-item" onclick="colCtxFilterBy()"><span class="material-symbols-outlined">filter_alt</span>Filter by this field</button>`
     : '';
   const groupByBtn = _colCtxTable !== 'af'
@@ -12370,11 +13536,20 @@ function closeQuickView() {
 
 function colCtxFilterBy() {
   const key = colCtxKey; closeColMenu();
-  if (!filterFields.find(f => f.field === key)) {
-    filterFields.push({ field: key, value: '' });
+  if (_colCtxTable === 'wf') {
+    if (!wfFilterFields.find(f => f.field === key)) {
+      wfFilterFields.push({ field: key, value: '' });
+    }
+    setTimeout(() => { wfActiveFilterPopover = key; wfRenderActiveBar(); }, 0);
+    wfRenderFilterPanel(); wfRenderActiveBar();
+    if (wfTableMode) renderWorkFeedTable(); else renderWorkFeedList();
+  } else {
+    if (!filterFields.find(f => f.field === key)) {
+      filterFields.push({ field: key, value: '' });
+    }
+    setTimeout(() => { activeFilterPopover = key; renderActiveBar(); }, 0);
+    renderFilterPanel(); renderActiveBar(); applyAndRender();
   }
-  setTimeout(() => { activeFilterPopover = key; renderActiveBar(); }, 0);
-  renderFilterPanel(); renderActiveBar(); applyAndRender();
 }
 
 function colCtxSort(dir) {
@@ -12664,6 +13839,7 @@ document.addEventListener('click', (e) => {
   if (!e.target.closest('.view-btn-wrap')) {
     closeViewPicker();
     closeViewContextMenu();
+    document.getElementById('wf-view-picker')?.classList.add('hidden');
   }
 });
 
@@ -12680,6 +13856,17 @@ selectView('default'); // initialise view state + render btn
 _renderAiDrawerContext(); // init pills in generic mode
 _renderAiFooter();        // init footer with default input
 
+// Default to Work Feed on load
+(function() {
+  const pc = document.getElementById('portal-content');
+  const wfPage = document.getElementById('workfeed-page');
+  if (pc) pc.classList.add('hidden');
+  if (wfPage) { wfPage.style.display = 'flex'; renderWorkFeedPage(); }
+  _syncNavActive();
+  _updatePageTitle();
+  renderTopbarTabs();
+})();
+
 // Cmd+K / Ctrl+K → navigate home
 document.addEventListener('keydown', e => {
   const isMeta = e.metaKey || e.ctrlKey;
@@ -12694,7 +13881,7 @@ document.addEventListener('keydown', e => {
   const isMeta = e.metaKey || e.ctrlKey;
   if (isMeta && e.key === 'j') {
     e.preventDefault();
-    // Agent Assist solver
+    // Work Feed solver
     if (activeSection === 'workfeed' && activeWorkFeedCase) {
       const fetchedBy = _fetchedCases[activeWorkFeedCase];
       if (!fetchedBy) fetchCaseFromList(activeWorkFeedCase);
@@ -12759,6 +13946,17 @@ function openWfCaseReadOnly(caseId) {
   const wfEntry = _activeWfCases().find(c => c.id === caseId);
   if (wfEntry) _wfCaseStageData[id] = wfEntry;
   // Open case tab in the current Work Feed section — no section change
+  openCaseTab(id);
+}
+
+function openWfCaseTab(caseId) {
+  // Open case fetched by current user — full editable form in a new tab
+  if (!caseId) return;
+  const id = String(caseId).replace(/^#\s*/, '');
+  // NOT read-only — fetched by me, full access
+  _readOnlyCaseIds.delete(id);
+  const wfEntry = _activeWfCases().find(c => c.id === caseId);
+  if (wfEntry) _wfCaseStageData[id] = wfEntry;
   openCaseTab(id);
 }
 
@@ -13138,6 +14336,150 @@ function _syncNavTabWarnings() {
   });
 }
 
+function _renderWfTaskInCasePage(task) {
+  // Render an agent task in the full case-page tab (no case form, no utility sidebar)
+  _closeStagePopover();
+  // Header fields
+  const id = String(task.id);
+  document.getElementById('case-num-text').textContent  = id;
+  const companyEl = document.getElementById('case-company-text');
+  if (companyEl) companyEl.textContent = task.agent || 'Agent Task';
+  const stageBadge = document.getElementById('case-stage-badge');
+  if (stageBadge) stageBadge.textContent = '1';
+  const stageText = document.getElementById('case-stage-text');
+  if (stageText) stageText.textContent = task.need || 'Needs attention';
+  const statusEl = document.getElementById('case-status-text');
+  if (statusEl) { statusEl.textContent = 'Active'; statusEl.className = 'case-status-text'; }
+  // Hide utility sidebar and section nav tabs — not needed for agent tasks
+  const utSidebar = document.getElementById('utility-sidebar');
+  if (utSidebar) utSidebar.style.display = 'none';
+  closeUtility();
+  document.querySelectorAll('.case-header-footer').forEach(el => el.style.display = 'none');
+  // Render task panel in form area
+  const formArea = document.getElementById('case-form-area');
+  if (formArea) {
+    formArea.classList.remove('readonly');
+    formArea.dataset.taskId = task.id;
+    const _taskFetched = _fetchedCases[task.id] === _currentUser;
+    formArea.classList.toggle('task-locked', !_taskFetched);
+    // Remove previous lock-click handler if any
+    if (formArea._taskLockHandler) { formArea.removeEventListener('click', formArea._taskLockHandler); }
+    if (!_taskFetched) {
+      formArea._taskLockHandler = () => showToast('Fetch this task first to take action', { type: 'warning' });
+      formArea.addEventListener('click', formArea._taskLockHandler);
+    } else {
+      delete formArea._taskLockHandler;
+    }
+    const SHOW_N = 3;
+    const allItems = task.items || [];
+    const expanded = !!_wfTaskItemsExpanded[task.id];
+    const visible  = expanded ? allItems : allItems.slice(0, SHOW_N);
+    const hidden   = allItems.length - SHOW_N;
+    const actions  = _WF_TASK_ITEM_ACTIONS[task.agent] || [];
+    const actionsHtml = actions.map(a =>
+      `<button class="wf-item-action-btn${a.primary ? ' primary' : ''}" onclick="event.stopPropagation()">
+        <span class="material-symbols-outlined">${a.icon}</span>${a.label}
+       </button>`
+    ).join('');
+    const itemsHtml = visible.map((item, idx) => {
+      const key  = `${task.id}-${idx}`;
+      const open = !!_wfTaskItemOpen[key];
+      return `<div class="wf-task-panel-item${open ? ' open' : ''}" onclick="_toggleWfTaskInPage('${task.id}',${idx})">
+        <div class="wf-task-panel-item-row">
+          <span class="material-symbols-outlined">chevron_right</span>${item}
+        </div>
+        <div class="wf-task-panel-item-actions">${actionsHtml}</div>
+      </div>`;
+    }).join('');
+    const toggleHtml = allItems.length > SHOW_N
+      ? `<button class="wf-task-items-toggle" onclick="_toggleWfTaskItemsInPage('${task.id}')">
+          <span class="material-symbols-outlined">${expanded ? 'expand_less' : 'expand_more'}</span>
+          ${expanded ? 'Show less' : `+${hidden} more`}
+         </button>`
+      : '';
+    formArea.innerHTML = `
+      <div class="wf-task-panel" style="padding:24px 28px;max-width:760px">
+        <div class="wf-task-panel-summary" style="font-size:14px;line-height:1.6">${task.summary}</div>
+        <div class="wf-task-panel-items" id="wf-task-items-${task.id}">${itemsHtml}</div>
+        ${toggleHtml}
+        <div class="wf-task-panel-actions">
+          <button class="wf-task-resolve-btn" onclick="_resolveWfTask('${task.id}','tab')"><span class="material-symbols-outlined">check_circle</span> Mark as resolved</button>
+          <button class="wf-task-dismiss-btn" onclick="_dismissWfTask('${task.id}','tab')"><span class="material-symbols-outlined">close</span> Dismiss</button>
+        </div>
+      </div>`;
+  }
+  // Fetch / return button
+  _renderFetchBtn(id);
+}
+
+function _toggleWfTaskInPage(taskId, idx) {
+  const key = `${taskId}-${idx}`;
+  _wfTaskItemOpen[key] = !_wfTaskItemOpen[key];
+  const task = _activeWfCases().find(c => c.id === taskId && c.type === 'task');
+  if (task) _renderWfTaskInCasePage(task);
+}
+
+function _toggleWfTaskItemsInPage(taskId) {
+  _wfTaskItemsExpanded[taskId] = !_wfTaskItemsExpanded[taskId];
+  const task = _activeWfCases().find(c => c.id === taskId && c.type === 'task');
+  if (task) _renderWfTaskInCasePage(task);
+}
+
+// ── Task resolve / dismiss ────────────────────────────────────────────────────
+function _resolveWfTask(taskId, ctx) {
+  if (_fetchedCases[taskId] !== _currentUser) {
+    showToast('Fetch this task first to take action', { type: 'warning' });
+    return;
+  }
+  if (ctx === 'solver') {
+    // Split-view: delegate to the existing case-handback flow
+    _triggerCaseHandback(taskId);
+    return;
+  }
+  // Tab-view: show completion screen in form area then close tab
+  const formArea = document.getElementById('case-form-area');
+  if (formArea) {
+    formArea.innerHTML = `
+      <div class="wf-handback-screen" style="min-height:320px;justify-content:center">
+        <span class="material-symbols-outlined wf-handback-check">check_circle</span>
+        <div class="wf-handback-title">Task ${taskId} — Resolved</div>
+        <div class="wf-handback-sub">Task cleared. Returning to Work Feed…</div>
+        <div class="wf-handback-bar"><div class="wf-handback-bar-fill"></div></div>
+        <div class="wf-handback-dots"><span></span><span></span><span></span></div>
+      </div>`;
+  }
+  _updateWfTableStatus(taskId, 'complete');
+  const arr = _activeWfCases();
+  const idx = arr.findIndex(c => c.id === taskId);
+  if (idx !== -1) arr.splice(idx, 1);
+  setTimeout(() => {
+    closeTab(null, taskId);
+    if (wfTableMode) renderWorkFeedTable();
+    else renderWorkFeedList();
+    _wfUpdateKPIs();
+  }, 2400);
+}
+
+function _dismissWfTask(taskId, ctx) {
+  if (_fetchedCases[taskId] !== _currentUser) {
+    showToast('Fetch this task first to take action', { type: 'warning' });
+    return;
+  }
+  const arr = _activeWfCases();
+  const idx = arr.findIndex(c => c.id === taskId);
+  if (idx !== -1) arr.splice(idx, 1);
+  if (ctx === 'solver') {
+    const next = _activeWfCases()[0];
+    if (next) selectWorkFeedCase(next.id);
+    else renderWorkFeedList();
+  } else {
+    closeTab(null, taskId);
+    if (wfTableMode) renderWorkFeedTable();
+    else renderWorkFeedList();
+    _wfUpdateKPIs();
+  }
+}
+
 function renderCasePage(caseId) {
   _casePageMode = 'case';
   // If agent view replaced #case-page content, restore original structure first
@@ -13146,6 +14488,21 @@ function renderCasePage(caseId) {
   }
   const id = String(caseId);
   const _isDed = typeof activeSolution !== 'undefined' && activeSolution === 'deduction';
+
+  // ── Agent task opened in a tab ──────────────────────────────────────────────
+  // If this ID belongs to an agent task from the Work Feed, render the task
+  // panel in place of the case form and hide the utility sidebar.
+  const _wfTaskEntry = _activeWfCases().find(c =>
+    c.type === 'task' && String(c.id).replace(/^#\s*/, '') === id.replace(/^#\s*/, '')
+  );
+  if (_wfTaskEntry) {
+    _renderWfTaskInCasePage(_wfTaskEntry);
+    return;
+  }
+  // Restore utility sidebar and section nav tabs in case they were hidden for a task
+  const _utSidebar = document.getElementById('utility-sidebar');
+  if (_utSidebar) _utSidebar.style.display = '';
+  document.querySelectorAll('.case-header-footer').forEach(el => el.style.display = '');
   const allData = _isDed
     ? [...(_deductionStartedData || []), ...(_deductionTeamData || [])]
     : [...(assignedData || []), ...(queueData || [])];
@@ -13204,7 +14561,7 @@ function renderCasePage(caseId) {
     if (isReadOnly) {
       const btn = document.createElement('button');
       btn.className = 'case-back-btn';
-      btn.innerHTML = '<span class="material-symbols-outlined">chevron_left</span>Agent Assist';
+      btn.innerHTML = '<span class="material-symbols-outlined">chevron_left</span>Work Feed';
       btn.onclick = () => selectTab('home');
       headerLeft.insertBefore(btn, headerLeft.firstChild);
     }
@@ -13215,7 +14572,7 @@ function renderCasePage(caseId) {
       area.classList.add('readonly');
       const banner = document.createElement('div');
       banner.className = 'case-readonly-banner';
-      banner.innerHTML = '<span class="material-symbols-outlined">visibility</span> Read Only — opened from Agent Assist';
+      banner.innerHTML = '<span class="material-symbols-outlined">visibility</span> Read Only — opened from Work Feed';
       area.insertBefore(banner, area.firstChild);
       area.querySelectorAll('input, select, textarea').forEach(el => {
         el.setAttribute('readonly', '');
@@ -13346,6 +14703,12 @@ function fetchCase(caseId) {
   _fetchedCases[id] = _currentUser;
   _renderFetchBtn(caseId);
   _applyCaseFormLock(false); // unlock now that user has claimed it
+  // If this is a task open in a tab, re-render task panel to unlock buttons
+  const formArea = document.getElementById('case-form-area');
+  if (formArea && formArea.dataset.taskId === id) {
+    const task = _activeWfCases().find(c => c.id === id && c.type === 'task');
+    if (task) _renderWfTaskInCasePage(task);
+  }
   // Refresh list row and WF row if visible
   const rawId = String(caseId);
   _updateRowClaimUI(id, rawId);
