@@ -3468,6 +3468,18 @@
   .av-queue-table td { padding:6px 10px; border-bottom:1px solid var(--border-light); font-size:12px; vertical-align:middle; overflow:hidden; white-space:nowrap; }
   .av-queue-table tr:hover td { background:#fafafa; cursor:pointer; }
   .av-queue-table tr:last-child td { border-bottom:none; }
+  /* Row quick actions */
+  .av-row-actions { display:flex; gap:4px; opacity:0; transition:opacity 0.12s; justify-content:flex-end; }
+  .av-queue-table tr:hover .av-row-actions { opacity:1; }
+  .av-action-btn { display:inline-flex; align-items:center; gap:3px; padding:3px 8px; border-radius:6px; border:1px solid var(--border); background:#fff; font-size:11px; font-weight:500; color:var(--text-secondary); cursor:pointer; white-space:nowrap; transition:background 0.1s,border-color 0.1s; }
+  .av-action-btn:hover { background:var(--bg-light); border-color:#aaa; color:var(--text-primary); }
+  .av-action-btn .material-symbols-outlined { font-size:13px; }
+  /* Quick-action dropdown */
+  .av-action-pop { position:fixed; z-index:9999; background:#fff; border:1px solid var(--border); border-radius:8px; box-shadow:0 4px 16px rgba(0,0,0,.12); padding:4px 0; min-width:160px; }
+  .av-action-pop-item { display:flex; align-items:center; gap:8px; padding:7px 12px; font-size:12px; color:var(--text-primary); cursor:pointer; transition:background 0.1s; }
+  .av-action-pop-item:hover { background:var(--bg-light); }
+  .av-action-pop-item .material-symbols-outlined { font-size:14px; color:var(--text-muted); }
+  .av-action-pop-title { padding:6px 12px 4px; font-size:10px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.4px; border-bottom:1px solid var(--border-light); margin-bottom:2px; }
   .av-queue-table .av-tags-cell { display:flex; gap:4px; align-items:center; flex-wrap:nowrap; overflow:hidden; }
 
   /* Capability sub-sections */
@@ -6562,19 +6574,7 @@ function renderAgentView(type, tabKey) {
     </div>`;
 
   // ── Section: In Queue ────────────────────────────────────────────────────────
-  const queueRows = d.pendingAssists.map(p => {
-    const types = Array.isArray(p.assistType) ? p.assistType : [p.assistType];
-    const chips = types.map(t => `<span class="av-assist-tag ${t.toLowerCase().replace(/\s+/g,'')}">${t}</span>`).join(' ');
-    const prioClass = p.priority === 'High' ? 'high' : p.priority === 'Med' ? 'med' : 'low';
-    const prioIcon  = p.priority === 'High' ? 'priority_high' : p.priority === 'Med' ? 'remove' : 'expand_more';
-    return `<tr onclick="openCaseTab('${p.caseId}')">
-      <td><div class="av-case-link"><span class="material-symbols-outlined">folder_open</span>${p.caseId}</div></td>
-      <td><div class="av-tags-cell">${chips}</div></td>
-      <td><div class="av-priority-cell ${prioClass}"><span class="material-symbols-outlined">${prioIcon}</span>${p.priority}</div></td>
-      <td style="font-variant-numeric:tabular-nums;color:var(--text-secondary);white-space:nowrap">${p.elapsed || '—'}</td>
-      <td style="color:var(--text-secondary);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:0">${p.blockReason || '—'}</td>
-    </tr>`;
-  }).join('');
+  const queueRows = d.pendingAssists.map(p => _avQueueRowHtml(p)).join('');
 
   const queueSection = _avSection('queue', `In Queue (${queueTotal})`, 'Queue management', `
     <div class="av-queue-filters">
@@ -6591,6 +6591,7 @@ function renderAgentView(type, tabKey) {
           <th style="width:80px">Priority</th>
           <th style="width:100px">Escalated</th>
           <th>Reason</th>
+          <th style="width:160px"></th>
         </tr></thead>
         <tbody>${queueRows}</tbody>
       </table>
@@ -6760,6 +6761,73 @@ function scrollToAvSection(key, type) {
 }
 
 let _avQueueFilter = {};
+// ── Agent queue row template (shared by initial render + filter re-render) ───
+function _avQueueRowHtml(p) {
+  const types = Array.isArray(p.assistType) ? p.assistType : [p.assistType];
+  const chips = types.map(t => `<span class="av-assist-tag ${t.toLowerCase().replace(/\s+/g,'')}">${t}</span>`).join(' ');
+  const prioClass = p.priority === 'High' ? 'high' : p.priority === 'Med' ? 'med' : 'low';
+  const prioIcon  = p.priority === 'High' ? 'priority_high' : p.priority === 'Med' ? 'remove' : 'expand_more';
+  return `<tr onclick="openCaseTab('${p.caseId}')">
+    <td><div class="av-case-link"><span class="material-symbols-outlined">folder_open</span>${p.caseId}</div></td>
+    <td><div class="av-tags-cell">${chips}</div></td>
+    <td><div class="av-priority-cell ${prioClass}"><span class="material-symbols-outlined">${prioIcon}</span>${p.priority}</div></td>
+    <td style="font-variant-numeric:tabular-nums;color:var(--text-secondary);white-space:nowrap">${p.elapsed || '—'}</td>
+    <td style="color:var(--text-secondary);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:0">${p.blockReason || '—'}</td>
+    <td onclick="event.stopPropagation()" style="padding:4px 8px">
+      <div class="av-row-actions">
+        <button class="av-action-btn" onclick="_avShowAssignPop(event,'${p.caseId}')">
+          <span class="material-symbols-outlined">person_add</span>Assign to
+        </button>
+        <button class="av-action-btn" onclick="_avShowAllocatePop(event,'${p.caseId}')">
+          <span class="material-symbols-outlined">move_to_inbox</span>Allocate to
+        </button>
+      </div>
+    </td>
+  </tr>`;
+}
+
+const _AV_AGENTS = ['Ben Septer','Ahmed Arah','Emily Foster','Sara Klein','Tom Reeves','Liam Chen','Nora Vidal','Jake Moreno','Priya Patel','David Ellis'];
+const _AV_QUEUES = ['Tier 1 Queue','Tier 2 Queue','Tier 3 Queue','Escalated Queue','Unassigned Pool'];
+let _avActionPop = null;
+
+function _avCloseActionPop() {
+  if (_avActionPop) { _avActionPop.remove(); _avActionPop = null; }
+}
+
+function _avBuildPop(btn, title, items, onSelect) {
+  _avCloseActionPop();
+  const pop = document.createElement('div');
+  pop.className = 'av-action-pop';
+  pop.innerHTML = `<div class="av-action-pop-title">${title}</div>` +
+    items.map(it => `<div class="av-action-pop-item" data-val="${it}">
+      <span class="material-symbols-outlined">${title.startsWith('Assign') ? 'person' : 'inbox'}</span>${it}
+    </div>`).join('');
+  pop.querySelectorAll('.av-action-pop-item').forEach(el =>
+    el.addEventListener('click', () => { onSelect(el.dataset.val); _avCloseActionPop(); })
+  );
+  document.body.appendChild(pop);
+  _avActionPop = pop;
+  // Position below button
+  const rect = btn.getBoundingClientRect();
+  pop.style.top  = (rect.bottom + 4) + 'px';
+  pop.style.left = Math.min(rect.left, window.innerWidth - 180) + 'px';
+  setTimeout(() => document.addEventListener('click', _avCloseActionPop, { once: true }), 0);
+}
+
+function _avShowAssignPop(e, caseId) {
+  e.stopPropagation();
+  _avBuildPop(e.currentTarget, 'Assign to', _AV_AGENTS, agent => {
+    showToast(`Case ${caseId} assigned to ${agent}`, { type: 'success' });
+  });
+}
+
+function _avShowAllocatePop(e, caseId) {
+  e.stopPropagation();
+  _avBuildPop(e.currentTarget, 'Allocate to', _AV_QUEUES, queue => {
+    showToast(`Case ${caseId} allocated to ${queue}`, { type: 'success' });
+  });
+}
+
 function _avFilterQueue(e, filter, type) {
   e.stopPropagation();
   _avQueueFilter[type] = filter;
@@ -6774,19 +6842,7 @@ function _avFilterQueue(e, filter, type) {
   });
   const tbody = document.querySelector(`#av-queue-tbl-${type} tbody`);
   if (!tbody) return;
-  tbody.innerHTML = rows.map(p => {
-    const types = Array.isArray(p.assistType) ? p.assistType : [p.assistType];
-    const chips = types.map(t => `<span class="av-assist-tag ${t.toLowerCase().replace(/\s+/g,'')}">${t}</span>`).join(' ');
-    const prioClass = p.priority === 'High' ? 'high' : p.priority === 'Med' ? 'med' : 'low';
-    const prioIcon  = p.priority === 'High' ? 'priority_high' : p.priority === 'Med' ? 'remove' : 'expand_more';
-    return `<tr onclick="openCaseTab('${p.caseId}')">
-      <td><div class="av-case-link"><span class="material-symbols-outlined">folder_open</span>${p.caseId}</div></td>
-      <td><div class="av-tags-cell">${chips}</div></td>
-      <td><div class="av-priority-cell ${prioClass}"><span class="material-symbols-outlined">${prioIcon}</span>${p.priority}</div></td>
-      <td style="font-variant-numeric:tabular-nums;color:var(--text-secondary);white-space:nowrap">${p.elapsed || '—'}</td>
-      <td style="color:var(--text-secondary);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:0">${p.blockReason || '—'}</td>
-    </tr>`;
-  }).join('');
+  tbody.innerHTML = rows.map(p => _avQueueRowHtml(p)).join('');
 }
 
 // ── Agent feedback CTA ────────────────────────────────────────────────────────
@@ -7934,6 +7990,9 @@ function setWfSegFilter(val) {
   if (val === 'all')    { wfHiddenCols.delete('team'); wfHiddenCols.delete('assignTo'); }
   if (val === 'queue')  { wfHiddenCols.delete('team'); wfHiddenCols.add('assignTo'); }
   if (val === 'on-me')  { wfHiddenCols.add('team');    wfHiddenCols.add('assignTo'); }
+  // "Available only" chip is only meaningful for All tasks
+  const availChip = document.getElementById('wf-avail-chip');
+  if (availChip) availChip.style.display = val === 'all' ? '' : 'none';
   _wfCurrentPage = 1;
   _wfUpdateKPIs();
   renderWorkFeedList();
