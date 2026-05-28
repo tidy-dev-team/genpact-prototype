@@ -1352,13 +1352,14 @@
   .split-container .utility-sidebar { display: none; }
   .split-open-new-btn {
     display: inline-flex; align-items: center; justify-content: center;
-    width: 28px; height: 28px; margin-left: 8px;
+    gap: 5px; height: 28px; padding: 0 10px; margin-left: 8px;
     border: 1px solid var(--border); border-radius: 6px;
     background: var(--bg-white); cursor: pointer; color: var(--text-secondary);
+    font-size: 12px; font-family: inherit; font-weight: 500; white-space: nowrap;
     transition: background 0.1s, color 0.1s;
   }
   .split-open-new-btn:hover { background: var(--bg-light); color: var(--text-primary); }
-  .split-open-new-btn .material-symbols-outlined { font-size: 16px; }
+  .split-open-new-btn .material-symbols-outlined { font-size: 15px; }
   /* Only show the "open in new tab" button when we're inside split mode */
   #case-page .split-open-new-btn { display: none; }
   .split-container #case-page .split-open-new-btn { display: inline-flex; }
@@ -5647,7 +5648,8 @@
                   </span>
                 </div>
                 <button class="split-open-new-btn" id="wf-open-case-btn" title="Open case in tab" onclick="openWfCaseReadOnly(activeWorkFeedCase)">
-                  <span class="material-symbols-outlined">open_in_new</span>
+                  <span class="material-symbols-outlined">visibility</span>
+                  View case
                 </button>
               </div>
               <div class="case-header-meta">
