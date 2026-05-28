@@ -1286,25 +1286,41 @@
   }
   .row-actions {
     position: absolute; right: 0; top: 0; bottom: 0;
-    display: flex; align-items: center; justify-content: flex-end;
-    gap: 4px; padding: 0 12px;
-    background: #fafafa; /* solid — buttons always on clean background */
+    display: flex; align-items: center; padding-right: 8px;
     opacity: 0; transition: opacity 0.15s; pointer-events: none;
   }
-  /* Gradient fade extends LEFT of the buttons panel as a separate layer */
+  /* Gradient only appears when panel is expanded */
   .row-actions::before {
     content: ''; position: absolute; right: 100%; top: 0; bottom: 0; width: 80px;
-    background: linear-gradient(to right, rgba(250,250,250,0), #fafafa);
-    pointer-events: none;
+    background: linear-gradient(to right, transparent, var(--hover-row));
+    pointer-events: none; opacity: 0; transition: opacity 0.1s;
   }
+  .row-actions:hover::before { opacity: 1; }
   tbody tr:hover .row-actions { opacity: 1; pointer-events: auto; }
+  /* Primary "more" trigger — dark pill, always visible when row is hovered */
+  .row-action-trigger {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; border-radius: 6px; border: none;
+    background: #1a1a1a; color: #fff; cursor: pointer; flex-shrink: 0;
+    transition: background 0.1s;
+  }
+  .row-action-trigger:hover { background: #444; }
+  .row-action-trigger .material-symbols-outlined { font-size: 16px; }
+  /* Expanded action panel — slides in on .row-actions:hover */
+  .row-action-panel {
+    display: flex; align-items: center; gap: 2px; padding: 3px 6px;
+    background: #fff; border: 1px solid var(--border); border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.09); margin-right: 4px;
+    opacity: 0; pointer-events: none; transition: opacity 0.1s; white-space: nowrap;
+  }
+  .row-actions:hover .row-action-panel { opacity: 1; pointer-events: auto; }
   .row-action-btn {
     height: 28px; padding: 0 8px; border-radius: 6px; flex-shrink: 0;
     background: none; border: none; cursor: pointer; color: var(--text-secondary);
     display: flex; align-items: center; gap: 4px;
     transition: background 0.1s, color 0.1s; white-space: nowrap;
   }
-  .row-action-btn:hover { background: #e1e1e1; color: var(--text-primary); }
+  .row-action-btn:hover { background: #f0f0f0; color: var(--text-primary); }
   .row-action-btn .material-symbols-outlined { font-size: 14px; }
   .row-action-btn span:not(.material-symbols-outlined) { font-size: 12px; font-weight: 500; }
   /* Row density */
@@ -1714,7 +1730,8 @@
   /* ── Case Header Footer (hover-reveal tab bar) ── */
   .case-header-footer {
     display: flex; align-items: center; gap: 0;
-    padding: 0 20px; height: 0; overflow: hidden; flex-shrink: 0;
+    position: absolute; top: 100%; left: 0; right: 0; z-index: 99;
+    padding: 0 20px; height: 0; overflow: hidden;
     background: var(--bg-white);
     border-bottom: 1px solid transparent;
     transition: height 0.15s ease, border-color 0.15s;
@@ -1953,6 +1970,14 @@
     pointer-events: none; opacity: 0.45; cursor: not-allowed;
   }
   #case-page.wf-readonly .case-header-right { display: none; }
+  /* Agent-task tab mode — hide case-specific header chrome */
+  #case-page.case-task-tab .case-header-meta { display: none; }
+  #case-page.case-task-tab .case-company-text { display: none; }
+  #case-page.case-task-tab #case-task-tab-need {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 16px 7px; font-size: 12px; color: var(--text-muted);
+    border-top: 1px solid var(--border-light);
+  }
   /* WF solver body — locked until case is fetched */
   #wf-solver-body.locked input,
   #wf-solver-body.locked select,
@@ -3601,7 +3626,7 @@
 
   /* ── Work Feed page — uses shared .portal-content shell ─ */
   /* 3-panel split view — lives inside .portal-content-area */
-  .wf-panels { display: flex; flex-direction: row; flex: 1; min-height: 0; overflow: hidden; border: 1px solid var(--border); border-radius: 10px; }
+  .wf-panels { position: relative; display: flex; flex-direction: row; flex: 1; min-height: 0; overflow: hidden; border: 1px solid var(--border); border-radius: 10px; }
 
   /* Left feed */
   .wf-feed { width: 240px; min-width: 240px; border-right: 1px solid var(--border); display: flex; flex-direction: column; background: var(--bg-white); overflow: hidden; }
@@ -3614,11 +3639,30 @@
   .wf-feed-icon-btn:hover { background: var(--border); color: var(--text-primary); }
   .wf-feed-icon-btn .material-symbols-outlined { font-size: 15px; }
   .wf-feed-list { flex: 1; overflow-y: auto; }
-  .wf-feed-card { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid var(--border-light); display: flex; flex-direction: column; gap: 5px; transition: background .1s; }
+  .wf-feed-card { position: relative; padding: 10px 12px; cursor: pointer; border-bottom: 1px solid var(--border-light); display: flex; flex-direction: column; gap: 5px; transition: background .1s; }
   .wf-feed-card:hover { background: var(--hover-row); }
   .wf-feed-card.active { background: #f3f0ff; border-left: 3px solid #7c3aed; padding-left: 9px; }
+  /* Checkbox — fades in on hover, overlays the card icon */
+  .wf-card-cb { position: absolute; top: 11px; left: 12px; width: 14px; height: 14px; margin: 0; cursor: pointer; opacity: 0; transition: opacity 0.15s; accent-color: #4555D4; z-index: 2; }
+  .wf-feed-card:hover .wf-card-cb { opacity: 1; }
+  .wf-feed-card.active .wf-card-cb { left: 9px; }
+  /* Bulk mode — any checkbox checked makes all checkboxes visible, hides all card actions */
+  #wf-feed-list.wf-bulk-mode .wf-card-cb { opacity: 1; }
+  #wf-feed-list.wf-bulk-mode .wf-card-icon { opacity: 0; }
+  #wf-feed-list.wf-bulk-mode .wf-card-action-pill { opacity: 0 !important; pointer-events: none; }
+  #wf-feed-list.wf-bulk-mode .wf-card-open-btn { opacity: 0 !important; pointer-events: none; }
+  /* Feed bulk bar — spans full .wf-panels width, same base styles as table bulk bar */
+  .wf-feed-bulk-bar { left: 8px !important; right: 8px !important; bottom: 8px !important; }
+  /* Solver bulk placeholder */
+  .wf-bulk-placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; background: var(--bg-white); z-index: 1; }
   .wf-card-top { display: flex; align-items: center; gap: 5px; }
-  .wf-card-icon { font-size: 13px; color: var(--text-muted); flex-shrink: 0; }
+  .wf-card-icon { font-size: 13px; color: var(--text-muted); flex-shrink: 0; transition: opacity 0.15s; }
+  .wf-feed-card:hover .wf-card-icon { opacity: 0; }
+  /* Open-in-tab button — appears on hover in the top-right of the card */
+  .wf-card-open-btn { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 4px; border: none; background: none; color: var(--text-muted); cursor: pointer; opacity: 0; transition: opacity 0.15s; padding: 0; margin-left: auto; flex-shrink: 0; }
+  .wf-card-open-btn .material-symbols-outlined { font-size: 13px; }
+  .wf-feed-card:hover .wf-card-open-btn { opacity: 1; }
+  .wf-card-open-btn:hover { background: var(--border-light); color: var(--text-primary); }
   .wf-card-id { font-size: 12px; font-weight: 600; color: var(--text-primary); }
   .wf-card-id-ai {
     background: linear-gradient(90deg, #7c3aed 0%, #2563eb 100%);
@@ -3629,27 +3673,24 @@
     -webkit-background-clip: text; background-clip: text;
     -webkit-text-fill-color: transparent; color: transparent;
   }
-  .wf-card-bottom { display: flex; align-items: center; justify-content: space-between; }
+  .wf-card-bottom { display: flex; align-items: center; gap: 6px; }
   .wf-card-stage { font-size: 11px; color: var(--text-muted); }
   .wf-card-desc  { font-size: 11px; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .wf-card-stage-tag { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 500; color: #6d28d9; background: #f5f3ff; border: 1px solid #ddd6fe; border-radius: 4px; padding: 2px 6px; white-space: nowrap; }
   .wf-card-stage-tag .material-symbols-outlined { font-size: 11px; }
   .wf-card-badge { display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 10px; background: #e5e7eb; font-size: 10px; color: var(--text-secondary); white-space: nowrap; }
   .wf-card-badge.intervention { background: #e5e7eb; color: var(--text-secondary); }
-  /* Card fetch button — hidden, revealed on hover */
-  .wf-card-fetch-btn { margin-left: auto; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 5px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; opacity: 0; transition: opacity 0.1s, background 0.1s; padding: 0; }
-  .wf-card-fetch-btn .material-symbols-outlined { font-size: 14px; }
-  .wf-feed-card:hover .wf-card-fetch-btn { opacity: 1; }
-  .wf-card-fetch-btn:hover { background: rgba(0,0,0,0.08); color: var(--text-primary); }
-  /* Avatar wrapper — hover reveals return overlay */
-  .wf-card-avatar-wrap { margin-left: auto; flex-shrink: 0; position: relative; display: inline-flex; cursor: pointer; }
-  .wf-card-avatar-bottom { margin-left: auto; }
-  .wf-card-return-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.55); border-radius: 50%; opacity: 0; transition: opacity 0.15s; color: #fff; }
-  .wf-card-return-overlay .material-symbols-outlined { font-size: 11px; }
-  .wf-feed-card:hover .wf-card-return-overlay { opacity: 1; }
+  /* Action area — avatar + pill, right-aligned */
+  .wf-card-actions { display: flex; align-items: center; gap: 5px; margin-left: auto; flex-shrink: 0; flex: 1; justify-content: flex-end; }
+  .wf-card-avatar-wrap { flex-shrink: 0; position: relative; display: inline-flex; }
+  /* Card action button — black primary, right-aligned, revealed on hover */
+  .wf-card-action-pill { display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 10px; border-radius: 6px; border: none; background: #1a1a1a; color: #fff; font-size: 11px; font-weight: 600; cursor: pointer; font-family: inherit; opacity: 0; transition: opacity 0.15s; white-space: nowrap; }
+  .wf-card-action-pill .material-symbols-outlined { font-size: 13px; }
+  .wf-feed-card:hover .wf-card-action-pill { opacity: 1; }
+  .wf-card-action-pill:hover { background: #333; }
 
   /* Center solver */
-  .wf-solver { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg-white); border-right: 1px solid var(--border); }
+  .wf-solver { position: relative; flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg-white); border-right: 1px solid var(--border); }
   /* ── Case header (2-row) ── */
   .wf-case-header { border-bottom: 1px solid var(--border); flex-shrink: 0; background: var(--bg-white); display: flex; flex-direction: column; }
   .wf-case-row1 { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px 6px; }
@@ -3709,6 +3750,13 @@
   .wf-solver.wf-task-mode #wf-task-need-row { display: flex !important; }
   .wf-solver.wf-task-mode #wf-open-case-btn { display: none !important; }
   /* Task detail body */
+  /* Agent task sections — collapsible boxes used in both split + tab views */
+  .wf-task-sec { background:#fcfcfc; border:1px solid #f0f0f0; border-radius:8px; margin-bottom:12px; overflow:hidden; }
+  .wf-task-sec.minimized { padding-bottom:0; }
+  .wf-task-sec-header { display:flex; align-items:center; gap:8px; padding:12px 14px; cursor:pointer; user-select:none; }
+  .wf-task-sec-header:hover .case-section-toggle { background:#f0f0f0; }
+  .wf-task-sec-body { padding:0 14px 14px; }
+  .wf-task-sec-divider { height:1px; background:#e8eef4; margin:0 0 12px; }
   .wf-task-panel { padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; flex: 1; }
   .wf-task-panel-summary { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
   .wf-task-panel-items { display: flex; flex-direction: column; gap: 6px; }
@@ -3755,6 +3803,10 @@
   .wf-task-count { display: inline-flex; align-items: center; justify-content: center; min-width: 16px; height: 16px; border-radius: 10px; font-size: 10px; font-weight: 600; padding: 0 4px; background: var(--bg-dark); color: #fff; }
   .wf-task-tab:not(.active) .wf-task-count { background: #e8e8e8; color: var(--text-muted); }
   .wf-solver-body { flex: 1; overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; }
+  .wf-hm2-item { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 0 12px 0 0; }
+  .wf-hm2-label { font-size: 10px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: .3px; white-space: nowrap; }
+  .wf-hm2-value { font-size: 12px; color: var(--text-primary); font-weight: 500; white-space: nowrap; }
+  .wf-hm2-sep { width: 1px; height: 11px; background: var(--border); margin: 0 12px 0 0; flex-shrink: 0; }
   /* ── Form card (Figma 878:139544) ── */
   /* ── Form card (Figma 148:6005) ── */
   .wf-form-card { border: 1px solid var(--border); border-radius: 12px; background: #f8f8f8; display: flex; flex-direction: column; min-width: 0; flex-shrink: 0; }
@@ -3971,6 +4023,39 @@
   .wf-pa-eye-btn { display: flex; align-items: center; justify-content: center; width: 16px; height: 16px; border: none; background: none; cursor: pointer; padding: 0; opacity: 0; transition: opacity .15s; color: #9080B8; }
   .wf-pa-eye-btn .material-symbols-outlined { font-size: 14px; }
   .wf-pa-field:hover .wf-pa-eye-btn { opacity: 1; }
+
+  /* ── Eyeball structured form ──────────────────────────────────────────── */
+  .eyb-sec { border-top: 1px solid var(--border-light); }
+  .eyb-sec:first-child { border-top: none; }
+  .eyb-sec-hdr { display:flex;align-items:center;gap:8px;padding:9px 16px;cursor:pointer;user-select:none;font-size:12px;font-weight:600;color:var(--text-secondary);background:var(--bg-white); }
+  .eyb-sec-hdr:hover { background:var(--bg-light); }
+  .eyb-sec-hdr .material-symbols-outlined { font-size:14px;color:var(--text-muted);transition:transform .15s; }
+  .eyb-sec-body { padding:10px 16px 14px;display:flex;flex-direction:column;gap:10px;overflow:hidden; }
+  .eyb-field-grid { display:grid;grid-template-columns:1fr 1fr;gap:8px 14px; }
+  .eyb-span2 { grid-column:1 / -1; }
+  .eyb-field { display:flex;flex-direction:column;gap:4px; }
+  .eyb-label { font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px; }
+  .eyb-input { height:30px;padding:0 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;color:var(--text-primary);font-family:inherit;background:#fff;outline:none;transition:border-color .15s;box-sizing:border-box;width:100%; }
+  .eyb-input:focus { border-color:#4555D4; }
+  .eyb-input[type=number] { -moz-appearance:textfield; }
+  .eyb-input[type=number]::-webkit-inner-spin-button { -webkit-appearance:none; }
+  .eyb-check-row { display:flex;gap:16px;align-items:center;flex-wrap:wrap; }
+  .eyb-check-item { display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text-secondary);cursor:pointer; }
+  .eyb-check-item input[type=checkbox] { width:14px;height:14px;cursor:pointer;accent-color:#4555D4; }
+  .eyb-textarea { width:100%;box-sizing:border-box;resize:vertical;min-height:72px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:inherit;color:var(--text-primary);outline:none;transition:border-color .15s; }
+  .eyb-textarea:focus { border-color:#4555D4; }
+  .eyb-char-count { font-size:10px;color:var(--text-muted);text-align:right;margin-top:2px; }
+  .eyb-po-table { width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed;min-width:0; }
+  .eyb-po-table th { background:var(--bg-light);padding:5px 8px;text-align:left;font-size:10px;font-weight:600;color:var(--text-secondary);border-bottom:1px solid var(--border);overflow:hidden; }
+  .eyb-po-table td { padding:3px 3px;border-bottom:1px solid var(--border-light);overflow:hidden; }
+  .eyb-po-table tr:last-child td { border-bottom:none; }
+  .eyb-po-input { width:100%;min-width:0;height:26px;padding:0 6px;border:1px solid transparent;border-radius:4px;font-size:12px;font-family:inherit;background:transparent;box-sizing:border-box;outline:none; }
+  .eyb-po-input:focus { border-color:#4555D4;background:#fff; }
+  .eyb-po-del { border:none;background:none;cursor:pointer;color:var(--text-muted);padding:2px 6px;font-size:16px;line-height:1; }
+  .eyb-po-del:hover { color:#dc2626; }
+  .eyb-add-row-btn { margin-top:6px;border:1px dashed var(--border);background:none;border-radius:6px;padding:5px 12px;font-size:11px;color:var(--text-muted);cursor:pointer;width:100%;font-family:inherit; }
+  .eyb-add-row-btn:hover { background:var(--bg-light);color:var(--text-secondary); }
+
   /* Eye tooltip — positioned fixed by JS */
   .wf-eye-tooltip { position: fixed; z-index: 9998; background: #fff; border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,.2); overflow: hidden; width: 280px; height: 160px; }
   .wf-eye-viewport { width: 100%; height: 100%; overflow: hidden; }
@@ -4162,6 +4247,17 @@
   .ded-inline-tbl thead th:hover .ded-tbl-pin-btn,
   .ded-inline-tbl thead th.col-pinned .ded-tbl-pin-btn { opacity: 1; color: #474747; }
 
+  /* Global tooltip */
+  #g-tip {
+    position: fixed; z-index: 9999; pointer-events: none;
+    background: #1a1a1a; color: #fff; border-radius: 6px;
+    padding: 5px 9px; font-size: 11px; font-weight: 500; line-height: 1.4;
+    white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,.25);
+    opacity: 0; transition: opacity .1s; transform: translate(-50%, -100%);
+    margin-top: -8px;
+  }
+  #g-tip.visible { opacity: 1; }
+
   /* Email approval card */
   .wf-email-avatar { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0; }
   .wf-email-avatar.ea1 { background: #0369a1; }
@@ -4225,6 +4321,7 @@
 </style>
 </head>
 <body>
+<div id="g-tip"></div>
 
 <!-- Sidebar -->
 <nav class="sidebar">
@@ -4546,7 +4643,7 @@
   <div class="topbar">
     <div class="tabs-scroll" id="tabs-scroll"></div>
     <div class="topbar-actions">
-      <button class="icon-btn" title="New"><span class="material-symbols-outlined">add</span></button>
+      <button class="icon-btn" title="New" style="display:none"><span class="material-symbols-outlined">add</span></button>
       <button class="recent-btn" title="Recent" onclick="toggleRecentMenu()">
         <span class="material-symbols-outlined">history</span>
         <span class="recent-label">recent</span>
@@ -4879,11 +4976,11 @@
 
         <div class="case-header-meta">
           <div class="case-meta-sep"></div>
-          <div class="case-meta-item case-stage-trigger" id="case-stage-item" onclick="toggleStagePopover(event)">
+          <div class="case-meta-item case-stage-trigger" id="case-stage-item" onclick="toggleStagePopover(event)" style="min-width:0">
             <span class="case-meta-label">Current stage</span>
-            <span class="case-stage">
+            <span class="case-stage" style="min-width:0;overflow:hidden">
               <span class="stage-badge" id="case-stage-badge">—</span>
-              <span id="case-stage-text">—</span>
+              <span id="case-stage-text" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">—</span>
               <span class="material-symbols-outlined stage-chevron" id="stage-chevron">expand_more</span>
             </span>
             <div class="stage-popover hidden" id="stage-popover"></div>
@@ -4906,7 +5003,7 @@
         </div>
 
         <div class="case-header-right">
-          <div id="case-header-fetch"></div>
+          <div id="case-header-fetch" style="padding-right:12px;border-right:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;margin-right:4px"></div>
           <button class="header-icon" title="Refresh" onclick="renderCasePage(sectionActiveTab[activeSection])">
             <span class="material-symbols-outlined">refresh</span>
           </button>
@@ -4926,13 +5023,27 @@
           <button class="chf-tab" data-tab="scmt">SCMT <span class="chf-tab-badge">81</span></button>
           <button class="chf-tab" data-tab="tracking">Tracking <span class="chf-tab-badge">81</span></button>
         </div>
-        <div class="chf-right">
-          <!-- info button hidden per design -->
-          <button class="chf-info-btn" id="chf-info-btn" style="display:none">
-            <span class="material-symbols-outlined">info</span>
-            info
-            <span class="material-symbols-outlined chf-info-chevron">expand_more</span>
-          </button>
+        <div class="chf-right" id="chf-meta-row" style="gap:0;display:flex;flex:1;align-items:center;height:100%;border-left:1px solid var(--border)">
+          <div class="wf-hm2-item" style="flex:1;justify-content:center;padding:0;border-right:1px solid var(--border)">
+            <span class="wf-hm2-label">Created</span>
+            <span class="wf-hm2-value" id="chf-created">—</span>
+          </div>
+          <div class="wf-hm2-item" style="flex:1;justify-content:center;padding:0;border-right:1px solid var(--border)">
+            <span class="wf-hm2-label">Priority</span>
+            <span class="wf-hm2-value" id="chf-priority">—</span>
+          </div>
+          <div class="wf-hm2-item" style="flex:1;justify-content:center;padding:0;border-right:1px solid var(--border)">
+            <span class="wf-hm2-label">Category</span>
+            <span class="wf-hm2-value" id="chf-category">—</span>
+          </div>
+          <div class="wf-hm2-item" style="flex:1;justify-content:center;padding:0;border-right:1px solid var(--border)">
+            <span class="wf-hm2-label">Type</span>
+            <span class="wf-hm2-value" id="chf-type">—</span>
+          </div>
+          <div class="wf-hm2-item" style="flex:1;justify-content:center;padding:0">
+            <span class="wf-hm2-label">Subtype</span>
+            <span class="wf-hm2-value" id="chf-subtype">—</span>
+          </div>
         </div>
       </div>
 
@@ -5404,6 +5515,24 @@
       <!-- Split view: hidden when in table mode (default) -->
       <div id="wf-split-view" class="wf-panels" style="display:none">
 
+        <!-- Bulk action bar — spans full panel width, same component as table view -->
+        <div class="bulk-action-bar wf-feed-bulk-bar" id="wf-feed-bulk-bar">
+          <span class="bulk-selected-count" id="wf-feed-bulk-count">0 selected</span>
+          <button class="bulk-unselect-btn" onclick="_wfClearBulk()">Unselect all</button>
+          <div class="bulk-bar-divider"></div>
+          <div class="bulk-actions">
+            <button class="bulk-action-btn" onclick="_wfBulkAction('fetch')">
+              <span class="material-symbols-outlined">download</span>Fetch
+            </button>
+            <button class="bulk-action-btn" onclick="_wfBulkAction('assign')">
+              <span class="material-symbols-outlined">person_add</span>Assign
+            </button>
+            <button class="bulk-action-btn" onclick="_wfBulkAction('reallocate')">
+              <span class="material-symbols-outlined">group</span>Reallocate
+            </button>
+          </div>
+        </div>
+
         <!-- LEFT: Feed list -->
         <div class="wf-feed">
           <div class="wf-feed-list" id="wf-feed-list"></div>
@@ -5426,27 +5555,57 @@
                 </button>
               </div>
               <div class="case-header-meta">
+                <div class="case-meta-sep" id="wf-customer-sep"></div>
+                <div class="case-meta-item" id="wf-customer-item" style="flex:1;min-width:0">
+                  <span class="case-meta-label">Customer</span>
+                  <span id="wf-customer-text" style="font-size:13px;font-weight:500;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%">—</span>
+                </div>
                 <div class="case-meta-sep"></div>
-                <div class="case-meta-item case-stage-trigger" id="wf-stage-trigger" onclick="toggleWfStagePopover(event)">
+                <div class="case-meta-item case-stage-trigger" id="wf-stage-trigger" onclick="toggleWfStagePopover(event)" style="flex:2;min-width:0">
                   <span class="case-meta-label">Stage</span>
-                  <span class="case-stage">
+                  <span class="case-stage" style="min-width:0;overflow:hidden">
                     <span class="stage-badge" id="wf-stage-badge">4</span>
-                    <span id="wf-stage-name">Invoice Retrieval</span>
+                    <span id="wf-stage-name" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">Invoice Retrieval</span>
                     <span class="material-symbols-outlined stage-chevron" id="wf-stage-chevron">expand_more</span>
                   </span>
                   <div class="stage-popover hidden" id="wf-stage-popover"></div>
                 </div>
                 <div class="case-meta-sep"></div>
-                <div class="case-meta-item">
+                <div class="case-meta-item" style="flex:1;min-width:0">
                   <span class="case-meta-label">Status</span>
-                  <span class="case-status-text" id="wf-status-text">Running</span>
+                  <span class="case-status-text" id="wf-status-text" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Running</span>
                 </div>
               </div>
               <div class="case-header-right">
-                <div id="wf-fetch-ctrl"></div>
+                <div id="wf-fetch-ctrl" style="padding-right:12px;border-right:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;margin-right:4px"></div>
                 <button class="header-icon" title="Activity log" onclick="openCaseActivityLog(activeWorkFeedCase)">
                   <span class="material-symbols-outlined">history</span>
                 </button>
+              </div>
+            </div>
+            <!-- Second metadata row — case mode only (same footer strip as full case page) -->
+            <div class="case-header-footer" id="wf-case-header-footer">
+              <div style="display:flex;flex:1;align-items:center;justify-content:space-evenly;height:100%">
+                <div class="wf-hm2-item" style="flex:1;justify-content:center;padding:0;border-right:1px solid var(--border)">
+                  <span class="wf-hm2-label">Created</span>
+                  <span class="wf-hm2-value" id="wf-chf-created">—</span>
+                </div>
+                <div class="wf-hm2-item" style="flex:1;justify-content:center;padding:0;border-right:1px solid var(--border)">
+                  <span class="wf-hm2-label">Priority</span>
+                  <span class="wf-hm2-value" id="wf-chf-priority">—</span>
+                </div>
+                <div class="wf-hm2-item" style="flex:1;justify-content:center;padding:0;border-right:1px solid var(--border)">
+                  <span class="wf-hm2-label">Category</span>
+                  <span class="wf-hm2-value" id="wf-chf-category">—</span>
+                </div>
+                <div class="wf-hm2-item" style="flex:1;justify-content:center;padding:0;border-right:1px solid var(--border)">
+                  <span class="wf-hm2-label">Type</span>
+                  <span class="wf-hm2-value" id="wf-chf-type">—</span>
+                </div>
+                <div class="wf-hm2-item" style="flex:1;justify-content:center;padding:0">
+                  <span class="wf-hm2-label">Subtype</span>
+                  <span class="wf-hm2-value" id="wf-chf-subtype">—</span>
+                </div>
               </div>
             </div>
             <!-- Task need row — shown only in task mode -->
@@ -5456,8 +5615,14 @@
             </div>
           </div>
           <!-- Task tabs as segmented button above the body -->
-          <div id="wf-task-tabs-wrap" style="padding:12px 20px 0;flex-shrink:0"></div>
+          <div id="wf-task-tabs-wrap" style="padding:12px 20px 0;flex-shrink:0;display:flex;justify-content:flex-end"></div>
           <div class="wf-solver-body" id="wf-solver-body"></div>
+          <!-- Bulk selection placeholder — shown when feed cards are checked -->
+          <div class="wf-bulk-placeholder" id="wf-bulk-placeholder" style="display:none">
+            <span class="material-symbols-outlined" style="font-size:36px;color:var(--border)">checklist</span>
+            <span id="wf-bulk-placeholder-count" style="font-size:15px;font-weight:600;color:var(--text-primary)">2 items selected</span>
+            <span style="font-size:12px;color:var(--text-muted)">Use the action bar below to act on selected items</span>
+          </div>
         </div>
 
       </div><!-- /wf-split-view -->
@@ -6890,20 +7055,20 @@ function submitAvFeedback() {
 
 // ── Work Feed ─────────────────────────────────────────────────────────────────
 const workFeedData = [
-  { id: '2947-5839', type: 'case', stage: 'Invoice Retrieval', tasks: 4, status: 'intervention', priority: 'High',   stageSteps: '4/6', stageDesc: 'Retrieving invoice documents from vendor portals',      assists: [{label:'Credentials',count:2},{label:'Authorize'},{label:'Compare'}],   team: 'Analytics Team',  assignTo: 'Sarah Johnson'  },
-  { id: '2947-3214', type: 'case', stage: 'AP Matching',        tasks: 3, status: 'running',      priority: 'High',   stageSteps: '2/5', stageDesc: 'Matching invoices against AP ledger records',            assists: [{label:'Captcha'}],                                                     team: 'Deductions Team', assignTo: 'Ahmed Arah'     },
-  { id: '3212-2345', type: 'case', stage: 'Document Review',    tasks: 6, status: 'running',      priority: 'High',   stageSteps: '3/7', stageDesc: 'Processing and reviewing document batch',               assists: [{label:'Credentials'},{label:'Compare'},{label:'Authorize'}],           team: 'OCR Team',        assignTo: 'Michael Nguyen' },
-  { id: '1233-9845', type: 'case', stage: 'OCR Processing',     tasks: 1, status: 'running',      priority: 'High',   stageSteps: '4/4', stageDesc: 'Running OCR batch on document queue',                  assists: [{label:'Credentials'},{label:'Comparison'}],                           team: 'OCR Team',        assignTo: 'Priya Nair'    },
-  { id: '2337-3312', type: 'case', stage: 'Classification',     tasks: 4, status: 'running',      priority: 'Medium', stageSteps: '2/6', stageDesc: 'Classifying documents using AI pipeline',               assists: [{label:'Authorize'},{label:'Credentials'}],                             team: 'Analytics Team',  assignTo: 'David Kim'     },
-  { id: '5675-5443', type: 'case', stage: 'Invoice Retrieval',  tasks: 5, status: 'running',      priority: 'Low',    stageSteps: '3/5', stageDesc: 'Retrieving supplementary vendor invoices',              assists: [{label:'Captcha'}],                                                     team: 'Disputes Team',   assignTo: 'Sarah Johnson' },
-  { id: '2947-5432', type: 'case', stage: 'Document Signing',   tasks: 2, status: 'running',      priority: 'Low',    stageSteps: '1/6', stageDesc: 'Preparing documents for digital signing',              assists: [{label:'Compare'},{label:'Credentials'}],                               team: 'Compliance Team', assignTo: 'Ahmed Arah'    },
-  { id: '4821-1093', type: 'case', stage: 'Comparison',         tasks: 3, status: 'awaiting',     priority: 'Medium', stageSteps: '2/5', stageDesc: 'Comparing datasets for cross-portal analysis',         assists: [{label:'Credentials'},{label:'Compare'}],                               team: 'Analytics Team',  assignTo: null            },
-  { id: '7734-2201', type: 'case', stage: 'AP Review',          tasks: 1, status: 'running',      priority: 'Low',    stageSteps: '3/4', stageDesc: 'Finalizing AP review and preparing submission',         assists: [{label:'Credentials'}],                                                 team: 'Deductions Team', assignTo: 'Michael Nguyen'},
-  { id: '6612-8845', type: 'case', stage: 'Invoice Retrieval',  tasks: 7, status: 'running',      priority: 'High',   stageSteps: '2/6', stageDesc: 'Large invoice retrieval across vendor portals',        assists: [{label:'Credentials',count:4},{label:'Captcha',count:3}],               team: 'OCR Team',        assignTo: 'Priya Nair'    },
-  { id: '3301-7729', type: 'case', stage: 'Document Review',    tasks: 2, status: 'running',      priority: 'Medium', stageSteps: '4/7', stageDesc: 'Quality checking document review batch',               assists: [{label:'Credentials',count:2}],                                         team: 'Analytics Team',  assignTo: 'David Kim'     },
-  { id: '9102-4456', type: 'case', stage: 'OCR Processing',     tasks: 4, status: 'running',      priority: 'Medium', stageSteps: '2/4', stageDesc: 'OCR batch processing and validation',                  assists: [{label:'Credentials',count:2},{label:'Authorize',count:2}],             team: 'OCR Team',        assignTo: null            },
-  { id: '8803-1124', type: 'case', stage: 'Classification',     tasks: 1, status: 'running',      priority: 'Low',    stageSteps: '1/6', stageDesc: 'Running classification batch on document queue',       assists: [{label:'Credentials'}],                                                 team: 'Disputes Team',   assignTo: 'Sarah Johnson' },
-  { id: '5541-0032', type: 'case', stage: 'AP Matching',        tasks: 5, status: 'running',      priority: 'High',   stageSteps: '3/5', stageDesc: 'Reconciling invoices against purchase order records', assists: [{label:'Credentials',count:3},{label:'Compare',count:2}],               team: 'Compliance Team', assignTo: 'Ahmed Arah'    },
+  { id: '2947-5839', type: 'case', customer: 'Amazon.com Inc.',  stage: 'Invoice Retrieval', tasks: 4, status: 'intervention', priority: 'High',   created: 'May 14, 2026 · 09:41', category: 'OS&D',             caseType: 'Multiple Validation', subtype: 'No Casualties', stageSteps: '4/6', stageDesc: 'Retrieving invoice documents from vendor portals',      assists: [{label:'Credentials',count:2},{label:'Authorize'},{label:'Compare'}],   team: 'Analytics Team',  assignTo: 'Sarah Johnson'  },
+  { id: '2947-3214', type: 'case', customer: 'Walmart Inc.',      stage: 'AP Matching',       tasks: 3, status: 'running',      priority: 'High',   created: 'May 14, 2026 · 11:05', category: 'Price Discrepancy',caseType: 'Multiple Validation', subtype: 'No Casualties', stageSteps: '2/5', stageDesc: 'Matching invoices against AP ledger records',            assists: [{label:'Captcha'}],                                                     team: 'Deductions Team', assignTo: 'Ahmed Arah'     },
+  { id: '3212-2345', type: 'case', customer: 'Coca-Cola',         stage: 'Document Review',   tasks: 6, status: 'running',      priority: 'High',   created: 'May 13, 2026 · 14:22', category: 'OS&D',             caseType: 'Multiple Validation', subtype: 'No Casualties', stageSteps: '3/7', stageDesc: 'Processing and reviewing document batch',               assists: [{label:'Credentials'},{label:'Compare'},{label:'Authorize'}],           team: 'OCR Team',        assignTo: 'Michael Nguyen' },
+  { id: '1233-9845', type: 'case', customer: 'Amazon.com Inc.',  stage: 'OCR Processing',    tasks: 1, status: 'running',      priority: 'High',   created: 'May 13, 2026 · 16:48', category: 'Tax/Freight',      caseType: 'Multiple Validation', subtype: 'No Casualties', stageSteps: '4/4', stageDesc: 'Running OCR batch on document queue',                  assists: [{label:'Credentials'},{label:'Comparison'}],                           team: 'OCR Team',        assignTo: 'Priya Nair'    },
+  { id: '2337-3312', type: 'case', customer: 'Walmart Inc.',      stage: 'Classification',    tasks: 4, status: 'running',      priority: 'Medium', created: 'May 12, 2026 · 08:30', category: 'OS&D',             caseType: 'Multiple Validation', subtype: 'No Casualties', stageSteps: '2/6', stageDesc: 'Classifying documents using AI pipeline',               assists: [{label:'Authorize'},{label:'Credentials'}],                             team: 'Analytics Team',  assignTo: 'David Kim'     },
+  { id: '5675-5443', type: 'case', customer: 'Coca-Cola',         stage: 'Invoice Retrieval', tasks: 5, status: 'running',      priority: 'Low',    created: 'May 12, 2026 · 10:15', category: 'Price Discrepancy',caseType: 'Multiple Validation', subtype: 'No Casualties', stageSteps: '3/5', stageDesc: 'Retrieving supplementary vendor invoices',              assists: [{label:'Captcha'}],                                                     team: 'Disputes Team',   assignTo: 'Sarah Johnson' },
+  { id: '2947-5432', type: 'case', customer: 'Amazon.com Inc.',  stage: 'Document Signing',  tasks: 2, status: 'running',      priority: 'Low',    created: 'May 11, 2026 · 13:00', category: 'OS&D',             caseType: 'Multiple Validation', subtype: 'No Casualties', stageSteps: '1/6', stageDesc: 'Preparing documents for digital signing',              assists: [{label:'Compare'},{label:'Credentials'}],                               team: 'Compliance Team', assignTo: 'Ahmed Arah'    },
+  { id: '4821-1093', type: 'case', customer: 'Walmart Inc.',      stage: 'Comparison',        tasks: 3, status: 'awaiting',     priority: 'Medium', created: 'May 11, 2026 · 15:33', category: 'RTV',              caseType: 'Multiple Validation', subtype: 'No Casualties', stageSteps: '2/5', stageDesc: 'Comparing datasets for cross-portal analysis',         assists: [{label:'Credentials'},{label:'Compare'}],                               team: 'Analytics Team',  assignTo: null            },
+  { id: '7734-2201', type: 'case', customer: 'Coca-Cola',         stage: 'AP Review',         tasks: 1, status: 'running',      priority: 'Low',    created: 'May 10, 2026 · 09:20', category: 'Duplicate Billing',caseType: 'Multiple Validation', subtype: 'No Casualties', stageSteps: '3/4', stageDesc: 'Finalizing AP review and preparing submission',         assists: [{label:'Credentials'}],                                                 team: 'Deductions Team', assignTo: 'Michael Nguyen'},
+  { id: '6612-8845', type: 'case', customer: 'Amazon.com Inc.',  stage: 'Invoice Retrieval', tasks: 7, status: 'running',      priority: 'High',   created: 'May 10, 2026 · 11:44', category: 'OS&D',             caseType: 'Multiple Validation', subtype: 'No Casualties', stageSteps: '2/6', stageDesc: 'Large invoice retrieval across vendor portals',        assists: [{label:'Credentials',count:4},{label:'Captcha',count:3}],               team: 'OCR Team',        assignTo: 'Priya Nair'    },
+  { id: '3301-7729', type: 'case', customer: 'Walmart Inc.',      stage: 'Document Review',   tasks: 2, status: 'running',      priority: 'Medium', created: 'May 09, 2026 · 14:10', category: 'Price Discrepancy',caseType: 'Multiple Validation', subtype: 'No Casualties', stageSteps: '4/7', stageDesc: 'Quality checking document review batch',               assists: [{label:'Credentials',count:2}],                                         team: 'Analytics Team',  assignTo: 'David Kim'     },
+  { id: '9102-4456', type: 'case', customer: 'Coca-Cola',         stage: 'OCR Processing',    tasks: 4, status: 'running',      priority: 'Medium', created: 'May 09, 2026 · 16:55', category: 'OS&D',             caseType: 'Multiple Validation', subtype: 'No Casualties', stageSteps: '2/4', stageDesc: 'OCR batch processing and validation',                  assists: [{label:'Credentials',count:2},{label:'Authorize',count:2}],             team: 'OCR Team',        assignTo: null            },
+  { id: '8803-1124', type: 'case', customer: 'Amazon.com Inc.',  stage: 'Classification',    tasks: 1, status: 'running',      priority: 'Low',    created: 'May 08, 2026 · 08:05', category: 'Tax/Freight',      caseType: 'Multiple Validation', subtype: 'No Casualties', stageSteps: '1/6', stageDesc: 'Running classification batch on document queue',       assists: [{label:'Credentials'}],                                                 team: 'Disputes Team',   assignTo: 'Sarah Johnson' },
+  { id: '5541-0032', type: 'case', customer: 'Walmart Inc.',      stage: 'AP Matching',       tasks: 5, status: 'running',      priority: 'High',   created: 'May 08, 2026 · 10:30', category: 'OS&D',             caseType: 'Multiple Validation', subtype: 'No Casualties', stageSteps: '3/5', stageDesc: 'Reconciling invoices against purchase order records', assists: [{label:'Credentials',count:3},{label:'Compare',count:2}],               team: 'Compliance Team', assignTo: 'Ahmed Arah'    },
 ];
 
 // General tasks — agent assistance requests, not tied to any case
@@ -7424,21 +7589,21 @@ const _deductionWfData = [
     invoiceNo: 'INV-84821', poNo: 'PO-293017', claimDate: '03/15/2024',
     stage: 'Eyeball Review', tasks: 2, status: 'intervention', priority: 'High',
     amount: '$12,450.00', stageSteps: '2/4', subtitle: 'Walmart Inc. · OS&D',
-    customerSign: true, carrierSign: true, stc: false,
+    customerSign: true, carrierSign: true, stc: false, caseType: 'Multiple Validation', subtype: 'No Casualties',
     stageDesc: 'OCR data extracted — human verification required', assists: [{label:'Eyeball',count:2}],
     team: 'Deductions Team', assignTo: 'Emily Foster' },
   { id: 'DED-00109', type: 'case', retailer: 'Amazon Retail', deductionType: 'Price Discrepancy',
     invoiceNo: 'INV-72941', poNo: 'PO-881203', claimDate: '03/22/2024',
     stage: 'Eyeball Review', tasks: 1, status: 'intervention', priority: 'High',
     amount: '$5,870.50', stageSteps: '2/4', subtitle: 'Amazon Retail · Price Discrepancy',
-    customerSign: true, carrierSign: false, stc: false,
+    customerSign: true, carrierSign: false, stc: false, caseType: 'Multiple Validation', subtype: 'No Casualties',
     stageDesc: 'Invoice extraction needs review before validation', assists: [{label:'Eyeball',count:1}],
     team: 'Deductions Team', assignTo: 'Marcus Webb' },
   { id: 'DED-00082', type: 'case', retailer: 'Safeway Inc.', deductionType: 'Tax/Freight Mismatch',
     invoiceNo: 'INV-66120', poNo: 'PO-773910', claimDate: '04/01/2024',
     stage: 'Eyeball Review', tasks: 3, status: 'intervention', priority: 'Medium',
     amount: '$9,250.00', stageSteps: '2/4', subtitle: 'Safeway Inc. · Tax/Freight Mismatch',
-    customerSign: false, carrierSign: true, stc: false,
+    customerSign: false, carrierSign: true, stc: false, caseType: 'Multiple Validation', subtype: 'No Casualties',
     stageDesc: 'POD and invoice OCR require verification', assists: [{label:'Eyeball',count:3}],
     team: 'Disputes Team', assignTo: 'Ahmed Arah' },
   // Deduction Validation stage
@@ -7446,21 +7611,21 @@ const _deductionWfData = [
     invoiceNo: 'INV-79302', poNo: 'PO-187445', claimDate: '03/18/2024',
     stage: 'Deduction Validation', tasks: 1, status: 'intervention', priority: 'High',
     amount: '$8,230.50', stageSteps: '3/4', subtitle: 'Target Corporation · OS&D',
-    customerSign: true, carrierSign: true, stc: true,
+    customerSign: true, carrierSign: true, stc: true, caseType: 'Multiple Validation', subtype: 'No Casualties',
     stageDesc: 'Analyst review required for final determination', assists: [{label:'Validate',count:1}],
     team: 'Deductions Team', assignTo: 'Ben Septer' },
   { id: 'DED-00105', type: 'case', retailer: 'Home Depot', deductionType: 'OS&D',
     invoiceNo: 'INV-71882', poNo: 'PO-229048', claimDate: '03/28/2024',
     stage: 'Deduction Validation', tasks: 1, status: 'intervention', priority: 'High',
     amount: '$19,450.00', stageSteps: '3/4', subtitle: 'Home Depot · OS&D',
-    customerSign: true, carrierSign: false, stc: true,
+    customerSign: true, carrierSign: false, stc: true, caseType: 'Multiple Validation', subtype: 'No Casualties',
     stageDesc: 'Shortage analysis ready for analyst determination', assists: [{label:'Validate',count:1}],
     team: 'Deductions Team', assignTo: 'Sarah Johnson' },
   { id: 'DED-00088', type: 'case', retailer: 'Publix Super Markets', deductionType: 'Price Discrepancy',
     invoiceNo: 'INV-64509', poNo: 'PO-559820', claimDate: '03/30/2024',
     stage: 'Deduction Validation', tasks: 1, status: 'intervention', priority: 'Medium',
     amount: '$14,100.00', stageSteps: '3/4', subtitle: 'Publix Super Markets · Price Discrepancy',
-    customerSign: false, carrierSign: false, stc: true,
+    customerSign: false, carrierSign: false, stc: true, caseType: 'Multiple Validation', subtype: 'No Casualties',
     stageDesc: 'Pricing discrepancy validation pending analyst review', assists: [{label:'Validate',count:1}],
     team: 'Disputes Team', assignTo: 'Ben Septer' },
   // Billback stage (approved — notification ready to send)
@@ -7468,21 +7633,21 @@ const _deductionWfData = [
     invoiceNo: 'INV-75844', poNo: 'PO-412093', claimDate: '03/20/2024',
     stage: 'Credit Memo / Billback', tasks: 1, status: 'intervention', priority: 'High',
     amount: '$31,200.00', stageSteps: '4/4', subtitle: 'Costco Wholesale · OS&D',
-    customerSign: true, carrierSign: true, stc: true,
+    customerSign: true, carrierSign: true, stc: true, caseType: 'Multiple Validation', subtype: 'No Casualties',
     stageDesc: 'Deduction approved — credit memo ready to send', assists: [{label:'Credit Memo',count:1}],
     team: 'Deductions Team', assignTo: 'Priya Nair' },
   { id: 'DED-00094', type: 'case', retailer: 'CVS Health', deductionType: 'Duplicate Billing',
     invoiceNo: 'INV-68831', poNo: 'PO-348820', claimDate: '03/25/2024',
     stage: 'Credit Memo / Billback', tasks: 1, status: 'intervention', priority: 'Medium',
     amount: '$6,790.00', stageSteps: '4/4', subtitle: 'CVS Health · Duplicate Billing',
-    customerSign: true, carrierSign: true, stc: false,
+    customerSign: true, carrierSign: true, stc: false, caseType: 'Multiple Validation', subtype: 'No Casualties',
     stageDesc: 'Approved deduction ready for client notification', assists: [{label:'Credit Memo',count:1}],
     team: 'Compliance Team', assignTo: 'David Kim' },
   { id: 'DED-00076', type: 'case', retailer: "Sam's Club", deductionType: 'RTV',
     invoiceNo: 'INV-59902', poNo: 'PO-280043', claimDate: '04/05/2024',
     stage: 'Credit Memo / Billback', tasks: 1, status: 'awaiting', priority: 'Low',
     amount: '$22,630.00', stageSteps: '4/4', subtitle: "Sam's Club · RTV",
-    customerSign: false, carrierSign: true, stc: false,
+    customerSign: false, carrierSign: true, stc: false, caseType: 'Multiple Validation', subtype: 'No Casualties',
     stageDesc: 'Awaiting final sign-off before credit memo is sent', assists: [{label:'Credit Memo',count:1}],
     team: 'Disputes Team', assignTo: 'Michael Nguyen' },
   // Document Collection (automated, no HITL yet)
@@ -7490,7 +7655,7 @@ const _deductionWfData = [
     invoiceNo: 'INV-70129', poNo: 'PO-301982', claimDate: '03/26/2024',
     stage: 'Document Collection', tasks: 0, status: 'running', priority: 'Medium',
     amount: '$3,420.00', stageSteps: '1/4', subtitle: 'Kroger Co. · Wrong Product',
-    customerSign: false, carrierSign: false, stc: false,
+    customerSign: false, carrierSign: false, stc: false, caseType: 'Multiple Validation', subtype: 'No Casualties',
     stageDesc: 'Retrieving POD and backup files from vendor portals', assists: [],
     team: 'Analytics Team', assignTo: 'Ben Septer' },
   // ── Global agent tasks (not linked to a specific case) ───────────────────
@@ -7532,21 +7697,37 @@ const _deductionWfTasks = {
       heading: 'Eyeball Review: OCR Validation Required',
       desc: 'The OCR engine extracted the fields below from the source documents. Verify each value against the original and correct any errors before confirming.',
       docs: [
-        { docLabel: 'Invoice INV-84821', docType: 'Invoice', fields: [
+        { docLabel: 'BOL #64868', docType: 'Bill of Lading', fields: [
           { field: 'Invoice #',      ocr: 'lNV-84821',    verified: 'INV-84821',     flagged: true  },
           { field: 'PO Number',      ocr: 'PO-29301?',    verified: 'PO-293017',     flagged: true  },
           { field: 'Retailer',       ocr: 'Walmart lnc',  verified: 'Walmart Inc.',  flagged: true  },
           { field: 'Claim Date',     ocr: '03/15/2O24',   verified: '03/15/2024',    flagged: true  },
           { field: 'Deduction Type', ocr: 'Shortage',     verified: 'Shortage',      flagged: false },
           { field: 'Claim Amount',   ocr: '$12.450.00',   verified: '$12,450.00',    flagged: true  },
-        ]},
+        ],
+        form: {
+          header: { documentProvider: 'Clorox University Park', bol: '64868', apptNumber: '896821858', freightChargeTerms: 'Prepaid', carrierSign: true, customerSign: false, subjectToCount: false, carrierSignText: 'ROEV', totalPackageQty: 1539, weight: 43852 },
+          poRows: [
+            { invoiceNumber: 'INV-84821', orderNumber: '2482860202', packageQty: 1539, lbsQty: 41707 },
+          ],
+          notations: "Driver must report any over, short, damaged or refused product at the time of delivery, by calling 833-220-1766. MABD 01/28/2025",
+          handWritten: "Sam's DC 6596. Receiver# 6024 TRL# 64646. PO# 2482860202 PLTS 6. Total Received 430. Damage 1163. Rec'd By 871. Date 16965"
+        }},
         { docLabel: 'POD #PD-48211', docType: 'Proof of Delivery', fields: [
           { field: 'Delivery Date',  ocr: '03/14/2024',   verified: '03/14/2024',    flagged: false },
           { field: 'Carrier',        ocr: 'FedEx Frght',  verified: 'FedEx Freight', flagged: true  },
           { field: 'Units Ordered',  ocr: '480',          verified: '480',           flagged: false },
           { field: 'Units Received', ocr: '412',          verified: '412',           flagged: false },
           { field: 'Shortage Units', ocr: '68',           verified: '68',            flagged: false },
-        ]},
+        ],
+        form: {
+          header: { documentProvider: 'FedEx Freight', bol: '48211', apptNumber: '', freightChargeTerms: 'Prepaid', carrierSign: true, customerSign: true, subjectToCount: true, carrierSignText: 'FedEx', totalPackageQty: 480, weight: 12840 },
+          poRows: [
+            { invoiceNumber: 'INV-84821', orderNumber: '2482860202', packageQty: 412, lbsQty: 11004 },
+          ],
+          notations: "Delivery confirmed at dock 7. Short 68 units noted at receiving.",
+          handWritten: "Received 412 of 480. Short 68 — noted on BOL. Driver: J. Marquez. Dock: 7B."
+        }},
       ]
     }
   ],
@@ -7562,7 +7743,15 @@ const _deductionWfTasks = {
           { field: 'Claim Date',     ocr: '03/22/2024',   verified: '03/22/2024',    flagged: false },
           { field: 'Deduction Type', ocr: 'Pricing Err',  verified: 'Pricing Error', flagged: true  },
           { field: 'Claim Amount',   ocr: '$5.870.50',    verified: '$5,870.50',     flagged: true  },
-        ]},
+        ],
+        form: {
+          header: { documentProvider: 'Procter & Gamble', bol: '72941', apptNumber: '440829', freightChargeTerms: 'Prepaid', carrierSign: true, customerSign: false, subjectToCount: false, carrierSignText: 'XPO', totalPackageQty: 840, weight: 22100 },
+          poRows: [
+            { invoiceNumber: 'INV-72941', orderNumber: 'PO-881203', packageQty: 840, lbsQty: 22100 },
+          ],
+          notations: "Pricing discrepancy on contract vs. invoice rate. Review Q1 2024 pricing amendment before confirming.",
+          handWritten: ""
+        }},
       ]
     }
   ],
@@ -7578,7 +7767,15 @@ const _deductionWfTasks = {
           { field: 'Claim Date',     ocr: '04/01/2024',   verified: '04/01/2024',    flagged: false },
           { field: 'Deduction Type', ocr: 'Shortage',     verified: 'Shortage',      flagged: false },
           { field: 'Claim Amount',   ocr: '$9,250.OO',    verified: '$9,250.00',     flagged: true  },
-        ]},
+        ],
+        form: {
+          header: { documentProvider: 'Kimberly-Clark', bol: '66120', apptNumber: '331047', freightChargeTerms: 'Prepaid', carrierSign: true, customerSign: true, subjectToCount: false, carrierSignText: 'ODFL', totalPackageQty: 1200, weight: 31500 },
+          poRows: [
+            { invoiceNumber: 'INV-66120', orderNumber: 'PO-773910', packageQty: 1200, lbsQty: 31500 },
+          ],
+          notations: "Shortage claim — 3 pallets short per driver count at destination.",
+          handWritten: "Safeway DC. Short 3 pallets. BOL signed short. Driver: R. Torres."
+        }},
       ]
     }
   ],
@@ -8680,7 +8877,7 @@ function renderWorkFeedTable() {
         <input type="checkbox" class="wf-row-cb" value="${c.id}" onchange="wfUpdateBulkBar()">
       </td>
       ${cells}
-      <td class="row-actions-cell" onclick="event.stopPropagation()"><div class="row-actions">${actionsHtml}</div></td>
+      <td class="row-actions-cell" onclick="event.stopPropagation()"><div class="row-actions"><div class="row-action-panel">${actionsHtml}</div><button class="row-action-trigger" title="Actions"><span class="material-symbols-outlined">more_horiz</span></button></div></td>
     </tr>`;
   }
 
@@ -8774,36 +8971,43 @@ function _wfQuickRenderTask(caseId, taskId) {
   const target = document.getElementById('wf-quick-task-body');
   if (!task || !target) return;
   activeWorkFeedTask[caseId] = taskId;
+  const _qOv = (heading, desc) =>
+    _wfSec('q-overview', heading, 'Task overview',
+      `<p style="font-size:13px;color:var(--text-secondary);line-height:1.6;margin:0">${desc}</p>`, true);
+
   if (task.type === 'auth-credential') {
-    target.innerHTML = `
-      <div>
-        <h2 class="wf-solver-h2">${task.heading || 'Intervention Required: Authentication Needed'}</h2>
-        <p class="wf-solver-desc">${task.desc || ''}</p>
-      </div>
-      ${(task.cards || []).map(c => _wfFormCard({ caseId, taskId: task.id, ...c })).join('')}`;
+    const heading = task.heading || 'Intervention Required: Authentication Needed';
+    target.innerHTML =
+      _qOv(heading, task.desc || '') +
+      _wfSec('q-content', 'Credentials', 'Approve or reject each authentication request',
+        (task.cards || []).map(c => _wfFormCard({ caseId, taskId: task.id, ...c })).join(''));
   } else if (task.type === 'email-approval') {
-    target.innerHTML = `
-      <div>
-        <h2 class="wf-solver-h2">${task.heading || 'Review Required: Outbound Customer Emails'}</h2>
-        <p class="wf-solver-desc">${task.desc || ''}</p>
-      </div>
-      ${(task.emails || []).map(e => _wfEmailCard({ caseId, taskId: task.id, ...e })).join('')}`;
+    const heading = task.heading || 'Review Required: Outbound Customer Emails';
+    target.innerHTML =
+      _qOv(heading, task.desc || '') +
+      _wfSec('q-content', 'Email Drafts', 'Review and approve each outbound email',
+        (task.emails || []).map(e => _wfEmailCard({ caseId, taskId: task.id, ...e })).join(''));
   } else if (task.type === 'comparison') {
-    target.innerHTML = `
-      <div>
-        <h2 class="wf-solver-h2">Authorization Required: Invoice Payment</h2>
-        <p class="wf-solver-desc">Verify the fields against the invoice document and authorize payment to continue.</p>
-      </div>
-      ${_wfComparisonCard({ caseId, taskId: task.id })}`;
+    target.innerHTML =
+      _qOv('Authorization Required: Invoice Payment',
+        'Verify the fields against the invoice document and authorize payment to continue.') +
+      _wfSec('q-content', 'Invoice Verification', 'Verify fields and authorize payment',
+        _wfComparisonCard({ caseId, taskId: task.id }));
   } else if (task.type === 'eyeball') {
-    target.innerHTML = `<div><h2 class="wf-solver-h2">${task.heading}</h2><p class="wf-solver-desc">${task.desc}</p></div>${_wfEyeballCard(caseId, task)}`;
+    target.innerHTML =
+      _qOv(task.heading, task.desc) +
+      _wfSec('q-content', 'Review Items', 'Approve or flag each item',
+        _wfEyeballCard(caseId, task));
   } else if (task.type === 'deduction-validation') {
-    target.innerHTML = `
-      <div><h2 class="wf-solver-h2">${task.heading}</h2><p class="wf-solver-desc">${task.desc}</p></div>
-      ${_dedQtyEstimationCard(caseId, task)}
-      ${_dedDeductionValidationCard(caseId, task)}`;
+    target.innerHTML =
+      _qOv(task.heading, task.desc) +
+      _wfSec('q-content', 'Deduction Validation', 'All fields pre-filled by agent — review, adjust if needed, then submit',
+        _dedCombinedValidationCard(caseId, task));
   } else if (task.type === 'billback') {
-    target.innerHTML = `<div><h2 class="wf-solver-h2">${task.heading}</h2><p class="wf-solver-desc">${task.desc}</p></div>${_wfBillbackCard(caseId, task)}`;
+    target.innerHTML =
+      _qOv(task.heading, task.desc) +
+      _wfSec('q-content', 'Billback Details', 'Review and approve billback items',
+        _wfBillbackCard(caseId, task));
   }
 }
 
@@ -8815,9 +9019,164 @@ function closeWfQuickModal() {
 // ─── Deductions HITL card renderers ─────────────────────────────────────────
 
 function _wfEyeballCard(caseId, task) {
-  // Reuse the split-view card: left field list with eye/highlight buttons,
-  // right live doc preview panel — same approve flow.
-  return _dedEyeballSplitCard(caseId, task);
+  return _dedEyeballFormCard(caseId, task);
+}
+
+// ── PO table row helpers ──────────────────────────────────────────────────────
+function _eybAddPoRow(tableId) {
+  const tbody = document.querySelector(`#${tableId} tbody`);
+  if (!tbody) return;
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><input class="eyb-po-input" type="text" placeholder="INV-"></td>
+    <td><input class="eyb-po-input" type="text" placeholder="PO-"></td>
+    <td><input class="eyb-po-input" type="number" placeholder="0" style="-moz-appearance:textfield"></td>
+    <td><input class="eyb-po-input" type="number" placeholder="0" style="-moz-appearance:textfield"></td>
+    <td><button class="eyb-po-del" onclick="_eybDelPoRow(this)" title="Remove row">×</button></td>`;
+  tbody.appendChild(tr);
+}
+function _eybDelPoRow(btn) {
+  btn.closest('tr')?.remove();
+}
+
+// ── Eyeball structured form card ──────────────────────────────────────────────
+function _dedEyeballFormCard(caseId, task, prefix = 'wf') {
+  const docs = task.docs || [];
+  return docs.map((doc, docIdx) => {
+    const splitId = `ded-eyb-${prefix}-${caseId}-${docIdx}`;   // prefix avoids ID collision between work-feed and case-page
+    const poTableId = `eyb-po-${splitId}`;
+    const f = doc.form || {};
+    const h = f.header || {};
+    const rows = f.poRows || [];
+    const notations = f.notations || '';
+    const hw = f.handWritten || '';
+
+    // ── Sub-section toggle helper (inline) ──────────────────────────────
+    const _secId = s => `eyb-body-${splitId}-${s}`;
+    const _sec = (key, icon, label, bodyHtml) => `
+      <div class="eyb-sec">
+        <div class="eyb-sec-hdr" onclick="(function(el){var b=document.getElementById('${_secId(key)}');if(b){var h=b.style.display==='none';b.style.display=h?'':'none';el.querySelector('.material-symbols-outlined.eyb-chev').style.transform=h?'':'rotate(-90deg)';})(this)">
+          <span class="material-symbols-outlined" style="font-size:15px;color:var(--text-muted)">${icon}</span>
+          ${label}
+          <span class="material-symbols-outlined eyb-chev" style="margin-left:auto;font-size:14px;color:var(--text-muted);transition:transform .15s">expand_more</span>
+        </div>
+        <div id="${_secId(key)}" class="eyb-sec-body">${bodyHtml}</div>
+      </div>`;
+
+    // Zoom shorthand
+    const _z = key => `onfocus="_splitDocZoom('${splitId}','${key}',true)" onblur="_splitDocZoom('${splitId}','${key}',false)"`;
+
+    // ── Header section ────────────────────────────────────────────────────
+    const headerHtml = `
+      <div class="eyb-field-grid">
+        <div class="eyb-field">
+          <label class="eyb-label">Document Provider</label>
+          <input class="eyb-input" type="text" value="${h.documentProvider || ''}" ${_z('document-provider')}>
+        </div>
+        <div class="eyb-field">
+          <label class="eyb-label">BOL #</label>
+          <input class="eyb-input" type="number" value="${h.bol || ''}" ${_z('bol')}>
+        </div>
+        <div class="eyb-field">
+          <label class="eyb-label">Appt Number</label>
+          <input class="eyb-input" type="number" value="${h.apptNumber || ''}" ${_z('appt-number')}>
+        </div>
+        <div class="eyb-field">
+          <label class="eyb-label">Freight Charge Terms</label>
+          <input class="eyb-input" type="text" value="${h.freightChargeTerms || ''}" ${_z('freight-charge-terms')}>
+        </div>
+        <div class="eyb-span2">
+          <div class="eyb-check-row">
+            <label class="eyb-check-item"><input type="checkbox" ${h.carrierSign ? 'checked' : ''} onchange="_splitDocZoom('${splitId}','carrier-sign',true);setTimeout(()=>_splitDocZoom('${splitId}','carrier-sign',false),800)"> Carrier Sign</label>
+            <label class="eyb-check-item"><input type="checkbox" ${h.customerSign ? 'checked' : ''} onchange="_splitDocZoom('${splitId}','customer-sign',true);setTimeout(()=>_splitDocZoom('${splitId}','customer-sign',false),800)"> Customer Sign</label>
+            <label class="eyb-check-item"><input type="checkbox" ${h.subjectToCount ? 'checked' : ''} onchange="_splitDocZoom('${splitId}','subject-to-count',true);setTimeout(()=>_splitDocZoom('${splitId}','subject-to-count',false),800)"> Subject to Count</label>
+          </div>
+        </div>
+        <div class="eyb-field">
+          <label class="eyb-label">Carrier Sign Text</label>
+          <input class="eyb-input" type="text" value="${h.carrierSignText || ''}" ${_z('carrier-sign-text')}>
+        </div>
+        <div></div>
+        <div class="eyb-field">
+          <label class="eyb-label">Total Package Qty</label>
+          <input class="eyb-input" type="number" value="${h.totalPackageQty || ''}" ${_z('total-package-qty')}>
+        </div>
+        <div class="eyb-field">
+          <label class="eyb-label">Weight (LB)</label>
+          <input class="eyb-input" type="number" value="${h.weight || ''}" ${_z('weight')}>
+        </div>
+      </div>`;
+
+    // ── PO Details section ────────────────────────────────────────────────
+    const poRowsHtml = rows.map(r => `
+      <tr>
+        <td><input class="eyb-po-input" type="text" value="${r.invoiceNumber || ''}" ${_z('invoice-number')}></td>
+        <td><input class="eyb-po-input" type="text" value="${r.orderNumber || ''}" ${_z('order-number')}></td>
+        <td><input class="eyb-po-input" type="number" value="${r.packageQty || ''}" style="-moz-appearance:textfield" ${_z('package-qty')}></td>
+        <td><input class="eyb-po-input" type="number" value="${r.lbsQty || ''}" style="-moz-appearance:textfield" ${_z('lbs-qty')}></td>
+        <td><button class="eyb-po-del" onclick="_eybDelPoRow(this)" title="Remove row">×</button></td>
+      </tr>`).join('');
+    const poHtml = `
+      <div style="overflow:hidden;width:100%;min-width:0">
+        <table class="eyb-po-table" id="${poTableId}">
+          <thead><tr>
+            <th style="width:28%">Invoice #</th><th style="width:36%">Order #</th><th style="width:16%">Pkg Qty</th><th style="width:16%">LBs</th><th style="width:28px"></th>
+          </tr></thead>
+          <tbody>${poRowsHtml}</tbody>
+        </table>
+      </div>
+      <button class="eyb-add-row-btn" onclick="_eybAddPoRow('${poTableId}')">+ Add row</button>`;
+
+    // ── Notations section ─────────────────────────────────────────────────
+    const notId = `eyb-char-${splitId}`;
+    const notHtml = `
+      <textarea class="eyb-textarea" maxlength="500"
+        oninput="document.getElementById('${notId}').textContent=this.value.length"
+        onfocus="_splitDocZoom('${splitId}','notations',true)"
+        onblur="_splitDocZoom('${splitId}','notations',false)"
+      >${notations}</textarea>
+      <div class="eyb-char-count"><span id="${notId}">${notations.length}</span> / 500</div>`;
+
+    // ── Hand Written section ──────────────────────────────────────────────
+    const hwHtml = `<input class="eyb-input" type="text" value="${hw.replace(/"/g, '&quot;')}" style="width:100%"
+      onfocus="_splitDocZoom('${splitId}','hand-written',true)"
+      onblur="_splitDocZoom('${splitId}','hand-written',false)">`;
+
+    return `
+      <div class="wf-form-card" style="overflow:hidden">
+        <div class="wf-form-card-header" style="align-items:center">
+          <span class="material-symbols-outlined" style="font-size:20px;color:var(--text-secondary);flex-shrink:0">description</span>
+          <div style="flex:1;min-width:0">
+            <div class="wf-form-card-vendor">${doc.docLabel}</div>
+            <div class="wf-form-card-task-type">${doc.docType} — eyeball review</div>
+          </div>
+        </div>
+        <div class="ded-eyeball-split">
+          <div class="ded-eyeball-left" style="padding:0;overflow-y:auto;overflow-x:hidden">
+            ${_sec('hdr', 'receipt_long', 'Header', headerHtml)}
+            ${_sec('po',  'table_rows',   'PO Details', poHtml)}
+            ${_sec('not', 'notes',        'Notations', notHtml)}
+            ${_sec('hw',  'edit',         'Hand Written', hwHtml)}
+          </div>
+          <div style="display:flex;flex-direction:column;background:#525659;overflow:hidden">
+            <div style="display:flex;align-items:center;gap:8px;padding:7px 12px;background:#3c3f41;flex-shrink:0">
+              <span class="material-symbols-outlined" style="font-size:13px;color:#aaa">picture_as_pdf</span>
+              <span style="font-size:11px;color:#ccc;font-weight:500">${doc.docLabel}</span>
+              <span style="font-size:10px;color:#888;margin-left:2px">· ${doc.docType}</span>
+            </div>
+            <div class="ded-eyeball-right" id="${splitId}-doc">
+              ${_dedRenderDoc(doc, splitId)}
+            </div>
+          </div>
+        </div>
+        <div class="wf-form-card-footer">
+          <button class="wf-reject-btn">Reject</button>
+          <button class="wf-approve-btn" onclick="approveWfCard(this,'${caseId}','eyeball','confirm-${docIdx}','eyeball')">
+            <span class="material-symbols-outlined" style="font-size:14px">check</span> Confirm
+          </button>
+        </div>
+      </div>`;
+  }).join('');
 }
 
 // ── Highlight a field in the right-panel invoice when eye-btn is hovered ──────
@@ -8858,6 +9217,79 @@ function _dedRenderDoc(doc, splitId) {
   const fk  = f => f.replace(/[^a-z0-9]/gi, '-').toLowerCase();
   const fv  = f => { const x = doc.fields.find(d => d.field === f); return x ? x.verified : '—'; };
   const fval = f => `<span class="ded-doc-val" data-fieldkey="${fk(f)}">${fv(f)}</span>`;
+  const dv  = (key, val) => `<span class="ded-doc-val" data-fieldkey="${key}">${val || '—'}</span>`;
+
+  if (doc.docType === 'Bill of Lading') {
+    const h = (doc.form && doc.form.header) || {};
+    const rows = (doc.form && doc.form.poRows) || [];
+    const chk = v => v ? '☑' : '☐';
+    const poRowsHtml = rows.map(r => `
+      <tr>
+        <td style="padding:2px 5px;border:1px solid #ddd;font-size:9px">${dv('invoice-number', r.invoiceNumber)}</td>
+        <td style="padding:2px 5px;border:1px solid #ddd;font-size:9px">${dv('order-number', r.orderNumber)}</td>
+        <td style="padding:2px 5px;border:1px solid #ddd;font-size:9px;text-align:right">${dv('package-qty', r.packageQty)}</td>
+        <td style="padding:2px 5px;border:1px solid #ddd;font-size:9px;text-align:right">${dv('lbs-qty', r.lbsQty)}</td>
+      </tr>`).join('');
+    return `
+      <div class="wf-invoice-doc" style="font-size:9px;line-height:1.4">
+        <div style="text-align:center;font-size:12px;font-weight:800;letter-spacing:.08em;border-bottom:2px solid #111;padding-bottom:6px;margin-bottom:8px">BILL OF LADING</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid #bbb;margin-bottom:6px">
+          <div style="padding:5px 7px;border-right:1px solid #bbb;border-bottom:1px solid #bbb">
+            <div style="font-size:7px;font-weight:700;text-transform:uppercase;color:#666;margin-bottom:2px">Ship From</div>
+            <div style="font-weight:700;font-size:10px">${dv('document-provider', h.documentProvider)}</div>
+          </div>
+          <div style="padding:5px 7px;border-bottom:1px solid #bbb">
+            <div style="font-size:7px;font-weight:700;text-transform:uppercase;color:#666;margin-bottom:2px">BOL #</div>
+            <div style="font-weight:700;font-size:10px">${dv('bol', h.bol)}</div>
+          </div>
+          <div style="padding:5px 7px;border-right:1px solid #bbb;border-bottom:1px solid #bbb">
+            <div style="font-size:7px;font-weight:700;text-transform:uppercase;color:#666;margin-bottom:2px">Carrier Name / SCAC</div>
+            <div style="font-weight:600">${dv('carrier-sign-text', h.carrierSignText)}</div>
+          </div>
+          <div style="padding:5px 7px;border-bottom:1px solid #bbb">
+            <div style="font-size:7px;font-weight:700;text-transform:uppercase;color:#666;margin-bottom:2px">Appt Number</div>
+            <div style="font-weight:600">${dv('appt-number', h.apptNumber)}</div>
+          </div>
+          <div style="padding:5px 7px;grid-column:1/-1;border-bottom:1px solid #bbb">
+            <div style="font-size:7px;font-weight:700;text-transform:uppercase;color:#666;margin-bottom:3px">Freight Charge Terms</div>
+            <div>${dv('freight-charge-terms', h.freightChargeTerms)}</div>
+          </div>
+          <div style="padding:5px 7px;grid-column:1/-1;border-bottom:1px solid #bbb;display:flex;gap:12px">
+            <span>${dv('carrier-sign', chk(h.carrierSign) + ' Carrier Sign')}</span>
+            <span>${dv('customer-sign', chk(h.customerSign) + ' Customer Sign')}</span>
+            <span>${dv('subject-to-count', chk(h.subjectToCount) + ' Subject to Count')}</span>
+          </div>
+        </div>
+        <div style="font-size:7px;font-weight:700;text-transform:uppercase;color:#666;margin-bottom:3px">Customer Information (PO Details)</div>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:6px">
+          <thead><tr style="background:#f0f0f0">
+            <th style="padding:3px 5px;border:1px solid #bbb;font-size:8px;font-weight:700;text-align:left">Invoice #</th>
+            <th style="padding:3px 5px;border:1px solid #bbb;font-size:8px;font-weight:700;text-align:left">Order #</th>
+            <th style="padding:3px 5px;border:1px solid #bbb;font-size:8px;font-weight:700;text-align:right"># Pkgs</th>
+            <th style="padding:3px 5px;border:1px solid #bbb;font-size:8px;font-weight:700;text-align:right">Weight (LB)</th>
+          </tr></thead>
+          <tbody>${poRowsHtml}</tbody>
+        </table>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;border:1px solid #bbb;padding:5px 7px;margin-bottom:6px">
+          <div>
+            <div style="font-size:7px;font-weight:700;text-transform:uppercase;color:#666">Grand Total Pkgs</div>
+            <div style="font-weight:700;font-size:10px">${dv('total-package-qty', h.totalPackageQty)}</div>
+          </div>
+          <div>
+            <div style="font-size:7px;font-weight:700;text-transform:uppercase;color:#666">Grand Total Weight</div>
+            <div style="font-weight:700;font-size:10px">${dv('weight', h.weight)}</div>
+          </div>
+        </div>
+        <div style="border:1px solid #bbb;padding:5px 7px;margin-bottom:4px;background:#fafafa">
+          <div style="font-size:7px;font-weight:700;text-transform:uppercase;color:#666;margin-bottom:2px">Special Instructions / Notations</div>
+          <div style="font-size:9px;color:#333;line-height:1.5">${dv('notations', doc.form && doc.form.notations)}</div>
+        </div>
+        <div style="border:1px solid #d4c87a;padding:5px 7px;background:#fffdf0">
+          <div style="font-size:7px;font-weight:700;text-transform:uppercase;color:#888;margin-bottom:2px">Hand Written Notes</div>
+          <div style="font-size:9px;font-style:italic;color:#555;line-height:1.5">${dv('hand-written', doc.form && doc.form.handWritten)}</div>
+        </div>
+      </div>`;
+  }
 
   if (doc.docType === 'Invoice') {
     return `
@@ -9128,7 +9560,7 @@ function _dedRefreshValTable(caseId) {
   const items    = (task?.items || []).filter(i => accepted.has(i.sku));
   tbody.innerHTML = items.length
     ? items.map(item => _dedValRow(caseId, item)).join('')
-    : `<tr><td colspan="15" style="padding:20px;color:var(--text-muted);text-align:center;font-size:12px">Submit quantities from Quantity Estimation to populate this table</td></tr>`;
+    : `<tr><td colspan="13" style="padding:20px;color:var(--text-muted);text-align:center;font-size:12px">Submit quantities from Quantity Estimation to populate this table</td></tr>`;
   _dedCheckValSubmit(caseId);
 }
 
@@ -9136,6 +9568,22 @@ function _dedValStatus(vq, iq) {
   if (vq >= iq && iq > 0) return `<span class="ded-tbl-status-full">Full Valid</span>`;
   if (vq > 0)             return `<span class="ded-tbl-status-partial">Partial Valid</span>`;
   return `<span class="ded-tbl-status-invalid">Invalid</span>`;
+}
+
+// ── Combined OS&D cell (Shortage / Damaged / Overage icons + counts) ──────────
+function _dedOsdCell(shortage, damaged, overage) {
+  const chip = (icon, val, color, label, desc) => {
+    const muted = val === 0;
+    return `<span class="osd-chip" data-tip-label="${label}" data-tip-val="${val}" data-tip-desc="${desc}"
+                  onmouseenter="_showTipEl(event,this)" onmousemove="_moveTip(event)" onmouseleave="_hideTip()"
+                  style="display:inline-flex;align-items:center;gap:2px;font-size:11px;font-weight:600;cursor:default;color:${muted ? 'var(--text-muted)' : color}">
+      <span class="material-symbols-outlined" style="font-size:12px;line-height:1">${icon}</span>${val}</span>`;
+  };
+  return `<div style="display:inline-flex;align-items:center;gap:7px;white-space:nowrap">
+    ${chip('south',   shortage, '#dc2626', 'Shortage', 'Units missing from shipment')}
+    ${chip('warning', damaged,  '#d97706', 'Damaged',  'Units damaged or destroyed')}
+    ${chip('north',   overage,  '#16a34a', 'Overage',  'Units received above order qty')}
+  </div>`;
 }
 
 function _dedValRow(caseId, item) {
@@ -9156,9 +9604,7 @@ function _dedValRow(caseId, item) {
     <td data-col="netPrice"   >${item.netPrice || '—'}</td>
     <td data-col="deductAmt"  style="color:#dc2626">${item.amount}</td>
     <td data-col="invQtyEach" class="num ded-tbl-output"><span class="ded-output-pill">${invQtyEach}</span></td>
-    <td data-col="shortage"   class="num">${item.discrepancy || 0}</td>
-    <td data-col="damaged"    class="num">0</td>
-    <td data-col="overage"    class="num">0</td>
+    <td data-col="osd"         class="num">${_dedOsdCell(item.discrepancy||0, item.damaged||0, item.overage||0)}</td>
     <td data-col="validQty"   class="ded-tbl-input num"><input type="number" min="0" max="${invQtyEach}" value="${validQty}" placeholder="0" id="ded-vq-${caseId}-${item.sku}" oninput="_dedUpdateValOutputs('${caseId}','${item.sku}',${invQtyEach},${netNum})"></td>
     <td data-col="validAmt"   class="num ded-tbl-output" id="ded-va-${caseId}-${item.sku}">${hasVal ? `<span class="ded-output-pill">$${(vq*netNum).toFixed(2)}</span>` : '—'}</td>
     <td data-col="invalidQty" class="num ded-tbl-output" id="ded-iq-${caseId}-${item.sku}">${hasVal ? `<span class="ded-output-pill">${iq}</span>` : '—'}</td>
@@ -9245,6 +9691,113 @@ function _dedAttemptValSubmit(caseId) {
   }
 }
 
+// ─── Combined Qty Estimation + Deduction Validation (single pre-filled table) ─
+function _dedCombinedValidationCard(caseId, task) {
+  const tblId   = `ded-val-tbl-${caseId}`;
+  const tbodyId = `ded-val-tbl-${caseId}-body`;
+  const items   = task.items || [];
+
+  // Seed state on first render so all fields are pre-filled
+  if (!_dedQtyDenominators[caseId]) _dedQtyDenominators[caseId] = {};
+  if (!_dedValInputs[caseId])       _dedValInputs[caseId]       = {};
+  items.forEach(item => {
+    if (!_dedQtyDenominators[caseId][item.sku]) _dedQtyDenominators[caseId][item.sku] = 1;
+    const denom      = _dedQtyDenominators[caseId][item.sku];
+    const invQtyEach = item.received * denom;
+    if (!_dedValInputs[caseId][item.sku]) {
+      _dedValInputs[caseId][item.sku] = { validQty: invQtyEach, reasoning: 'Accepted' };
+    }
+  });
+
+  const head =
+    _dedMakeTh('sku',        'SKU',            tblId, '') +
+    _dedMakeTh('name',       'Item Name',      tblId, '') +
+    _dedMakeTh('invQty',     'Invoice Qty',    tblId, 'num') +
+    _dedMakeTh('denom',      'Denominator',    tblId, '') +
+    _dedMakeTh('invQtyEach', 'Inv. Qty/Each',  tblId, 'num') +
+    _dedMakeTh('netPrice',   'Net Price',      tblId, '') +
+    _dedMakeTh('deductAmt',  'Deduct Amount',  tblId, '') +
+    _dedMakeTh('osd',         'OS&D',           tblId, 'num') +
+    _dedMakeTh('validQty',   'Valid Qty',      tblId, 'num') +
+    _dedMakeTh('validAmt',   'Valid Amount',   tblId, 'num') +
+    _dedMakeTh('invalidQty', 'Invalid Qty',    tblId, 'num') +
+    _dedMakeTh('invalidAmt', 'Invalid Amount', tblId, 'num') +
+    _dedMakeTh('valStatus',  'Status',         tblId, '') +
+    _dedMakeTh('reasoning',  'Reasoning',      tblId, '');
+
+  const reasons = ['OS&D','Price Discrepancy','Carrier Error','Admin Error','Accepted','Rejected'];
+  const rows = items.map(item => {
+    const denom      = _dedQtyDenominators[caseId][item.sku] || 1;
+    const invQtyEach = item.received * denom;
+    const inp        = _dedValInputs[caseId][item.sku] || {};
+    const validQty   = inp.validQty  !== undefined ? inp.validQty  : invQtyEach;
+    const reasoning  = inp.reasoning || 'Accepted';
+    const netNum     = parseFloat((item.netPrice || '0').replace(/[^0-9.]/g,'')) || 0;
+    const vq         = parseFloat(validQty) || 0;
+    const iq         = invQtyEach - vq;
+    return `<tr>
+      <td data-col="sku" style="font-family:'SFMono-Regular',Consolas,monospace;font-size:10px;color:var(--text-muted)">${item.sku}</td>
+      <td data-col="name">${item.description}</td>
+      <td data-col="invQty" class="num">${item.received}</td>
+      <td data-col="denom" class="ded-tbl-input"><input type="number" min="1" value="${denom}" data-received="${item.received}" data-netprice="${netNum}" id="ded-denom-${caseId}-${item.sku}" oninput="_dedCombinedUpdate('${caseId}','${item.sku}')"></td>
+      <td data-col="invQtyEach" class="num ded-tbl-output"><span class="ded-output-pill" id="ded-qty-out-${caseId}-${item.sku}">${invQtyEach}</span></td>
+      <td data-col="netPrice">${item.netPrice || '—'}</td>
+      <td data-col="deductAmt" style="color:#dc2626">${item.amount}</td>
+      <td data-col="osd" class="num">${_dedOsdCell(item.discrepancy||0, item.damaged||0, item.overage||0)}</td>
+      <td data-col="validQty" class="ded-tbl-input num"><input type="number" min="0" max="${invQtyEach}" value="${validQty}" id="ded-vq-${caseId}-${item.sku}" oninput="_dedUpdateValOutputs('${caseId}','${item.sku}',${invQtyEach},${netNum})"></td>
+      <td data-col="validAmt"   class="num ded-tbl-output" id="ded-va-${caseId}-${item.sku}"><span class="ded-output-pill">$${(vq*netNum).toFixed(2)}</span></td>
+      <td data-col="invalidQty" class="num ded-tbl-output" id="ded-iq-${caseId}-${item.sku}"><span class="ded-output-pill">${iq}</span></td>
+      <td data-col="invalidAmt" class="num ded-tbl-output" id="ded-ia-${caseId}-${item.sku}"><span class="ded-output-pill">$${(iq*netNum).toFixed(2)}</span></td>
+      <td data-col="valStatus"  id="ded-vs-${caseId}-${item.sku}">${_dedValStatus(vq, invQtyEach)}</td>
+      <td data-col="reasoning"  class="ded-tbl-input"><select onchange="_dedSaveReasoning('${caseId}','${item.sku}',this.value)">${reasons.map(r=>`<option value="${r}"${r===reasoning?' selected':''}>${r}</option>`).join('')}</select></td>
+    </tr>`;
+  }).join('');
+
+  const totalValidated = items.reduce((sum, item) => {
+    const inp    = _dedValInputs[caseId][item.sku] || {};
+    const netNum = parseFloat((item.netPrice || '0').replace(/[^0-9.]/g,'')) || 0;
+    const denom  = _dedQtyDenominators[caseId][item.sku] || 1;
+    const vq     = parseFloat(inp.validQty ?? item.received * denom) || 0;
+    return sum + vq * netNum;
+  }, 0);
+
+  return `
+    <div class="wf-form-card" style="padding:0;overflow:hidden">
+      ${_dedBuildInlineTbl(tblId, head, rows, tbodyId)}
+      <div class="wf-form-card-footer" style="padding:8px 12px;gap:10px;border-top:1px solid var(--border-light)">
+        <span id="ded-val-hint-${caseId}" style="font-size:11px;color:#dc2626;flex:1;display:none"></span>
+        <div style="display:flex;align-items:center;gap:5px;border-right:1px solid var(--border);padding-right:10px">
+          <span style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.3px;font-weight:600">Validated</span>
+          <span id="ded-total-validated-${caseId}" class="ded-output-pill" style="font-weight:700">$${totalValidated.toFixed(2)}</span>
+        </div>
+        <div onclick="_dedAttemptValSubmit('${caseId}')" style="display:inline-flex">
+          <button id="ded-submit-val-${caseId}" class="wf-approve-btn" style="pointer-events:none;padding:5px 16px;font-size:11px;border-radius:20px">
+            <span class="material-symbols-outlined" style="font-size:13px;vertical-align:middle">check_circle</span> Submit Validation
+          </button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function _dedCombinedUpdate(caseId, sku) {
+  const denomInput = document.getElementById(`ded-denom-${caseId}-${sku}`);
+  if (!denomInput) return;
+  const denom      = Math.max(1, parseInt(denomInput.value) || 1);
+  const received   = parseInt(denomInput.dataset.received) || 0;
+  const netNum     = parseFloat(denomInput.dataset.netprice) || 0;
+  if (!_dedQtyDenominators[caseId]) _dedQtyDenominators[caseId] = {};
+  _dedQtyDenominators[caseId][sku] = denom;
+  const invQtyEach = received * denom;
+  const qtyOut = document.getElementById(`ded-qty-out-${caseId}-${sku}`);
+  if (qtyOut) qtyOut.textContent = invQtyEach;
+  const vqInput = document.getElementById(`ded-vq-${caseId}-${sku}`);
+  if (vqInput) {
+    vqInput.max   = invQtyEach;
+    vqInput.value = Math.min(invQtyEach, parseFloat(vqInput.value) || 0);
+    _dedUpdateValOutputs(caseId, sku, invQtyEach, netNum);
+  }
+}
+
 // ─── Deduction Validation card (Box 3) ───────────────────────────────────────
 function _dedDeductionValidationCard(caseId, task) {
   const tblId   = `ded-val-tbl-${caseId}`;
@@ -9256,9 +9809,7 @@ function _dedDeductionValidationCard(caseId, task) {
     _dedMakeTh('netPrice',   'Net Price',       tblId, '') +
     _dedMakeTh('deductAmt',  'Deduct Amount',   tblId, '') +
     _dedMakeTh('invQtyEach', 'Inv. Qty/Each',   tblId, 'num') +
-    _dedMakeTh('shortage',   'Shortage',        tblId, 'num') +
-    _dedMakeTh('damaged',    'Damaged',         tblId, 'num') +
-    _dedMakeTh('overage',    'Overage',         tblId, 'num') +
+    _dedMakeTh('osd',         'OS&D',            tblId, 'num') +
     _dedMakeTh('validQty',   'Valid Qty',       tblId, 'num') +
     _dedMakeTh('validAmt',   'Valid Amount',    tblId, 'num') +
     _dedMakeTh('invalidQty', 'Invalid Qty',     tblId, 'num') +
@@ -9267,7 +9818,7 @@ function _dedDeductionValidationCard(caseId, task) {
     _dedMakeTh('reasoning',  'Reasoning',       tblId, '');
   const accepted = _dedAcceptedItems[caseId] || new Set();
   const items    = (task.items || []).filter(i => accepted.has(i.sku));
-  const placeholder = `<tr><td colspan="15" style="padding:16px;color:var(--text-muted);text-align:center;font-size:11px">Submit quantities from Qty Estimation to populate this table</td></tr>`;
+  const placeholder = `<tr><td colspan="13" style="padding:16px;color:var(--text-muted);text-align:center;font-size:11px">Submit quantities from Qty Estimation to populate this table</td></tr>`;
   return `
     <div class="wf-form-card" style="padding:0;overflow:hidden">
       ${_dedBuildInlineTbl(tblId, head, items.length ? items.map(i => _dedValRow(caseId, i)).join('') : placeholder, tbodyId)}
@@ -9660,30 +10211,94 @@ function renderWorkFeedList() {
       : `${_realTaskCount} Task${_realTaskCount !== 1 ? 's' : ''}`;
     const badgeClass = c.status === 'intervention' ? 'intervention' : '';
 
-    // Avatar in bottom row (fetched by someone)
-    const avatarHtml = fetchedByMe
-      ? `<span class="wf-card-avatar-wrap wf-card-avatar-bottom" onclick="event.stopPropagation();returnCaseFromList('${c.id}')" title="Return case">
-           ${_activeUserAvatarHtml(fetched, 'sm')}
-           <span class="wf-card-return-overlay"><span class="material-symbols-outlined">undo</span></span>
-         </span>`
-      : fetchedByOther
-        ? `<span class="wf-card-avatar-wrap wf-card-avatar-bottom" title="Fetched by ${fetched}">${_activeUserAvatarHtml(fetched, 'sm')}</span>`
-        : '';
+    // Avatar — shows who has the case (no action overlay; pill handles actions now)
+    const avatarHtml = (fetchedByMe || fetchedByOther)
+      ? `<span class="wf-card-avatar-wrap" title="${fetchedByMe ? 'Fetched by you' : 'Fetched by ' + fetched}">${_activeUserAvatarHtml(fetched, 'sm')}</span>`
+      : '';
 
-    return `<div class="wf-feed-card${isActive ? ' active' : ''}${fetchedByOther ? ' wf-taken' : ''}" onclick="selectWorkFeedCase('${c.id}')">
+    // Pill action button — only for mine ("Return") or unfetched ("Fetch"); hidden if taken by someone else
+    const pillHtml = fetchedByOther ? '' : (() => {
+      const label  = fetchedByMe ? 'Return' : 'Fetch';
+      const icon   = fetchedByMe ? 'undo' : 'download';
+      const action = fetchedByMe ? `returnCaseFromList('${c.id}')` : `fetchCaseFromList('${c.id}')`;
+      return `<button class="wf-card-action-pill" onclick="event.stopPropagation();${action}"><span class="material-symbols-outlined">${icon}</span>${label}</button>`;
+    })();
+
+    const openFn = fetchedByOther ? `openWfCaseReadOnly('${c.id}')` : `openWfCaseTab('${c.id}')`;
+    return `<div class="wf-feed-card${isActive ? ' active' : ''}${fetchedByOther ? ' wf-taken' : ''}" data-id="${c.id}" onclick="selectWorkFeedCase('${c.id}')">
+      <input type="checkbox" class="wf-card-cb" onclick="event.stopPropagation();_wfCardCbClick(event,this)">
       <div class="wf-card-top">
         <span class="material-symbols-outlined wf-card-icon">${cardIcon}</span>
         <span class="wf-card-id${isTask ? ' wf-card-id-ai' : ''}">${cardName}</span>
+        <button class="wf-card-open-btn" onclick="event.stopPropagation();${openFn}" title="Open in new tab"><span class="material-symbols-outlined">open_in_new</span></button>
       </div>
       <div class="wf-card-desc">${cardDesc}</div>
       <div class="wf-card-bottom">
         <span class="wf-card-badge ${badgeClass}">${cardCount}</span>
-        ${avatarHtml}
+        <div class="wf-card-actions">${avatarHtml}${pillHtml}</div>
       </div>
     </div>`;
   }
 
   list.innerHTML = data.map(_buildCard).join('');
+}
+
+let _wfLastCheckedIdx = null;   // anchor for shift-range selection
+
+function _wfCardCbClick(event, cb) {
+  const list = document.getElementById('wf-feed-list');
+  if (!list) return;
+  const allCbs = [...list.querySelectorAll('.wf-card-cb')];
+  const currentIdx = allCbs.indexOf(cb);
+
+  if (event.shiftKey && _wfLastCheckedIdx !== null && currentIdx !== _wfLastCheckedIdx) {
+    // Fill the range between anchor and current with the current checked state
+    const start  = Math.min(_wfLastCheckedIdx, currentIdx);
+    const end    = Math.max(_wfLastCheckedIdx, currentIdx);
+    const target = cb.checked;
+    for (let i = start; i <= end; i++) allCbs[i].checked = target;
+  } else {
+    // Normal click — update anchor
+    _wfLastCheckedIdx = currentIdx;
+  }
+
+  _wfOnCardCheck();
+}
+
+function _wfOnCardCheck() {
+  const list        = document.getElementById('wf-feed-list');
+  const bar         = document.getElementById('wf-feed-bulk-bar');
+  const countEl     = document.getElementById('wf-feed-bulk-count');
+  const placeholder = document.getElementById('wf-bulk-placeholder');
+  const phCount     = document.getElementById('wf-bulk-placeholder-count');
+  if (!list) return;
+  const checked = list.querySelectorAll('.wf-card-cb:checked');
+  const n = checked.length;
+  const label = n === 1 ? '1 item selected' : `${n} items selected`;
+  list.classList.toggle('wf-bulk-mode', n > 0);
+  if (bar)         bar.classList.toggle('visible', n > 0);
+  if (countEl)     countEl.textContent = n === 1 ? '1 selected' : `${n} selected`;
+  if (placeholder) placeholder.style.display = n > 0 ? 'flex' : 'none';
+  if (phCount)     phCount.textContent = label;
+}
+
+function _wfClearBulk() {
+  const list = document.getElementById('wf-feed-list');
+  if (!list) return;
+  list.querySelectorAll('.wf-card-cb').forEach(cb => cb.checked = false);
+  _wfLastCheckedIdx = null;
+  _wfOnCardCheck();
+}
+
+function _wfBulkAction(action) {
+  const list = document.getElementById('wf-feed-list');
+  if (!list) return;
+  const ids = [...list.querySelectorAll('.wf-card-cb:checked')].map(cb => cb.closest('.wf-feed-card')?.dataset?.id).filter(Boolean);
+  if (!ids.length) return;
+  if (action === 'fetch')      ids.forEach(id => fetchCaseFromList(id));
+  if (action === 'assign')     wfBulkAssign();
+  if (action === 'reallocate') wfBulkReallocate();
+  _wfClearBulk();
 }
 
 function selectWorkFeedCase(id) {
@@ -9696,9 +10311,103 @@ function selectWorkFeedCase(id) {
   if (cr) cr.innerHTML = `<span class="material-symbols-outlined" style="font-size:11px">inbox</span>${id}<span class="material-symbols-outlined" style="font-size:11px">expand_more</span>`;
 }
 
+// ── Shared task section builder (split view + tab view) ──────────────────────
+function _wfSec(key, title, desc, bodyHtml, startCollapsed = false) {
+  return `
+    <div class="wf-task-sec${startCollapsed ? ' minimized' : ''}" id="wf-ts-${key}">
+      <div class="wf-task-sec-header" onclick="_toggleWfTaskSec('${key}')">
+        <div class="case-section-toggle${startCollapsed ? ' collapsed' : ''}" id="wf-ts-tog-${key}">
+          <span class="material-symbols-outlined">expand_more</span>
+        </div>
+        <div class="case-section-labels">
+          <div class="case-section-title">${title}</div>
+          <div class="case-section-desc">${desc}</div>
+        </div>
+      </div>
+      <div class="wf-task-sec-divider" id="wf-ts-div-${key}"${startCollapsed ? ' style="display:none"' : ''}></div>
+      <div class="wf-task-sec-body" id="wf-ts-body-${key}"${startCollapsed ? ' style="display:none"' : ''}>${bodyHtml}</div>
+    </div>`;
+}
+
+function _toggleWfTaskSec(secId) {
+  const body    = document.getElementById(`wf-ts-body-${secId}`);
+  const divider = document.getElementById(`wf-ts-div-${secId}`);
+  const toggle  = document.getElementById(`wf-ts-tog-${secId}`);
+  const section = document.getElementById(`wf-ts-${secId}`);
+  if (!body) return;
+  const willHide = body.style.display !== 'none';
+  body.style.display    = willHide ? 'none' : '';
+  if (divider) divider.style.display = willHide ? 'none' : '';
+  if (toggle)  toggle.classList.toggle('collapsed', willHide);
+  if (section) section.classList.toggle('minimized', willHide);
+}
+
+function _buildWfTaskBody(task, ctx) {
+  // ctx: 'solver' (split) | 'tab' (case-page tab)
+  const allItems   = task.items || [];
+  const actions    = _WF_TASK_ITEM_ACTIONS[task.agent] || [];
+  const toggleItem = ctx === 'solver' ? '_toggleWfTaskItem' : '_toggleWfTaskInPage';
+  const resolveCtx = ctx === 'solver' ? 'solver' : 'tab';
+
+  const actionsHtml = actions.map(a =>
+    `<button class="wf-item-action-btn${a.primary ? ' primary' : ''}" onclick="event.stopPropagation()">
+       <span class="material-symbols-outlined">${a.icon}</span>${a.label}
+     </button>`
+  ).join('');
+
+  const itemsHtml = allItems.map((item, idx) => {
+    const key  = `${task.id}-${idx}`;
+    const open = !!_wfTaskItemOpen[key];
+    return `<div class="wf-task-panel-item${open ? ' open' : ''}" onclick="${toggleItem}('${task.id}',${idx})" style="margin-bottom:6px">
+      <div class="wf-task-panel-item-row"><span class="material-symbols-outlined">chevron_right</span>${item}</div>
+      <div class="wf-task-panel-item-actions">${actionsHtml}</div>
+    </div>`;
+  }).join('') || `<p style="font-size:12px;color:var(--text-muted);margin:0">No action items.</p>`;
+
+  const metaFields = [
+    { label: 'Agent',    val: task.agent    || '—' },
+    { label: 'Need',     val: task.need     || '—' },
+    { label: 'Priority', val: task.priority || 'Normal' },
+    { label: 'Task ID',  val: task.id },
+  ].map(f => `
+    <div style="display:flex;flex-direction:column;gap:2px">
+      <span style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px">${f.label}</span>
+      <span style="font-size:13px;color:var(--text-primary);font-weight:500">${f.val}</span>
+    </div>`).join('');
+
+  return `
+    ${_wfSec('overview', 'Task Overview', `${task.agent || 'Agent'} · ${task.need || 'Needs attention'}`, `
+      <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;margin:0 0 14px">${task.summary}</p>
+      <div style="display:flex;gap:20px;flex-wrap:wrap">${metaFields}</div>
+    `)}
+    ${_wfSec('items', `Action Items (${allItems.length})`, 'Items requiring your attention', `
+      <div id="wf-task-items-${task.id}">${itemsHtml}</div>
+    `)}
+    ${_wfSec('resolution', 'Resolution', 'Mark this task complete or dismiss it', `
+      <div class="wf-task-panel-actions" style="padding:0">
+        <button class="wf-task-resolve-btn" onclick="_resolveWfTask('${task.id}','${resolveCtx}')">
+          <span class="material-symbols-outlined">check_circle</span> Mark as resolved
+        </button>
+        <button class="wf-task-dismiss-btn" onclick="_dismissWfTask('${task.id}','${resolveCtx}')">
+          <span class="material-symbols-outlined">close</span> Dismiss
+        </button>
+      </div>
+    `)}`;
+}
+
 function _renderWfTaskSolver(task) {
   // Switch solver into task mode (CSS hides case-specific chrome)
   document.querySelector('.wf-solver')?.classList.add('wf-task-mode');
+  // Restore header if it was hidden by empty state
+  const _wfHeader = document.getElementById('wf-case-header');
+  if (_wfHeader) _wfHeader.style.display = '';
+  // Hide case-only header rows
+  const _wfFooter = document.getElementById('wf-case-header-footer');
+  if (_wfFooter) _wfFooter.style.height = '0';
+  const _custItem = document.getElementById('wf-customer-item');
+  if (_custItem) _custItem.style.display = 'none';
+  const _custSep = document.getElementById('wf-customer-sep');
+  if (_custSep) _custSep.style.display = 'none';
 
   // Row 1: show agent name, update icon
   const bc = document.getElementById('wf-solver-breadcrumb');
@@ -9717,43 +10426,7 @@ function _renderWfTaskSolver(task) {
   // Render task detail panel in solver body
   const body = document.getElementById('wf-solver-body');
   if (!body) return;
-  const SHOW_N   = 3;
-  const allItems = task.items || [];
-  const expanded = !!_wfTaskItemsExpanded[task.id];
-  const visible  = expanded ? allItems : allItems.slice(0, SHOW_N);
-  const hidden   = allItems.length - SHOW_N;
-  const actions  = _WF_TASK_ITEM_ACTIONS[task.agent] || [];
-  const actionsHtml = actions.map(a =>
-    `<button class="wf-item-action-btn${a.primary ? ' primary' : ''}" onclick="event.stopPropagation()">
-      <span class="material-symbols-outlined">${a.icon}</span>${a.label}
-     </button>`
-  ).join('');
-  const itemsHtml = visible.map((item, idx) => {
-    const key  = `${task.id}-${idx}`;
-    const open = !!_wfTaskItemOpen[key];
-    return `<div class="wf-task-panel-item${open ? ' open' : ''}" onclick="_toggleWfTaskItem('${task.id}',${idx})">
-      <div class="wf-task-panel-item-row">
-        <span class="material-symbols-outlined">chevron_right</span>${item}
-      </div>
-      <div class="wf-task-panel-item-actions">${actionsHtml}</div>
-    </div>`;
-  }).join('');
-  const toggleHtml = allItems.length > SHOW_N
-    ? `<button class="wf-task-items-toggle" onclick="_toggleWfTaskItems('${task.id}')">
-        <span class="material-symbols-outlined">${expanded ? 'expand_less' : 'expand_more'}</span>
-        ${expanded ? 'Show less' : `+${hidden} more`}
-       </button>`
-    : '';
-  body.innerHTML = `
-    <div class="wf-task-panel">
-      <div class="wf-task-panel-summary">${task.summary}</div>
-      <div class="wf-task-panel-items" id="wf-task-items-${task.id}">${itemsHtml}</div>
-      ${toggleHtml}
-      <div class="wf-task-panel-actions">
-        <button class="wf-task-resolve-btn" onclick="_resolveWfTask('${task.id}','solver')"><span class="material-symbols-outlined">check_circle</span> Mark as resolved</button>
-        <button class="wf-task-dismiss-btn" onclick="_dismissWfTask('${task.id}','solver')"><span class="material-symbols-outlined">close</span> Dismiss</button>
-      </div>
-    </div>`;
+  body.innerHTML = `<div style="padding:20px 24px;overflow-y:auto;flex:1">${_buildWfTaskBody(task, 'solver')}</div>`;
   _applyWfSolverLock(task.id);
 }
 
@@ -9776,6 +10449,18 @@ function _toggleWfTaskItems(taskId) {
   if (task) _renderWfTaskSolver(task);
 }
 
+function _wfSolverShowEmptyState() {
+  document.querySelector('.wf-solver')?.classList.remove('wf-task-mode');
+  const header = document.getElementById('wf-case-header'); if (header) header.style.display = 'none';
+  const tabsWrap = document.getElementById('wf-task-tabs-wrap'); if (tabsWrap) tabsWrap.innerHTML = '';
+  const body = document.getElementById('wf-solver-body');
+  if (body) body.innerHTML = `
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;color:var(--text-muted)">
+      <span class="material-symbols-outlined" style="font-size:40px;opacity:0.2">inbox</span>
+      <span style="font-size:13px">Select a case from the list</span>
+    </div>`;
+}
+
 function renderWorkFeedSolver(caseId) {
   const isDeduction = typeof activeSolution !== 'undefined' && activeSolution === 'deduction';
   // Check if it's a global agent task (works for both Cora and Deduction solutions)
@@ -9795,12 +10480,38 @@ function renderWorkFeedSolver(caseId) {
   if (icon) icon.textContent = isDeduction ? 'receipt_long' : 'inventory_2';
   // Update stage badge + name + status
   const caseData = _activeWfCases().find(c => c.id === caseId);
+  if (!caseData) { _wfSolverShowEmptyState(); return; }
+  // Restore header if it was hidden by empty state
+  const _wfHeader = document.getElementById('wf-case-header');
+  if (_wfHeader) _wfHeader.style.display = '';
   const sb = document.getElementById('wf-stage-badge');
   if (sb && caseData) sb.textContent = caseData.tasks;
   const sn = document.getElementById('wf-stage-name');
   if (sn && caseData) sn.textContent = caseData.stage || '—';
   const st = document.getElementById('wf-status-text');
-  if (st && caseData) st.textContent = caseData.status || '—';
+  const _wfStatusLabel = { intervention: 'Awaiting human', running: 'In progress', awaiting: 'Awaiting human', failed: 'Failed', completed: 'Completed' };
+  if (st && caseData) st.textContent = _wfStatusLabel[caseData.status] || caseData.status || '—';
+  // Customer name (row 1)
+  const custEl = document.getElementById('wf-customer-text');
+  if (custEl) custEl.textContent = caseData?.customer || caseData?.retailer || '—';
+  const custItem = document.getElementById('wf-customer-item');
+  if (custItem) custItem.style.display = '';
+  const custSep = document.getElementById('wf-customer-sep');
+  if (custSep) custSep.style.display = '';
+  // Footer metadata strip
+  const _wfFooter = document.getElementById('wf-case-header-footer');
+  if (_wfFooter) _wfFooter.style.height = '';  // let CSS hover handle it; restore from task-mode hide
+  const _priorityColor = { High: '#dc2626', Medium: '#d97706', Low: '#16a34a' };
+  const _setWfChf = (id, val, color) => {
+    const el = document.getElementById(id); if (!el) return;
+    el.textContent = val || '—';
+    el.style.color = color || '';
+  };
+  _setWfChf('wf-chf-created',  caseData?.created  || caseData?.claimDate || '—');
+  _setWfChf('wf-chf-priority', caseData?.priority || '—', _priorityColor[caseData?.priority] || '');
+  _setWfChf('wf-chf-category', caseData?.category || caseData?.deductionType || '—');
+  _setWfChf('wf-chf-type',     caseData?.caseType || '—');
+  _setWfChf('wf-chf-subtype',  caseData?.subtype  || '—');
   // Close stage popover if open from previous case
   _closeWfStagePopover();
   // Render task tabs + body
@@ -9854,53 +10565,47 @@ function _renderWfTaskBody(caseId) {
     return;
   }
 
+  const _taskWrap = (sections) =>
+    `<div style="padding:20px 24px;overflow-y:auto;flex:1">${sections}</div>`;
+  const _ovSec = (heading, desc) =>
+    _wfSec('t-overview', heading, 'Task overview',
+      `<p style="font-size:13px;color:var(--text-secondary);line-height:1.6;margin:0">${desc}</p>`, true);
+
   if (task.type === 'auth-credential') {
     const heading = task.heading || 'Intervention Required: Authentication Needed';
     const desc = task.desc || 'Casey has paused because vendor portals require active credentials. Review and approve or reject each request below.';
-    body.innerHTML = `
-      <div>
-        <h2 class="wf-solver-h2">${heading}</h2>
-        <p class="wf-solver-desc">${desc}</p>
-      </div>
-      ${(task.cards || []).map(c => _wfFormCard({ caseId, taskId: task.id, ...c })).join('')}`;
+    body.innerHTML = _taskWrap(
+      _ovSec(heading, desc) +
+      _wfSec('t-content', 'Credentials', 'Approve or reject each authentication request',
+        (task.cards || []).map(c => _wfFormCard({ caseId, taskId: task.id, ...c })).join('')));
   } else if (task.type === 'email-approval') {
     const heading = task.heading || 'Review Required: Outbound Customer Emails';
     const desc = task.desc || 'The Communicator has drafted emails to customers with missing data. Review each email and approve to send.';
-    body.innerHTML = `
-      <div>
-        <h2 class="wf-solver-h2">${heading}</h2>
-        <p class="wf-solver-desc">${desc}</p>
-      </div>
-      ${(task.emails || []).map(e => _wfEmailCard({ caseId, taskId: task.id, ...e })).join('')}`;
+    body.innerHTML = _taskWrap(
+      _ovSec(heading, desc) +
+      _wfSec('t-content', 'Email Drafts', 'Review and approve each outbound email',
+        (task.emails || []).map(e => _wfEmailCard({ caseId, taskId: task.id, ...e })).join('')));
   } else if (task.type === 'comparison') {
-    body.innerHTML = `
-      <div>
-        <h2 class="wf-solver-h2">Authorization Required: Invoice Payment</h2>
-        <p class="wf-solver-desc">Casey has retrieved Invoice #INV-2024-0891 and extracted the data below. Verify the fields against the invoice document and authorize payment to continue.</p>
-      </div>
-      ${_wfComparisonCard({ caseId, taskId: task.id })}`;
+    body.innerHTML = _taskWrap(
+      _ovSec('Authorization Required: Invoice Payment',
+        'Casey has retrieved Invoice #INV-2024-0891 and extracted the data below. Verify the fields against the invoice document and authorize payment to continue.') +
+      _wfSec('t-content', 'Invoice Verification', 'Verify fields and authorize payment',
+        _wfComparisonCard({ caseId, taskId: task.id })));
   } else if (task.type === 'eyeball') {
-    body.innerHTML = `
-      <div>
-        <h2 class="wf-solver-h2">${task.heading}</h2>
-        <p class="wf-solver-desc">${task.desc}</p>
-      </div>
-      ${_wfEyeballCard(caseId, task)}`;
+    body.innerHTML = _taskWrap(
+      _ovSec(task.heading, task.desc) +
+      _wfSec('t-content', 'Review Items', 'Approve or flag each item',
+        _wfEyeballCard(caseId, task)));
   } else if (task.type === 'deduction-validation') {
-    body.innerHTML = `
-      <div>
-        <h2 class="wf-solver-h2">${task.heading}</h2>
-        <p class="wf-solver-desc">${task.desc}</p>
-      </div>
-      ${_dedQtyEstimationCard(caseId, task)}
-      ${_dedDeductionValidationCard(caseId, task)}`;
+    body.innerHTML = _taskWrap(
+      _ovSec(task.heading, task.desc) +
+      _wfSec('t-content', 'Deduction Validation', 'All fields pre-filled by agent — review, adjust if needed, then submit',
+        _dedCombinedValidationCard(caseId, task)));
   } else if (task.type === 'billback') {
-    body.innerHTML = `
-      <div>
-        <h2 class="wf-solver-h2">${task.heading}</h2>
-        <p class="wf-solver-desc">${task.desc}</p>
-      </div>
-      ${_wfBillbackCard(caseId, task)}`;
+    body.innerHTML = _taskWrap(
+      _ovSec(task.heading, task.desc) +
+      _wfSec('t-content', 'Billback Details', 'Review and approve billback items',
+        _wfBillbackCard(caseId, task)));
   }
 }
 
@@ -12061,7 +12766,7 @@ function renderRow(row) {
   const rowId = String(row.id).replace(/^#\s*/, '');
   const visibleCols = colOrder.filter(c => !hiddenCols.has(c.key));
   const cells = visibleCols.map(c => `<td data-col="${c.key}">${renderCellContent(row, c.key)}</td>`).join('');
-  const actionsTd = `<td class="row-actions-cell" onclick="event.stopPropagation()"><div class="row-actions"><button class="row-action-btn" title="Quick View" onclick="openQuickView(event,'${row.id}')"><span class="material-symbols-outlined">preview</span><span>Quick View</span></button>${_rowFetchBtn(rowId, row.id)}<button class="row-action-btn" title="Assignee"><span class="material-symbols-outlined">person_add</span><span>Assign</span></button></div></td>`;
+  const actionsTd = `<td class="row-actions-cell" onclick="event.stopPropagation()"><div class="row-actions"><div class="row-action-panel"><button class="row-action-btn" title="Quick View" onclick="openQuickView(event,'${row.id}')"><span class="material-symbols-outlined">preview</span><span>Quick View</span></button>${_rowFetchBtn(rowId, row.id)}<button class="row-action-btn" title="Assignee"><span class="material-symbols-outlined">person_add</span><span>Assign</span></button></div><button class="row-action-trigger" title="Actions"><span class="material-symbols-outlined">more_horiz</span></button></div></td>`;
   return `<tr style="cursor:pointer" data-rowid="${rowId}" onclick="handleRowClick(event, '${row.id}')"><td onclick="event.stopPropagation()"><input type="checkbox"></td>${cells}${actionsTd}</tr>`;
 }
 
@@ -13070,6 +13775,30 @@ const sectionTabs = {
   agentfleet: [{ id: 'home', label: 'Agent Fleet', icon: 'smart_toy',   home: true }],
   workfeed:   [{ id: 'home', label: 'Work Feed', icon: 'dynamic_feed', home: true }],
 };
+
+// ── Global tooltip helpers ────────────────────────────────────────────────────
+function _showTip(e, html) {
+  const tip = document.getElementById('g-tip');
+  if (!tip) return;
+  tip.innerHTML = html;
+  tip.style.left = e.clientX + 'px';
+  tip.style.top  = e.clientY + 'px';
+  tip.classList.add('visible');
+}
+function _showTipEl(e, el) {
+  const label = el.dataset.tipLabel || '';
+  const val   = el.dataset.tipVal   || '';
+  const desc  = el.dataset.tipDesc  || '';
+  _showTip(e, `<strong>${label}</strong>&nbsp;${val}<br><span style="font-size:10px;opacity:.7">${desc}</span>`);
+}
+function _moveTip(e) {
+  const tip = document.getElementById('g-tip');
+  if (tip) { tip.style.left = e.clientX + 'px'; tip.style.top = e.clientY + 'px'; }
+}
+function _hideTip() {
+  const tip = document.getElementById('g-tip');
+  if (tip) tip.classList.remove('visible');
+}
 
 // Which tab is selected per section
 const sectionActiveTab = { mywork: 'home', allwork: 'home', analytics: 'home', archive: 'home', agentfleet: 'home', workfeed: 'home' };
@@ -14396,32 +15125,48 @@ function _syncNavTabWarnings() {
 }
 
 function _renderWfTaskInCasePage(task) {
-  // Render an agent task in the full case-page tab (no case form, no utility sidebar)
+  // Render an agent task in the full case-page tab — matches split-view task presentation
   _closeStagePopover();
-  // Header fields
   const id = String(task.id);
-  document.getElementById('case-num-text').textContent  = id;
-  const companyEl = document.getElementById('case-company-text');
-  if (companyEl) companyEl.textContent = task.agent || 'Agent Task';
-  const stageBadge = document.getElementById('case-stage-badge');
-  if (stageBadge) stageBadge.textContent = '1';
-  const stageText = document.getElementById('case-stage-text');
-  if (stageText) stageText.textContent = task.need || 'Needs attention';
-  const statusEl = document.getElementById('case-status-text');
-  if (statusEl) { statusEl.textContent = 'Active'; statusEl.className = 'case-status-text'; }
-  // Hide utility sidebar and section nav tabs — not needed for agent tasks
+
+  // Apply task-tab mode (hides case-header-meta, company text)
+  const casePage = document.getElementById('case-page');
+  if (casePage) casePage.classList.add('case-task-tab');
+
+  // Header: show agent icon + task ID in breadcrumb
+  const iconEl = document.querySelector('#case-page .wf-case-icon');
+  if (iconEl) iconEl.textContent = task.agentIcon || 'smart_toy';
+  document.getElementById('case-num-text').textContent = task.agent || id;
+
+  // Inject / update the need row below the case-header-main (like wf-task-need-row in split view)
+  let needRow = document.getElementById('case-task-tab-need');
+  const caseHeader = document.getElementById('case-header');
+  if (!needRow && caseHeader) {
+    needRow = document.createElement('div');
+    needRow.id = 'case-task-tab-need';
+    // Insert after case-header-main, before case-header-footer
+    const chMain = caseHeader.querySelector('.case-header-main');
+    if (chMain && chMain.nextSibling) caseHeader.insertBefore(needRow, chMain.nextSibling);
+    else if (caseHeader) caseHeader.appendChild(needRow);
+  }
+  if (needRow) {
+    needRow.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px">${task.needIcon || 'help'}</span>
+      <span>Needs: <strong>${task.need || 'Attention'}</strong></span>`;
+  }
+
+  // Hide utility sidebar and section nav tabs
   const utSidebar = document.getElementById('utility-sidebar');
   if (utSidebar) utSidebar.style.display = 'none';
   closeUtility();
   document.querySelectorAll('.case-header-footer').forEach(el => el.style.display = 'none');
-  // Render task panel in form area
+
+  // Render task body in form area
   const formArea = document.getElementById('case-form-area');
   if (formArea) {
     formArea.classList.remove('readonly');
     formArea.dataset.taskId = task.id;
     const _taskFetched = _fetchedCases[task.id] === _currentUser;
     formArea.classList.toggle('task-locked', !_taskFetched);
-    // Remove previous lock-click handler if any
     if (formArea._taskLockHandler) { formArea.removeEventListener('click', formArea._taskLockHandler); }
     if (!_taskFetched) {
       formArea._taskLockHandler = () => showToast('Fetch this task first to take action', { type: 'warning' });
@@ -14429,43 +15174,7 @@ function _renderWfTaskInCasePage(task) {
     } else {
       delete formArea._taskLockHandler;
     }
-    const SHOW_N = 3;
-    const allItems = task.items || [];
-    const expanded = !!_wfTaskItemsExpanded[task.id];
-    const visible  = expanded ? allItems : allItems.slice(0, SHOW_N);
-    const hidden   = allItems.length - SHOW_N;
-    const actions  = _WF_TASK_ITEM_ACTIONS[task.agent] || [];
-    const actionsHtml = actions.map(a =>
-      `<button class="wf-item-action-btn${a.primary ? ' primary' : ''}" onclick="event.stopPropagation()">
-        <span class="material-symbols-outlined">${a.icon}</span>${a.label}
-       </button>`
-    ).join('');
-    const itemsHtml = visible.map((item, idx) => {
-      const key  = `${task.id}-${idx}`;
-      const open = !!_wfTaskItemOpen[key];
-      return `<div class="wf-task-panel-item${open ? ' open' : ''}" onclick="_toggleWfTaskInPage('${task.id}',${idx})">
-        <div class="wf-task-panel-item-row">
-          <span class="material-symbols-outlined">chevron_right</span>${item}
-        </div>
-        <div class="wf-task-panel-item-actions">${actionsHtml}</div>
-      </div>`;
-    }).join('');
-    const toggleHtml = allItems.length > SHOW_N
-      ? `<button class="wf-task-items-toggle" onclick="_toggleWfTaskItemsInPage('${task.id}')">
-          <span class="material-symbols-outlined">${expanded ? 'expand_less' : 'expand_more'}</span>
-          ${expanded ? 'Show less' : `+${hidden} more`}
-         </button>`
-      : '';
-    formArea.innerHTML = `
-      <div class="wf-task-panel" style="padding:24px 28px;max-width:760px">
-        <div class="wf-task-panel-summary" style="font-size:14px;line-height:1.6">${task.summary}</div>
-        <div class="wf-task-panel-items" id="wf-task-items-${task.id}">${itemsHtml}</div>
-        ${toggleHtml}
-        <div class="wf-task-panel-actions">
-          <button class="wf-task-resolve-btn" onclick="_resolveWfTask('${task.id}','tab')"><span class="material-symbols-outlined">check_circle</span> Mark as resolved</button>
-          <button class="wf-task-dismiss-btn" onclick="_dismissWfTask('${task.id}','tab')"><span class="material-symbols-outlined">close</span> Dismiss</button>
-        </div>
-      </div>`;
+    formArea.innerHTML = `<div style="padding:20px 24px;max-width:780px;flex:1;overflow-y:auto">${_buildWfTaskBody(task, 'tab')}</div>`;
   }
   // Fetch / return button
   _renderFetchBtn(id);
@@ -14562,6 +15271,11 @@ function renderCasePage(caseId) {
   const _utSidebar = document.getElementById('utility-sidebar');
   if (_utSidebar) _utSidebar.style.display = '';
   document.querySelectorAll('.case-header-footer').forEach(el => el.style.display = '');
+  // Remove task-tab mode styles + need row
+  document.getElementById('case-page')?.classList.remove('case-task-tab');
+  document.getElementById('case-task-tab-need')?.remove();
+  const _iconEl = document.querySelector('#case-page .wf-case-icon');
+  if (_iconEl) _iconEl.textContent = 'bookmark';
   const allData = _isDed
     ? [...(_deductionStartedData || []), ...(_deductionTeamData || [])]
     : [...(assignedData || []), ...(queueData || [])];
@@ -14592,6 +15306,16 @@ function renderCasePage(caseId) {
   }
   document.getElementById('case-category').textContent = row?.category || 'General';
   document.getElementById('case-vendor-num').textContent = row?.vendorNum || 'V-' + (caseId || '00000').toString().slice(-5);
+  // Footer metadata row (chf-right)
+  const _wfEntry = _isDed ? (_deductionWfData || []).find(d => d.id === cleanIdEarly) : null;
+  const _priColors = { High: '#dc2626', Medium: '#d97706', Low: '#16a34a' };
+  const _setChf = (elId, val, color) => { const el = document.getElementById(elId); if (!el) return; el.textContent = val || '—'; el.style.color = color || ''; };
+  const _pri = row?.priority || _wfEntry?.priority || '—';
+  _setChf('chf-created',  row?.created  || _wfEntry?.claimDate || '—');
+  _setChf('chf-priority', _pri, _priColors[_pri] || '');
+  _setChf('chf-category', row?.client   || row?.category || _wfEntry?.deductionType || '—');
+  _setChf('chf-type',     row?.caseType || _wfEntry?.caseType  || 'Multiple Validation');
+  _setChf('chf-subtype',  row?.subtype  || _wfEntry?.subtype   || 'No Casualties');
   // Render sections — deduction cases get the 3-stage pipeline layout
   if (_isDed) {
     _renderDeductionCase(row, id);
@@ -14696,27 +15420,32 @@ function _renderFetchBtn(caseId) {
 function _renderWfFetchBtn(caseId) {
   const ctrl = document.getElementById('wf-fetch-ctrl');
   if (!ctrl) return;
-  ctrl.innerHTML = '';
   const fetchedBy = _fetchedCases[caseId];
   const isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
   const kbd = isMac ? 'Cmd+J' : 'Ctrl+J';
   if (!fetchedBy) {
-    const btn = document.createElement('button');
-    btn.className = 'case-fetch-btn';
-    btn.innerHTML = `<span class="material-symbols-outlined" style="font-size:15px">download</span> Fetch case <span class="case-fetch-shortcut">${kbd}</span>`;
-    btn.onclick = () => fetchCaseFromList(caseId);
-    ctrl.appendChild(btn);
+    ctrl.innerHTML = `
+      <button class="case-fetch-btn" onclick="fetchCaseFromList('${caseId}')">
+        <span class="material-symbols-outlined" style="font-size:15px">download</span>
+        Fetch case
+        <span class="case-fetch-shortcut">${kbd}</span>
+      </button>`;
   } else if (fetchedBy === _currentUser) {
-    const btn = document.createElement('button');
-    btn.className = 'case-fetch-btn';
-    btn.innerHTML = `<span class="material-symbols-outlined" style="font-size:15px">undo</span> Return <span class="case-fetch-shortcut">${kbd}</span>`;
-    btn.onclick = () => returnCaseFromList(caseId);
-    ctrl.appendChild(btn);
+    ctrl.innerHTML = `
+      <div style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-secondary)">
+        ${_activeUserAvatarHtml(fetchedBy, 'sm')}
+        <span>Fetched by you</span>
+        <button class="case-fetch-btn" onclick="returnCaseFromList('${caseId}')">
+          <span class="material-symbols-outlined" style="font-size:15px">undo</span> Return
+          <span class="case-fetch-shortcut">${kbd}</span>
+        </button>
+      </div>`;
   } else {
-    const badge = document.createElement('div');
-    badge.className = 'wf-solver-fetched-badge';
-    badge.innerHTML = `${_activeUserAvatarHtml(fetchedBy, 'sm')} Fetched by ${fetchedBy.split(' ')[0]}`;
-    ctrl.appendChild(badge);
+    ctrl.innerHTML = `
+      <div style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-secondary)">
+        ${_activeUserAvatarHtml(fetchedBy, 'sm')}
+        <span>In progress by <strong>${fetchedBy}</strong></span>
+      </div>`;
   }
 }
 
@@ -16005,11 +16734,18 @@ function _dedValidationSummarySection(row, wfEntry) {
 
 function _renderDeductionCase(row, caseId) {
   _dedActiveStageCaseId = caseId;
-  const stageKey = _DED_STAGE_KEY[row?.stage] || 'eyeball';
+  const stageKey  = _DED_STAGE_KEY[row?.stage] || 'eyeball';
+  const isReadOnly = _readOnlyCaseIds.has(caseId);
 
   // Set tabs based on current stage — tabs are scroll anchors only
   let stageTabs;
-  if (stageKey === 'eyeball') {
+  if (isReadOnly) {
+    stageTabs = [
+      { key: 'ded-general', label: 'General'   },
+      { key: 'ded-docs',    label: 'Documents' },
+      { key: 'ded-eyeball', label: 'Eyeball'   },
+    ];
+  } else if (stageKey === 'eyeball') {
     stageTabs = [
       { key: 'ded-general', label: 'General'        },
       { key: 'eyeball',     label: 'Eyeball Review' },
@@ -16080,6 +16816,7 @@ function _renderDeductionCase(row, caseId) {
 
   const _actionBadge  = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:8px;background:#fff7ed;color:#c2410c;font-size:11px;font-weight:600;margin-left:auto;flex-shrink:0">Action Required</span>`;
   const _doneBadge    = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:8px;background:#dcfce7;color:#166534;font-size:11px;font-weight:600;margin-left:auto;flex-shrink:0"><span class="material-symbols-outlined" style="font-size:12px">check_circle</span>Completed</span>`;
+  const _pendingBadge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:8px;background:#f1f5f9;color:#64748b;font-size:11px;font-weight:600;margin-left:auto;flex-shrink:0">Pending</span>`;
 
   const _missionBox = (sectionKey, title, desc, badge, body) => `
     <div class="case-section" id="case-section-${sectionKey}">
@@ -16103,7 +16840,76 @@ function _renderDeductionCase(row, caseId) {
 
   const _noTask = `<div style="padding:16px;color:var(--text-muted);font-size:13px">Task data is being prepared…</div>`;
 
-  if (stageKey === 'eyeball') {
+  if (isReadOnly) {
+    // Read-only view: General (already built) + Documents table + Eyeball viewer
+    const eyeballTask = tasks.find(t => t.type === 'eyeball');
+    const allDocs = eyeballTask?.docs || [];
+
+    // ── Documents table ──────────────────────────────────────────────────────
+    const _docRows = allDocs.map(doc => {
+      const corrections = doc.fields.filter(f => f.flagged).length;
+      const status = corrections > 0 ? 'Failed' : 'Valid';
+      const eyeballTxt = corrections > 0 ? `${corrections} correction${corrections > 1 ? 's' : ''}` : 'All verified';
+      return `<tr class="${status === 'Failed' ? 'doc-row-failed' : ''}">
+        <td>${doc.docType}</td>
+        <td style="color:var(--text-secondary)">${doc.docLabel}</td>
+        <td><span class="doc-status-val ${status.toLowerCase()}">${status}</span></td>
+        <td><span class="doc-eyeball-val">${eyeballTxt}</span></td>
+      </tr>`;
+    }).join('');
+    const _docsTable = allDocs.length ? `
+      <div class="doc-status-table-wrap">
+        <table class="doc-status-table">
+          <colgroup><col class="col-type"><col class="col-name"><col class="col-status"><col class="col-eye"></colgroup>
+          <thead><tr><th>Document Type</th><th>Document Name</th><th>Status</th><th>Eyeball</th></tr></thead>
+          <tbody>${_docRows}</tbody>
+        </table>
+      </div>` : _noTask;
+
+    // ── Eyeball read-only cards ───────────────────────────────────────────────
+    const _roCards = allDocs.map((doc, docIdx) => {
+      const splitId = `ded-eyb-ro-${caseId}-${docIdx}`;
+      const fieldsHtml = doc.fields.map(f => `
+        <div style="display:flex;align-items:baseline;gap:8px;padding:6px 0;border-bottom:1px solid var(--border-light)">
+          <span style="font-size:11px;color:var(--text-muted);width:110px;flex-shrink:0;font-weight:500">${f.field}</span>
+          <span style="font-size:13px;color:var(--text-primary);font-weight:500;flex:1">${f.verified}</span>
+          ${f.flagged ? `<span style="font-size:10px;color:#c2410c;font-weight:600;background:#fff7ed;padding:1px 6px;border-radius:4px;flex-shrink:0">Corrected</span>` : ''}
+        </div>`).join('');
+      return `
+        <div class="wf-form-card" style="overflow:hidden;margin-bottom:8px">
+          <div class="wf-form-card-header" style="align-items:center">
+            <span class="material-symbols-outlined" style="font-size:20px;color:var(--text-secondary);flex-shrink:0">description</span>
+            <div style="flex:1;min-width:0">
+              <div class="wf-form-card-vendor">${doc.docLabel}</div>
+              <div class="wf-form-card-task-type">${doc.docType} · read only</div>
+            </div>
+          </div>
+          <div class="ded-eyeball-split">
+            <div class="ded-eyeball-left">
+              <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px">Verified field values</div>
+              ${fieldsHtml}
+            </div>
+            <div style="display:flex;flex-direction:column;background:#525659;overflow:hidden">
+              <div style="display:flex;align-items:center;gap:8px;padding:7px 12px;background:#3c3f41;flex-shrink:0">
+                <span class="material-symbols-outlined" style="font-size:13px;color:#aaa">picture_as_pdf</span>
+                <span style="font-size:11px;color:#ccc;font-weight:500">${doc.docLabel}</span>
+                <span style="font-size:10px;color:#888;margin-left:2px">· ${doc.docType}</span>
+              </div>
+              <div class="ded-eyeball-right" id="${splitId}-doc">
+                ${_dedRenderDoc(doc, splitId)}
+              </div>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+
+    missionSections =
+      _missionBox('ded-docs', 'Documents', `${allDocs.length} file${allDocs.length !== 1 ? 's' : ''}`, '',
+        _docsTable) +
+      _missionBox('ded-eyeball', 'Eyeball Review', 'Invoices and proofs of delivery', '',
+        allDocs.length ? _roCards : _noTask);
+
+  } else if (stageKey === 'eyeball') {
     const task = tasks.find(t => t.type === 'eyeball');
     missionSections = `
       <div class="case-section" id="case-section-eyeball">
@@ -16119,17 +16925,15 @@ function _renderDeductionCase(row, caseId) {
         </div>
         <div class="case-section-divider"></div>
         <div class="case-fields" id="case-fields-eyeball" style="padding:0">
-          ${task ? _dedEyeballSplitCard(caseId, task) : _noTask}
+          ${task ? _dedEyeballFormCard(caseId, task, 'cp') : _noTask}
         </div>
       </div>`;
   } else if (stageKey === 'validation') {
     const task = tasks.find(t => t.type === 'deduction-validation');
     const _qtyCount = (task?.items || []).length;
     missionSections =
-      _missionBox('qty-estimation', 'Quantity Estimation', `${_qtyCount} item${_qtyCount !== 1 ? 's' : ''}`, _actionBadge,
-        task ? _dedQtyEstimationCard(caseId, task) : _noTask) +
-      _missionBox('validation', 'Deduction Validation', 'Accepted items to validate', _actionBadge,
-        task ? _dedDeductionValidationCard(caseId, task) : _noTask);
+      _missionBox('validation', 'Deduction Validation', `${_qtyCount} item${_qtyCount !== 1 ? 's' : ''} — pre-filled`, _actionBadge,
+        task ? _dedCombinedValidationCard(caseId, task) : _noTask);
   } else { // billback
     const task = tasks.find(t => t.type === 'billback');
     missionSections =
