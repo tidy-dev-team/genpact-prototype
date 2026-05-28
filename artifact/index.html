@@ -1331,15 +1331,25 @@
   .table-wrapper.density-spacious .status-badge { padding: 4px 10px; font-size: 11px; }
   .table-wrapper.density-spacious .assignee-chip { gap: 6px; font-size: 12px; }
   /* Split view: transforms only the table area */
-  .split-container { display: none; flex: 1; min-height: 0; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+  .split-container { display: none; flex: 1; min-height: 0; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
   .portal-body.split-mode .split-container { display: flex; }
   .portal-body.split-mode .table-wrapper { display: none; }
-  .portal-body.split-mode .pagination-bar { display: none; }
-  .portal-body.split-mode .bulk-action-bar { display: none !important; }
-  .split-list { width: 260px; flex-shrink: 0; overflow-y: auto; border-right: 1px solid var(--border); background: var(--bg-white); }
+  .portal-body.split-mode .pagination-bar:not(#split-pg-bar) { display: none; }
+  .portal-body.split-mode .bulk-action-bar:not(#split-bulk-bar) { display: none !important; }
+  /* Split-list: same shell as .wf-feed */
+  .split-list { width: 240px; min-width: 240px; flex-shrink: 0; border-right: 1px solid var(--border); display: flex; flex-direction: column; background: var(--bg-white); overflow: hidden; }
+  .split-list .wf-feed-list { flex: 1; overflow-y: auto; }
+  /* Bulk + pagination bars shown below split-container (same pattern as work-feed) */
+  #split-bulk-bar { display: none; }
+  #split-pg-bar { display: none; }
+  .portal-body.split-mode #split-pg-bar { display: flex; }
+  .portal-body.split-mode.split-bulk-active #split-bulk-bar { display: flex !important; }
+  .portal-body.split-mode.split-bulk-active #split-pg-bar { display: none !important; }
   .split-container #case-page { display: flex; flex: 1; min-width: 0; height: auto; position: relative; }
   .split-container #case-page.hidden { display: none; }
   .split-container #case-page .case-header-right { margin-left: auto; }
+  /* Hide utility sidebar in split mode — no room for the 44px strip + slide-out panel */
+  .split-container .utility-sidebar { display: none; }
   .split-open-new-btn {
     display: inline-flex; align-items: center; justify-content: center;
     width: 28px; height: 28px; margin-left: 8px;
@@ -1997,6 +2007,21 @@
   }
   #wf-solver-body.locked .wf-captcha-tile {
     pointer-events: none; opacity: 0.7;
+  }
+  /* WF solver — fully dimmed while bulk selection is active */
+  .wf-solver.bulk-locked input,
+  .wf-solver.bulk-locked select,
+  .wf-solver.bulk-locked textarea,
+  .wf-solver.bulk-locked [contenteditable] {
+    pointer-events: none; opacity: 0.45;
+    background: var(--bg-light); cursor: not-allowed;
+  }
+  .wf-solver.bulk-locked button {
+    pointer-events: none; opacity: 0.35; cursor: not-allowed;
+  }
+  .wf-solver.bulk-locked .wf-solver-fetch-btn,
+  .wf-solver.bulk-locked .wf-solver-return-btn {
+    pointer-events: none; opacity: 0.35; cursor: not-allowed;
   }
   /* Task panel in case-page tab — locked until fetched */
   #case-form-area.task-locked .wf-task-resolve-btn,
@@ -3647,12 +3672,12 @@
   .wf-feed-card:hover .wf-card-cb { opacity: 1; }
   .wf-feed-card.active .wf-card-cb { left: 9px; }
   /* Bulk mode — any checkbox checked makes all checkboxes visible, hides all card actions */
-  #wf-feed-list.wf-bulk-mode .wf-card-cb { opacity: 1; }
-  #wf-feed-list.wf-bulk-mode .wf-card-icon { opacity: 0; }
-  #wf-feed-list.wf-bulk-mode .wf-card-action-pill { opacity: 0 !important; pointer-events: none; }
-  #wf-feed-list.wf-bulk-mode .wf-card-open-btn { opacity: 0 !important; pointer-events: none; }
+  .wf-feed-list.wf-bulk-mode .wf-card-cb { opacity: 1; }
+  .wf-feed-list.wf-bulk-mode .wf-card-icon { opacity: 0; }
+  .wf-feed-list.wf-bulk-mode .wf-card-action-pill { opacity: 0 !important; pointer-events: none; }
+  .wf-feed-list.wf-bulk-mode .wf-card-open-btn { opacity: 0 !important; pointer-events: none; }
   /* Feed bulk bar — spans full .wf-panels width, same base styles as table bulk bar */
-  .wf-feed-bulk-bar { left: 8px !important; right: 8px !important; bottom: 8px !important; }
+  .wf-feed-bulk-bar { position: static !important; }
   /* Solver bulk placeholder */
   .wf-bulk-placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; background: var(--bg-white); z-index: 1; }
   .wf-card-top { display: flex; align-items: center; gap: 5px; }
@@ -4166,6 +4191,69 @@
   /* Keep eye btn subtly visible in the eyeball split left panel */
   .ded-eyeball-left .wf-pa-eye-btn { opacity: 0.3; }
   .ded-eyeball-left .wf-pa-field:hover .wf-pa-eye-btn { opacity: 1; }
+  /* ── Responsive eyeball card (case-page context) ── */
+  .eyb-slim-card { container-type: inline-size; }
+  .eyb-slim-card .eyb-doc-view-btn { display: none !important; } /* hidden when doc panel visible */
+  .eyb-slim-card .eyb-eye-icon    { display: none !important; } /* hidden in wide mode */
+  /* Breakpoint 1 – 700px: single-column field grid, doc panel still visible */
+  @container (max-width: 699px) {
+    .eyb-slim-card .eyb-field-grid { grid-template-columns: 1fr; }
+    .eyb-slim-card .eyb-field-grid .eyb-span2 { grid-column: 1; }
+  }
+  /* Breakpoint 2 – 500px: full slim mode — hide doc, show button + eye icons */
+  @container (max-width: 499px) {
+    .eyb-slim-card .ded-eyeball-split { grid-template-columns: 1fr; }
+    .eyb-slim-card .eyb-doc-panel { display: none !important; }
+    .eyb-slim-card .eyb-doc-view-btn { display: inline-flex !important; }
+    .eyb-slim-card .eyb-eye-icon    { display: flex !important; }
+  }
+  /* Per-field eye icon (appears on hover, zooms doc panel) */
+  .eyb-input-wrap { position: relative; }
+  .eyb-input-wrap .eyb-input { padding-right: 26px; }
+  .eyb-textarea-wrap { position: relative; }
+  .eyb-eye-icon {
+    position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
+    width: 20px; height: 20px; border: none; background: none; cursor: pointer;
+    color: var(--text-muted); opacity: 0; transition: opacity 0.12s, color 0.12s;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 3px; z-index: 1; padding: 0; flex-shrink: 0;
+  }
+  .eyb-textarea-wrap .eyb-eye-icon { top: 7px; transform: none; }
+  .eyb-field:hover .eyb-eye-icon,
+  .eyb-textarea-wrap:hover .eyb-eye-icon { opacity: 0.55; }
+  .eyb-eye-icon:hover { opacity: 1 !important; color: #4555D4; background: rgba(69,85,212,.07); }
+  .eyb-eye-icon .material-symbols-outlined { font-size: 13px; pointer-events: none; }
+  /* Field popup (slim-mode eye-icon hover → mini doc preview) */
+  .eyb-field-popup {
+    position: fixed; z-index: 500; width: 230px; height: 160px;
+    border-radius: 8px; overflow: hidden;
+    box-shadow: 0 8px 28px rgba(0,0,0,.45);
+    border: 1px solid rgba(0,0,0,.1);
+    pointer-events: none; display: none; background: white;
+  }
+  .eyb-field-popup-inner {
+    width: 480px; transform-origin: top left; transform: scale(0.48);
+    background: white; padding: 10px 12px; pointer-events: none;
+  }
+  .eyb-field-popup-inner .ded-doc-val-hl { background: #fef3c7; outline: 2px solid #f59e0b; }
+  .eyb-field-popup-arrow {
+    position: absolute; bottom: -5px; left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    width: 10px; height: 10px; background: white;
+    border-right: 1px solid rgba(0,0,0,.1); border-bottom: 1px solid rgba(0,0,0,.1);
+  }
+  .eyb-doc-view-btn { display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border:1px solid var(--border);border-radius:6px;font-size:11px;font-family:inherit;font-weight:500;background:var(--bg-light);color:var(--text-secondary);cursor:pointer;flex-shrink:0;white-space:nowrap;transition:background .12s,color .12s; }
+  .eyb-doc-view-btn:hover { background:var(--border);color:var(--text-primary); }
+  .eyb-doc-view-btn .material-symbols-outlined { font-size:14px; }
+  .eyb-doc-overlay { position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:450;display:flex;align-items:center;justify-content:center; }
+  .eyb-doc-overlay-box { background:#525659;border-radius:12px;width:520px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 16px 48px rgba(0,0,0,.45); }
+  .eyb-doc-overlay-hdr { display:flex;align-items:center;gap:8px;padding:8px 12px;background:#3c3f41;flex-shrink:0;border-radius:12px 12px 0 0; }
+  .eyb-doc-overlay-close { margin-left:auto;width:26px;height:26px;border:none;border-radius:6px;background:rgba(255,255,255,.08);color:#aaa;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .12s; }
+  .eyb-doc-overlay-close:hover { background:rgba(255,255,255,.16);color:#fff; }
+  .eyb-doc-overlay-close .material-symbols-outlined { font-size:16px; }
+  .eyb-doc-overlay-body { flex:1;overflow-y:auto;padding:16px;display:flex;align-items:flex-start;justify-content:center; }
+  .eyb-doc-overlay-body .wf-invoice-doc { background:#fff;border:none;border-radius:2px;box-shadow:0 2px 12px rgba(0,0,0,.35);padding:18px 20px;width:100%;pointer-events:none;user-select:none; }
+  .eyb-doc-overlay-body .ded-doc-val-hl { background:#fef3c7;outline:2px solid #f59e0b; }
 
   /* Deduction validation card */
   .wf-ded-header { display: flex; flex-wrap: wrap; gap: 12px 20px; padding: 10px 14px; background: var(--bg-light); border-bottom: 1px solid var(--border); }
@@ -4948,7 +5036,38 @@
 
     <!-- Split view container (visible only in split mode): holds split-list + #case-page (moved here via JS) -->
     <div id="split-container" class="split-container">
-      <div id="split-list" class="split-list"></div>
+      <div id="split-list" class="split-list">
+        <div class="wf-feed-list" id="split-card-list"></div>
+      </div>
+    </div>
+
+    <!-- Split bulk bar (replaces pagination when cards checked) -->
+    <div class="bulk-action-bar" id="split-bulk-bar" style="position:static;border-radius:8px;border:1px solid var(--border-light)">
+      <span class="bulk-selected-count" id="split-bulk-count">0 selected</span>
+      <button class="bulk-unselect-btn" onclick="_splitClearBulk()">Unselect all</button>
+      <div class="bulk-bar-divider"></div>
+      <div class="bulk-actions">
+        <button class="bulk-action-btn" onclick="_splitBulkAction('assign')"><span class="material-symbols-outlined">person_add</span>Assign</button>
+        <button class="bulk-action-btn" onclick="_splitBulkAction('reallocate')"><span class="material-symbols-outlined">group</span>Reallocate</button>
+      </div>
+    </div>
+
+    <!-- Split pagination -->
+    <div class="pagination-bar" id="split-pg-bar" style="padding:8px 16px 6px;border-top:1px solid var(--border-light)">
+      <div class="pg-items-per-page">
+        <span class="pg-label">Items per page:</span>
+        <span class="pg-value" id="split-pg-per-page-val">10</span>
+        <button class="pg-chevron-btn" onclick="_splitTogglePerPageMenu(event)" title="Change items per page">
+          <span class="material-symbols-outlined">expand_more</span>
+        </button>
+        <div class="pg-per-page-menu hidden" id="split-pg-per-page-menu">
+          <button class="pg-per-page-opt active" onclick="_splitChangePerPage(10)">10</button>
+          <button class="pg-per-page-opt" onclick="_splitChangePerPage(20)">20</button>
+          <button class="pg-per-page-opt" onclick="_splitChangePerPage(50)">50</button>
+        </div>
+      </div>
+      <span class="pg-count" id="split-pg-count">—</span>
+      <div class="pg-controls" id="split-pg-controls"></div>
     </div>
 
     </div><!-- /portal-content-area -->
@@ -5326,9 +5445,9 @@
         <h2>Work Feed</h2>
       </div>
       <div class="segmented-btn" style="height:30px">
-        <button id="wf-seg-all"   class="active" onclick="setWfSegFilter('all')"   style="font-size:12px;padding:0 14px">All tasks</button>
-        <button id="wf-seg-queue"             onclick="setWfSegFilter('queue')" style="font-size:12px;padding:0 14px">Tasks in queue</button>
-        <button id="wf-seg-on-me"             onclick="setWfSegFilter('on-me')" style="font-size:12px;padding:0 14px">Tasks on me</button>
+        <button id="wf-seg-all"   class="active" onclick="setWfSegFilter('all')"   style="font-size:12px;padding:0 14px">All items</button>
+        <button id="wf-seg-queue"             onclick="setWfSegFilter('queue')" style="font-size:12px;padding:0 14px">Available items</button>
+        <button id="wf-seg-on-me"             onclick="setWfSegFilter('on-me')" style="font-size:12px;padding:0 14px">Items on me</button>
       </div>
       <div class="header-actions">
         <button class="header-icon active" id="wf-metrics-toggle" title="Toggle metrics"
@@ -5480,11 +5599,6 @@
               </div>
             </div>
           </div>
-          <div class="tb-wrap">
-            <button class="wf-avail-chip" id="wf-avail-chip" onclick="toggleWfAvailFilter()">
-              <span class="material-symbols-outlined">lock_open</span> Available only
-            </button>
-          </div>
         </div>
         <div class="toolbar-right">
           <div class="filter-dropdown">
@@ -5514,24 +5628,6 @@
 
       <!-- Split view: hidden when in table mode (default) -->
       <div id="wf-split-view" class="wf-panels" style="display:none">
-
-        <!-- Bulk action bar — spans full panel width, same component as table view -->
-        <div class="bulk-action-bar wf-feed-bulk-bar" id="wf-feed-bulk-bar">
-          <span class="bulk-selected-count" id="wf-feed-bulk-count">0 selected</span>
-          <button class="bulk-unselect-btn" onclick="_wfClearBulk()">Unselect all</button>
-          <div class="bulk-bar-divider"></div>
-          <div class="bulk-actions">
-            <button class="bulk-action-btn" onclick="_wfBulkAction('fetch')">
-              <span class="material-symbols-outlined">download</span>Fetch
-            </button>
-            <button class="bulk-action-btn" onclick="_wfBulkAction('assign')">
-              <span class="material-symbols-outlined">person_add</span>Assign
-            </button>
-            <button class="bulk-action-btn" onclick="_wfBulkAction('reallocate')">
-              <span class="material-symbols-outlined">group</span>Reallocate
-            </button>
-          </div>
-        </div>
 
         <!-- LEFT: Feed list -->
         <div class="wf-feed">
@@ -5617,15 +5713,44 @@
           <!-- Task tabs as segmented button above the body -->
           <div id="wf-task-tabs-wrap" style="padding:12px 20px 0;flex-shrink:0;display:flex;justify-content:flex-end"></div>
           <div class="wf-solver-body" id="wf-solver-body"></div>
-          <!-- Bulk selection placeholder — shown when feed cards are checked -->
-          <div class="wf-bulk-placeholder" id="wf-bulk-placeholder" style="display:none">
-            <span class="material-symbols-outlined" style="font-size:36px;color:var(--border)">checklist</span>
-            <span id="wf-bulk-placeholder-count" style="font-size:15px;font-weight:600;color:var(--text-primary)">2 items selected</span>
-            <span style="font-size:12px;color:var(--text-muted)">Use the action bar below to act on selected items</span>
-          </div>
         </div>
 
       </div><!-- /wf-split-view -->
+
+      <!-- Feed pagination + bulk bar — outside the panel box, mutually exclusive (bulk replaces pagination) -->
+      <div class="bulk-action-bar wf-feed-bulk-bar" id="wf-feed-bulk-bar" style="position:static;border-radius:8px;border:1px solid var(--border-light)">
+        <span class="bulk-selected-count" id="wf-feed-bulk-count">0 selected</span>
+        <button class="bulk-unselect-btn" onclick="_wfClearBulk()">Unselect all</button>
+        <div class="bulk-bar-divider"></div>
+        <div class="bulk-actions">
+          <button class="bulk-action-btn" onclick="_wfBulkAction('fetch')">
+            <span class="material-symbols-outlined">download</span>Fetch
+          </button>
+          <button class="bulk-action-btn" onclick="_wfBulkAction('assign')">
+            <span class="material-symbols-outlined">person_add</span>Assign
+          </button>
+          <button class="bulk-action-btn" onclick="_wfBulkAction('reallocate')">
+            <span class="material-symbols-outlined">group</span>Reallocate
+          </button>
+        </div>
+      </div>
+      <div class="pagination-bar" id="wf-feed-pagination-bar" style="display:none">
+        <div class="pg-items-per-page">
+          <span class="pg-label">Items per page:</span>
+          <span class="pg-value" id="wf-feed-pg-per-page-val">20</span>
+          <button class="pg-chevron-btn" onclick="wfFeedTogglePerPageMenu(event)" title="Change items per page">
+            <span class="material-symbols-outlined">expand_more</span>
+          </button>
+          <div class="pg-per-page-menu hidden" id="wf-feed-pg-per-page-menu">
+            <button class="pg-per-page-opt" onclick="wfFeedChangeItemsPerPage(10)">10</button>
+            <button class="pg-per-page-opt active" onclick="wfFeedChangeItemsPerPage(20)">20</button>
+            <button class="pg-per-page-opt" onclick="wfFeedChangeItemsPerPage(50)">50</button>
+            <button class="pg-per-page-opt" onclick="wfFeedChangeItemsPerPage(100)">100</button>
+          </div>
+        </div>
+        <span class="pg-count" id="wf-feed-pg-count">—</span>
+        <div class="pg-controls" id="wf-feed-pg-controls"></div>
+      </div>
 
       <!-- Table view: default visible state — just the table content, toolbar is above -->
       <div id="wf-table-view" style="display:flex">
@@ -8036,6 +8161,11 @@ function toggleWfMode(mode) {
   const colsWrap   = document.getElementById('wf-columns-btn')?.closest('.tb-wrap');
   if (splitView)  splitView.style.display  = wfTableMode ? 'none' : '';
   if (tableView)  tableView.style.display  = wfTableMode ? 'flex' : 'none';
+  const feedPgBar  = document.getElementById('wf-feed-pagination-bar');
+  const feedBulkBar = document.getElementById('wf-feed-bulk-bar');
+  if (feedPgBar)   feedPgBar.style.display  = wfTableMode ? 'none' : '';
+  // Bulk bar visibility managed by _wfOnCardCheck; just hide it when switching to table
+  if (feedBulkBar && wfTableMode) feedBulkBar.classList.remove('visible');
   if (feedBtn)    feedBtn.classList.toggle('active',  !wfTableMode);
   if (tableBtn)   tableBtn.classList.toggle('active',  wfTableMode);
   // Hide Group + Columns controls in split/feed view — not relevant
@@ -8187,9 +8317,6 @@ function setWfSegFilter(val) {
   if (val === 'all')    { wfHiddenCols.delete('team'); wfHiddenCols.delete('assignTo'); }
   if (val === 'queue')  { wfHiddenCols.delete('team'); wfHiddenCols.add('assignTo'); }
   if (val === 'on-me')  { wfHiddenCols.add('team');    wfHiddenCols.add('assignTo'); }
-  // "Available only" chip is only meaningful for All tasks
-  const availChip = document.getElementById('wf-avail-chip');
-  if (availChip) availChip.style.display = val === 'all' ? '' : 'none';
   _wfCurrentPage = 1;
   _wfUpdateKPIs();
   renderWorkFeedList();
@@ -9039,6 +9166,73 @@ function _eybDelPoRow(btn) {
   btn.closest('tr')?.remove();
 }
 
+// ── Eyeball document overlay helpers (case-page slim view) ───────────────────
+function _eybOpenDocOverlay(splitId) {
+  const overlay = document.getElementById(splitId + '-overlay');
+  if (overlay) overlay.style.display = 'flex';
+}
+function _eybCloseDocOverlay(splitId) {
+  const overlay = document.getElementById(splitId + '-overlay');
+  if (overlay) { overlay.style.display = 'none'; _splitDocZoom(splitId, null, false); }
+}
+function _eybZoomField(splitId, fieldKey) {
+  _eybOpenDocOverlay(splitId);
+  requestAnimationFrame(() => _splitDocZoom(splitId, fieldKey, true));
+}
+
+// Eye-icon hover: wide mode → zoom right panel; slim mode → float popup above icon
+function _eybOnEyeEnter(splitId, fieldKey, btn) {
+  const docPanel = btn.closest('.eyb-slim-card')?.querySelector('.eyb-doc-panel');
+  const isSlim = docPanel && getComputedStyle(docPanel).display === 'none';
+  if (isSlim) {
+    _eybShowFieldPopup(splitId, fieldKey, btn);
+  } else {
+    _splitDocZoom(splitId, fieldKey, true);
+  }
+}
+function _eybOnEyeLeave(splitId, fieldKey) {
+  _eybHideFieldPopup();
+  _splitDocZoom(splitId, fieldKey, false);
+}
+function _eybShowFieldPopup(splitId, fieldKey, btn) {
+  let popup = document.getElementById('eyb-field-popup');
+  if (!popup) {
+    popup = document.createElement('div');
+    popup.id = 'eyb-field-popup';
+    popup.className = 'eyb-field-popup';
+    popup.innerHTML = `<div class="eyb-field-popup-inner" id="eyb-field-popup-inner"></div><div class="eyb-field-popup-arrow"></div>`;
+    document.body.appendChild(popup);
+  }
+  const docEl = document.getElementById(splitId + '-doc');
+  if (!docEl) return;
+  const inner = document.getElementById('eyb-field-popup-inner');
+  inner.innerHTML = docEl.innerHTML;
+  inner.style.transform = 'scale(0.48)';
+  popup.style.visibility = 'hidden';
+  popup.style.display = 'block';
+  requestAnimationFrame(() => {
+    const SCALE = 0.48, POP_W = 230, POP_H = 160;
+    const fieldEl = inner.querySelector(`[data-fieldkey="${fieldKey}"]`);
+    if (fieldEl) {
+      fieldEl.classList.add('ded-doc-val-hl');
+      const offset = Math.max(0, fieldEl.offsetTop + fieldEl.offsetHeight / 2 - (POP_H / 2) / SCALE);
+      inner.style.transform = `scale(${SCALE}) translateY(-${offset}px)`;
+    }
+    const rect = btn.getBoundingClientRect();
+    let left = rect.left + rect.width / 2 - POP_W / 2;
+    let top = rect.top - POP_H - 10;
+    left = Math.max(4, Math.min(left, window.innerWidth - POP_W - 4));
+    top = Math.max(4, top);
+    popup.style.left = left + 'px';
+    popup.style.top = top + 'px';
+    popup.style.visibility = '';
+  });
+}
+function _eybHideFieldPopup() {
+  const p = document.getElementById('eyb-field-popup');
+  if (p) p.style.display = 'none';
+}
+
 // ── Eyeball structured form card ──────────────────────────────────────────────
 function _dedEyeballFormCard(caseId, task, prefix = 'wf') {
   const docs = task.docs || [];
@@ -9142,6 +9336,116 @@ function _dedEyeballFormCard(caseId, task, prefix = 'wf') {
       onfocus="_splitDocZoom('${splitId}','hand-written',true)"
       onblur="_splitDocZoom('${splitId}','hand-written',false)">`;
 
+    // ── Case-page card (prefix='cp'): split layout + responsive breakpoint ──
+    if (prefix === 'cp') {
+      // Eye icon: wide mode → hover zooms right panel; slim mode → hover shows mini popup above icon; click → open overlay
+      const _cpEye = key => `<button class="eyb-eye-icon"
+        onmouseenter="_eybOnEyeEnter('${splitId}','${key}',this)"
+        onmouseleave="_eybOnEyeLeave('${splitId}','${key}')"
+        onclick="event.stopPropagation();_eybOpenDocOverlay('${splitId}')"
+        title="View in document"><span class="material-symbols-outlined">visibility</span></button>`;
+
+      const _cpField = (label, inputHtml, key) => `
+        <div class="eyb-field">
+          <label class="eyb-label">${label}</label>
+          <div class="eyb-input-wrap">${inputHtml}${_cpEye(key)}</div>
+        </div>`;
+
+      const headerHtmlCp = `
+        <div class="eyb-field-grid">
+          ${_cpField('Document Provider', `<input class="eyb-input" type="text" value="${h.documentProvider || ''}" ${_z('document-provider')}>`, 'document-provider')}
+          ${_cpField('BOL #', `<input class="eyb-input" type="number" value="${h.bol || ''}" ${_z('bol')}>`, 'bol')}
+          ${_cpField('Appt Number', `<input class="eyb-input" type="number" value="${h.apptNumber || ''}" ${_z('appt-number')}>`, 'appt-number')}
+          ${_cpField('Freight Charge Terms', `<input class="eyb-input" type="text" value="${h.freightChargeTerms || ''}" ${_z('freight-charge-terms')}>`, 'freight-charge-terms')}
+          <div class="eyb-span2">
+            <div class="eyb-check-row">
+              <label class="eyb-check-item"><input type="checkbox" ${h.carrierSign ? 'checked' : ''} onchange="_splitDocZoom('${splitId}','carrier-sign',true);setTimeout(()=>_splitDocZoom('${splitId}','carrier-sign',false),800)"> Carrier Sign</label>
+              <label class="eyb-check-item"><input type="checkbox" ${h.customerSign ? 'checked' : ''} onchange="_splitDocZoom('${splitId}','customer-sign',true);setTimeout(()=>_splitDocZoom('${splitId}','customer-sign',false),800)"> Customer Sign</label>
+              <label class="eyb-check-item"><input type="checkbox" ${h.subjectToCount ? 'checked' : ''} onchange="_splitDocZoom('${splitId}','subject-to-count',true);setTimeout(()=>_splitDocZoom('${splitId}','subject-to-count',false),800)"> Subject to Count</label>
+            </div>
+          </div>
+          ${_cpField('Carrier Sign Text', `<input class="eyb-input" type="text" value="${h.carrierSignText || ''}" ${_z('carrier-sign-text')}>`, 'carrier-sign-text')}
+          <div></div>
+          ${_cpField('Total Package Qty', `<input class="eyb-input" type="number" value="${h.totalPackageQty || ''}" ${_z('total-package-qty')}>`, 'total-package-qty')}
+          ${_cpField('Weight (LB)', `<input class="eyb-input" type="number" value="${h.weight || ''}" ${_z('weight')}>`, 'weight')}
+        </div>`;
+
+      const notIdCp = `eyb-char-${splitId}`;
+      const notHtmlCp = `
+        <div class="eyb-textarea-wrap">
+          <textarea class="eyb-textarea" maxlength="500"
+            oninput="document.getElementById('${notIdCp}').textContent=this.value.length"
+            onfocus="_splitDocZoom('${splitId}','notations',true)"
+            onblur="_splitDocZoom('${splitId}','notations',false)"
+          >${notations}</textarea>
+          ${_cpEye('notations')}
+        </div>
+        <div class="eyb-char-count"><span id="${notIdCp}">${notations.length}</span> / 500</div>`;
+
+      const hwHtmlCp = `
+        <div class="eyb-input-wrap">
+          <input class="eyb-input" type="text" value="${hw.replace(/"/g, '&quot;')}" style="width:100%"
+            onfocus="_splitDocZoom('${splitId}','hand-written',true)"
+            onblur="_splitDocZoom('${splitId}','hand-written',false)">
+          ${_cpEye('hand-written')}
+        </div>`;
+
+      return `
+        <div class="wf-form-card eyb-slim-card" style="overflow:hidden">
+          <div class="wf-form-card-header" style="align-items:center">
+            <span class="material-symbols-outlined" style="font-size:20px;color:var(--text-secondary);flex-shrink:0">description</span>
+            <div style="flex:1;min-width:0">
+              <div class="wf-form-card-vendor">${doc.docLabel}</div>
+              <div class="wf-form-card-task-type">${doc.docType} — eyeball review</div>
+            </div>
+            <button class="eyb-doc-view-btn" onclick="_eybOpenDocOverlay('${splitId}')">
+              <span class="material-symbols-outlined">picture_as_pdf</span> View document
+            </button>
+          </div>
+          <div class="ded-eyeball-split">
+            <div class="ded-eyeball-left" style="padding:0;overflow-y:auto;overflow-x:hidden">
+              ${_sec('hdr', 'receipt_long', 'Header', headerHtmlCp)}
+              ${_sec('po',  'table_rows',   'PO Details', poHtml)}
+              ${_sec('not', 'notes',        'Notations', notHtmlCp)}
+              ${_sec('hw',  'edit',         'Hand Written', hwHtmlCp)}
+            </div>
+            <div class="eyb-doc-panel" style="display:flex;flex-direction:column;background:#525659;overflow:hidden">
+              <div style="display:flex;align-items:center;gap:8px;padding:7px 12px;background:#3c3f41;flex-shrink:0">
+                <span class="material-symbols-outlined" style="font-size:13px;color:#aaa">picture_as_pdf</span>
+                <span style="font-size:11px;color:#ccc;font-weight:500">${doc.docLabel}</span>
+                <span style="font-size:10px;color:#888;margin-left:2px">· ${doc.docType}</span>
+              </div>
+              <div class="ded-eyeball-right" id="${splitId}-doc">
+                ${_dedRenderDoc(doc, splitId)}
+              </div>
+            </div>
+          </div>
+          <div class="wf-form-card-footer">
+            <button class="wf-reject-btn">Reject</button>
+            <button class="wf-approve-btn" onclick="approveWfCard(this,'${caseId}','eyeball','confirm-${docIdx}','eyeball')">
+              <span class="material-symbols-outlined" style="font-size:14px">check</span> Confirm
+            </button>
+          </div>
+        </div>
+        <div id="${splitId}-overlay" class="eyb-doc-overlay" style="display:none"
+             onclick="if(event.target===this)_eybCloseDocOverlay('${splitId}')">
+          <div class="eyb-doc-overlay-box">
+            <div class="eyb-doc-overlay-hdr">
+              <span class="material-symbols-outlined" style="font-size:14px;color:#aaa">picture_as_pdf</span>
+              <span style="font-size:12px;color:#ccc;font-weight:500">${doc.docLabel}</span>
+              <span style="font-size:11px;color:#888;margin-left:2px">· ${doc.docType}</span>
+              <button class="eyb-doc-overlay-close" onclick="_eybCloseDocOverlay('${splitId}')">
+                <span class="material-symbols-outlined">close</span>
+              </button>
+            </div>
+            <div class="eyb-doc-overlay-body">
+              ${_dedRenderDoc(doc, splitId + '-ov')}
+            </div>
+          </div>
+        </div>`;
+    }
+
+    // ── Work-feed split layout (prefix='wf', unchanged) ───────────────────
     return `
       <div class="wf-form-card" style="overflow:hidden">
         <div class="wf-form-card-header" style="align-items:center">
@@ -10033,46 +10337,62 @@ function _wfRenderPagination(totalItems) {
   _wfLastTotalPages = totalPages;
   const start = totalItems === 0 ? 0 : (_wfCurrentPage - 1) * _wfItemsPerPage + 1;
   const end   = Math.min(_wfCurrentPage * _wfItemsPerPage, totalItems);
+  const countText = totalItems === 0 ? '0 of 0' : `${start}–${end} of ${totalItems}`;
+
+  // Update table bar
   const countEl = document.getElementById('wf-pg-count');
   const valEl   = document.getElementById('wf-pg-per-page-val');
-  if (countEl) countEl.textContent = totalItems === 0 ? '0 of 0' : `${start}–${end} of ${totalItems}`;
+  if (countEl) countEl.textContent = countText;
   if (valEl)   valEl.textContent   = _wfItemsPerPage;
   document.querySelectorAll('#wf-pg-per-page-menu .pg-per-page-opt').forEach(btn => {
     btn.classList.toggle('active', parseInt(btn.textContent) === _wfItemsPerPage);
   });
+
+  // Update feed bar
+  const feedCountEl = document.getElementById('wf-feed-pg-count');
+  const feedValEl   = document.getElementById('wf-feed-pg-per-page-val');
+  if (feedCountEl) feedCountEl.textContent = countText;
+  if (feedValEl)   feedValEl.textContent   = _wfItemsPerPage;
+  document.querySelectorAll('#wf-feed-pg-per-page-menu .pg-per-page-opt').forEach(btn => {
+    btn.classList.toggle('active', parseInt(btn.textContent) === _wfItemsPerPage);
+  });
+
   const first = _wfCurrentPage === 1;
   const last  = _wfCurrentPage === totalPages;
   const pages = buildPageSequence(_wfCurrentPage, totalPages);
-  const controls = document.getElementById('wf-pg-controls');
-  if (!controls) return;
-  controls.innerHTML =
-    `<button class="pg-nav-btn" onclick="wfGoToPage(1)" ${first?'disabled':''} title="First page">
+  const navHtml = (goFn) =>
+    `<button class="pg-nav-btn" onclick="${goFn}(1)" ${first?'disabled':''} title="First page">
        <span class="material-symbols-outlined">first_page</span>
      </button>
-     <button class="pg-nav-btn" onclick="wfGoToPage(${_wfCurrentPage-1})" ${first?'disabled':''} title="Previous">
+     <button class="pg-nav-btn" onclick="${goFn}(${_wfCurrentPage-1})" ${first?'disabled':''} title="Previous">
        <span class="material-symbols-outlined">chevron_left</span>
      </button>
      ${pages.map(p => p === '...'
        ? `<button class="pg-ellipsis" disabled><span class="material-symbols-outlined">more_horiz</span></button>`
-       : `<button class="pg-page-btn${p===_wfCurrentPage?' active':''}" onclick="wfGoToPage(${p})">${p}</button>`
+       : `<button class="pg-page-btn${p===_wfCurrentPage?' active':''}" onclick="${goFn}(${p})">${p}</button>`
      ).join('')}
-     <button class="pg-nav-btn" onclick="wfGoToPage(${_wfCurrentPage+1})" ${last?'disabled':''} title="Next">
+     <button class="pg-nav-btn" onclick="${goFn}(${_wfCurrentPage+1})" ${last?'disabled':''} title="Next">
        <span class="material-symbols-outlined">chevron_right</span>
      </button>
-     <button class="pg-nav-btn" onclick="wfGoToPage(${totalPages})" ${last?'disabled':''} title="Last page">
+     <button class="pg-nav-btn" onclick="${goFn}(${totalPages})" ${last?'disabled':''} title="Last page">
        <span class="material-symbols-outlined">last_page</span>
      </button>`;
+
+  const controls     = document.getElementById('wf-pg-controls');
+  const feedControls = document.getElementById('wf-feed-pg-controls');
+  if (controls)     controls.innerHTML     = navHtml('wfGoToPage');
+  if (feedControls) feedControls.innerHTML = navHtml('wfGoToPage');
 }
 
 function wfGoToPage(page) {
   if (page < 1 || page > _wfLastTotalPages) return;
   _wfCurrentPage = page;
-  renderWorkFeedTable();
+  if (wfTableMode) renderWorkFeedTable(); else renderWorkFeedList();
 }
 
 function wfChangeItemsPerPage(n) {
-  _wfItemsPerPage  = n;
-  _wfCurrentPage   = 1;
+  _wfItemsPerPage = n;
+  _wfCurrentPage  = 1;
   const menu = document.getElementById('wf-pg-per-page-menu');
   if (menu) menu.classList.add('hidden');
   renderWorkFeedTable();
@@ -10081,6 +10401,20 @@ function wfChangeItemsPerPage(n) {
 function wfTogglePerPageMenu(e) {
   e.stopPropagation();
   document.getElementById('wf-pg-per-page-menu').classList.toggle('hidden');
+}
+
+// Feed-panel per-page helpers (mirror the table ones but re-render feed)
+function wfFeedChangeItemsPerPage(n) {
+  _wfItemsPerPage = n;
+  _wfCurrentPage  = 1;
+  const menu = document.getElementById('wf-feed-pg-per-page-menu');
+  if (menu) menu.classList.add('hidden');
+  renderWorkFeedList();
+}
+
+function wfFeedTogglePerPageMenu(e) {
+  e.stopPropagation();
+  document.getElementById('wf-feed-pg-per-page-menu').classList.toggle('hidden');
 }
 
 function renderWorkFeedPage() {
@@ -10216,14 +10550,6 @@ function renderWorkFeedList() {
       ? `<span class="wf-card-avatar-wrap" title="${fetchedByMe ? 'Fetched by you' : 'Fetched by ' + fetched}">${_activeUserAvatarHtml(fetched, 'sm')}</span>`
       : '';
 
-    // Pill action button — only for mine ("Return") or unfetched ("Fetch"); hidden if taken by someone else
-    const pillHtml = fetchedByOther ? '' : (() => {
-      const label  = fetchedByMe ? 'Return' : 'Fetch';
-      const icon   = fetchedByMe ? 'undo' : 'download';
-      const action = fetchedByMe ? `returnCaseFromList('${c.id}')` : `fetchCaseFromList('${c.id}')`;
-      return `<button class="wf-card-action-pill" onclick="event.stopPropagation();${action}"><span class="material-symbols-outlined">${icon}</span>${label}</button>`;
-    })();
-
     const openFn = fetchedByOther ? `openWfCaseReadOnly('${c.id}')` : `openWfCaseTab('${c.id}')`;
     return `<div class="wf-feed-card${isActive ? ' active' : ''}${fetchedByOther ? ' wf-taken' : ''}" data-id="${c.id}" onclick="selectWorkFeedCase('${c.id}')">
       <input type="checkbox" class="wf-card-cb" onclick="event.stopPropagation();_wfCardCbClick(event,this)">
@@ -10235,15 +10561,34 @@ function renderWorkFeedList() {
       <div class="wf-card-desc">${cardDesc}</div>
       <div class="wf-card-bottom">
         <span class="wf-card-badge ${badgeClass}">${cardCount}</span>
-        <div class="wf-card-actions">${avatarHtml}${pillHtml}</div>
+        <div class="wf-card-actions">${avatarHtml}</div>
       </div>
     </div>`;
   }
 
+  // Paginate the feed list using the same state as the table view
+  const _feedTotal = data.length;
+  const _feedMaxPage = Math.max(1, Math.ceil(_feedTotal / _wfItemsPerPage));
+  if (_wfCurrentPage > _feedMaxPage) _wfCurrentPage = _feedMaxPage;
+  _wfRenderPagination(_feedTotal);
+  data = data.slice((_wfCurrentPage - 1) * _wfItemsPerPage, _wfCurrentPage * _wfItemsPerPage);
+
   list.innerHTML = data.map(_buildCard).join('');
+
+  // Restore persisted checkbox selections after DOM rebuild
+  if (_wfCheckedIds.size) {
+    list.querySelectorAll('.wf-feed-card').forEach(card => {
+      if (_wfCheckedIds.has(card.dataset.id)) {
+        const cb = card.querySelector('.wf-card-cb');
+        if (cb) cb.checked = true;
+      }
+    });
+    _wfOnCardCheck();
+  }
 }
 
 let _wfLastCheckedIdx = null;   // anchor for shift-range selection
+const _wfCheckedIds   = new Set(); // persists checked card IDs across re-renders
 
 function _wfCardCbClick(event, cb) {
   const list = document.getElementById('wf-feed-list');
@@ -10256,10 +10601,16 @@ function _wfCardCbClick(event, cb) {
     const start  = Math.min(_wfLastCheckedIdx, currentIdx);
     const end    = Math.max(_wfLastCheckedIdx, currentIdx);
     const target = cb.checked;
-    for (let i = start; i <= end; i++) allCbs[i].checked = target;
+    for (let i = start; i <= end; i++) {
+      allCbs[i].checked = target;
+      const id = allCbs[i].closest('.wf-feed-card')?.dataset?.id;
+      if (id) { if (target) _wfCheckedIds.add(id); else _wfCheckedIds.delete(id); }
+    }
   } else {
-    // Normal click — update anchor
+    // Normal click — update anchor and persist
     _wfLastCheckedIdx = currentIdx;
+    const id = cb.closest('.wf-feed-card')?.dataset?.id;
+    if (id) { if (cb.checked) _wfCheckedIds.add(id); else _wfCheckedIds.delete(id); }
   }
 
   _wfOnCardCheck();
@@ -10271,21 +10622,26 @@ function _wfOnCardCheck() {
   const countEl     = document.getElementById('wf-feed-bulk-count');
   const placeholder = document.getElementById('wf-bulk-placeholder');
   const phCount     = document.getElementById('wf-bulk-placeholder-count');
+  const feedPgBar   = document.getElementById('wf-feed-pagination-bar');
+  const solver      = document.querySelector('#wf-split-view .wf-solver');
   if (!list) return;
   const checked = list.querySelectorAll('.wf-card-cb:checked');
   const n = checked.length;
   const label = n === 1 ? '1 item selected' : `${n} items selected`;
-  list.classList.toggle('wf-bulk-mode', n > 0);
-  if (bar)         bar.classList.toggle('visible', n > 0);
-  if (countEl)     countEl.textContent = n === 1 ? '1 selected' : `${n} selected`;
-  if (placeholder) placeholder.style.display = n > 0 ? 'flex' : 'none';
-  if (phCount)     phCount.textContent = label;
+  const bulkActive = n > 0;
+  list.classList.toggle('wf-bulk-mode', bulkActive);
+  if (bar)     bar.classList.toggle('visible', bulkActive);
+  if (countEl) countEl.textContent = n === 1 ? '1 selected' : `${n} selected`;
+  if (solver)  solver.classList.toggle('bulk-locked', bulkActive);
+  // Swap pagination ↔ bulk bar below the panel
+  if (feedPgBar && !wfTableMode) feedPgBar.style.display = bulkActive ? 'none' : '';
 }
 
 function _wfClearBulk() {
   const list = document.getElementById('wf-feed-list');
   if (!list) return;
   list.querySelectorAll('.wf-card-cb').forEach(cb => cb.checked = false);
+  _wfCheckedIds.clear();
   _wfLastCheckedIdx = null;
   _wfOnCardCheck();
 }
@@ -13339,13 +13695,18 @@ function setViewMode(mode) {
   document.getElementById('display-panel')?.classList.add('hidden');
   if (mode === 'split') {
     portalBody.classList.add('split-mode');
+    // Close utility panel if open — no sidebar shown in split mode
+    if (typeof closeUtility === 'function') closeUtility();
     // Move #case-page inside the split container so only the table area transforms
     if (casePage.parentElement !== splitContainer) splitContainer.appendChild(casePage);
+    _splitPage = 1;
+    _splitCheckedIds.clear();
     renderSplitList();
     const data = _splitData();
     if (data.length > 0) openSplitCase(String(data[0].id).replace(/^#\s*/, ''));
   } else {
     portalBody.classList.remove('split-mode');
+    portalBody.classList.remove('split-bulk-active');
     // Move #case-page back to .portal-body (as a sibling of #portal-content)
     if (casePage.parentElement !== portalBody) portalBody.appendChild(casePage);
     casePage.classList.add('hidden');
@@ -13356,21 +13717,117 @@ function setViewMode(mode) {
   document.querySelectorAll('.case-form-area').forEach(el => el.classList.remove('narrow'));
 }
 
+// ── Cases split-view feed state ───────────────────────────────────────────────
+let _splitPage    = 1;
+let _splitPerPage = 10;
+const _splitCheckedIds = new Set();
+
 function renderSplitList() {
-  const data = _splitData();
-  const list = document.getElementById('split-list');
-  if (!list) return;
-  list.innerHTML = data.map(row => {
-    const id = String(row.id).replace(/^#\s*/, '');
+  const allData = _splitData();
+  const total   = allData.length;
+  const maxPage = Math.max(1, Math.ceil(total / _splitPerPage));
+  if (_splitPage > maxPage) _splitPage = maxPage;
+
+  // Paginate
+  const data = allData.slice((_splitPage - 1) * _splitPerPage, _splitPage * _splitPerPage);
+
+  const cardList = document.getElementById('split-card-list');
+  if (!cardList) return;
+
+  cardList.innerHTML = data.map(row => {
+    const id       = String(row.id).replace(/^#\s*/, '');
     const isActive = splitActiveCaseId === id;
-    return `<div class="split-card${isActive ? ' active' : ''}" onclick="openSplitCase('${id}')">
-      <div class="split-card-top">
-        <div class="split-card-id"># ${id}</div>
-        <span class="status-badge ${statusClass(row.status)}">${row.status || '—'}</span>
+    const checked  = _splitCheckedIds.has(id);
+    return `<div class="wf-feed-card${isActive ? ' active' : ''}" data-id="${id}" onclick="openSplitCase('${id}')">
+      <input type="checkbox" class="wf-card-cb"${checked ? ' checked' : ''} onclick="event.stopPropagation();_splitCbClick(event,this,'${id}')">
+      <div class="wf-card-top">
+        <span class="material-symbols-outlined wf-card-icon">bookmark</span>
+        <span class="wf-card-id"># ${id}</span>
+        <button class="wf-card-open-btn" onclick="event.stopPropagation();openSplitCaseInTab()" title="Open in tab"><span class="material-symbols-outlined">open_in_new</span></button>
       </div>
-      <div class="split-card-name">${row.name || '—'}</div>
+      <div class="wf-card-desc">${row.name || '—'}</div>
+      <div class="wf-card-bottom">
+        <span class="wf-card-badge ${statusClass(row.status)}">${row.status || '—'}</span>
+        <div class="wf-card-actions"></div>
+      </div>
     </div>`;
   }).join('');
+
+  // Restore bulk-mode class if any checked
+  cardList.closest('.wf-feed-list')?.classList.toggle('wf-bulk-mode', _splitCheckedIds.size > 0);
+
+  // Pagination UI
+  _splitRenderPagination(total);
+}
+
+function _splitRenderPagination(total) {
+  const maxPage = Math.max(1, Math.ceil(total / _splitPerPage));
+  const start   = ((_splitPage - 1) * _splitPerPage) + 1;
+  const end     = Math.min(_splitPage * _splitPerPage, total);
+  const countEl = document.getElementById('split-pg-count');
+  const ctrlEl  = document.getElementById('split-pg-controls');
+  const valEl   = document.getElementById('split-pg-per-page-val');
+  if (countEl) countEl.textContent = total ? `${start}–${end} of ${total}` : '—';
+  if (valEl)   valEl.textContent   = _splitPerPage;
+  if (!ctrlEl) return;
+  const btn = (label, page, disabled) =>
+    `<button class="pg-btn${disabled ? ' disabled' : ''}" ${disabled ? 'disabled' : `onclick="_splitGoToPage(${page})"`}>${label}</button>`;
+  const pages = [];
+  for (let p = 1; p <= maxPage; p++) {
+    if (p === 1 || p === maxPage || Math.abs(p - _splitPage) <= 1)
+      pages.push(`<button class="pg-btn${p === _splitPage ? ' active' : ''}" onclick="_splitGoToPage(${p})">${p}</button>`);
+    else if (pages[pages.length-1] !== '<span class="pg-ellipsis">…</span>')
+      pages.push('<span class="pg-ellipsis">…</span>');
+  }
+  ctrlEl.innerHTML =
+    btn('«', 1, _splitPage === 1) +
+    btn('‹', _splitPage - 1, _splitPage === 1) +
+    pages.join('') +
+    btn('›', _splitPage + 1, _splitPage === maxPage) +
+    btn('»', maxPage, _splitPage === maxPage);
+}
+
+function _splitGoToPage(page) {
+  _splitPage = page;
+  renderSplitList();
+}
+
+function _splitChangePerPage(n) {
+  _splitPerPage = n;
+  _splitPage    = 1;
+  document.querySelectorAll('#split-pg-per-page-menu .pg-per-page-opt').forEach(b => b.classList.toggle('active', parseInt(b.textContent) === n));
+  document.getElementById('split-pg-per-page-menu')?.classList.add('hidden');
+  renderSplitList();
+}
+
+function _splitTogglePerPageMenu(e) {
+  e.stopPropagation();
+  document.getElementById('split-pg-per-page-menu')?.classList.toggle('hidden');
+}
+
+function _splitCbClick(event, cb, id) {
+  if (cb.checked) _splitCheckedIds.add(id);
+  else _splitCheckedIds.delete(id);
+  _splitOnCheck();
+}
+
+function _splitOnCheck() {
+  const cardList = document.getElementById('split-card-list');
+  const countEl  = document.getElementById('split-bulk-count');
+  const n = _splitCheckedIds.size;
+  if (cardList) cardList.classList.toggle('wf-bulk-mode', n > 0);
+  if (countEl)  countEl.textContent = n === 1 ? '1 selected' : `${n} selected`;
+  document.querySelector('.portal-body')?.classList.toggle('split-bulk-active', n > 0);
+}
+
+function _splitClearBulk() {
+  _splitCheckedIds.clear();
+  renderSplitList();
+  _splitOnCheck();
+}
+
+function _splitBulkAction(action) {
+  alert(`${action} — ${_splitCheckedIds.size} case(s) selected`);
 }
 
 function openSplitCase(caseId) {
