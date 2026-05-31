@@ -304,6 +304,59 @@
   }
   .ai-drawer-close:hover { background: #333; color: #fff; }
   .ai-drawer-close .material-symbols-outlined { font-size: 18px; }
+  /* View mode toggle */
+  .ai-view-wrap { position: relative; }
+  .ai-view-toggle-btn {
+    width: 28px; height: 28px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    border: none; background: none; cursor: pointer;
+    color: #888; transition: background 0.15s, color 0.15s;
+  }
+  .ai-view-toggle-btn:hover, .ai-view-toggle-btn.open { background: #333; color: #fff; }
+  .ai-view-toggle-btn .material-symbols-outlined { font-size: 17px; }
+  .ai-view-menu {
+    position: absolute; top: calc(100% + 6px); right: 0;
+    background: #fff; border: 1px solid var(--border);
+    border-radius: 10px; box-shadow: 0 6px 24px rgba(0,0,0,0.18);
+    z-index: 600; min-width: 155px; overflow: hidden; display: none;
+  }
+  .ai-view-menu-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 14px; cursor: pointer;
+    font-size: 13px; color: var(--text-primary);
+    transition: background 0.1s;
+  }
+  .ai-view-menu-item:hover { background: var(--bg-light); }
+  .ai-view-menu-item.active { color: #7c3aed; font-weight: 500; }
+  .ai-view-menu-item .material-symbols-outlined { font-size: 17px; color: var(--text-muted); }
+  .ai-view-menu-item.active .material-symbols-outlined { color: #7c3aed; }
+  /* Floating mode */
+  .ai-drawer.ai-float {
+    position: fixed !important;
+    width: var(--ai-drawer-w) !important;
+    height: 560px;
+    bottom: 56px; right: 20px;
+    border-radius: 14px;
+    border: 1px solid #3b1f6e !important;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.55);
+    z-index: 400; overflow: hidden;
+    transition: none !important;
+  }
+  .ai-drawer.ai-float .ai-drawer-resize-handle { display: none; }
+  .ai-drawer.ai-float .ai-drawer-inner { border-radius: 14px; overflow: hidden; }
+  .ai-drawer.ai-float .ai-drawer-header { border-radius: 14px 14px 0 0; }
+  /* Minimized float — show only header bar */
+  .ai-drawer.ai-float.ai-float-min { height: 52px !important; }
+  .ai-drawer.ai-float.ai-float-min .ai-drawer-inner { height: 52px; border-radius: 14px; }
+  /* Minimize button — only visible in float mode */
+  .ai-float-min-btn { display: none !important; }
+  .ai-drawer.ai-float .ai-float-min-btn { display: flex !important; }
+  /* Close-to-button animation */
+  .ai-drawer.ai-float-closing {
+    transition: transform 0.26s cubic-bezier(0.4, 0, 1, 1), opacity 0.22s ease !important;
+    pointer-events: none;
+    opacity: 0 !important;
+  }
   .ai-drawer-body {
     flex: 1; overflow-y: auto;
     display: flex; flex-direction: column;
@@ -1249,6 +1302,23 @@
   .col-ctx-item .material-symbols-outlined { font-size: 18px; color: var(--text-secondary); flex-shrink: 0; }
   .col-ctx-divider { height: 1px; background: #e1e1e1; margin: 4px 0; }
 
+  /* Row context-menu column */
+  th.col-row-ctx, td.col-row-ctx {
+    width: 28px; min-width: 28px; padding: 0 !important;
+    text-align: center; overflow: visible !important;
+  }
+  .row-ctx-btn {
+    display: flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px; margin: 0 auto;
+    border: none; background: none; border-radius: 4px;
+    cursor: pointer; color: var(--text-muted);
+  }
+  .row-ctx-btn:hover { background: var(--border-light); color: var(--text-primary); }
+  .row-ctx-btn .material-symbols-outlined { font-size: 18px; }
+  table.has-row-selection .row-ctx-btn {
+    opacity: 0.2; pointer-events: none; cursor: default;
+  }
+
   thead th:first-child { width: 36px; text-align: center; }
   .col-id { width: 100px; }
   .col-case { width: 14%; }
@@ -1626,7 +1696,7 @@
   .case-header-main {
     display: flex; align-items: center;
     padding: 0 20px; height: 64px; gap: 0;
-    position: relative; z-index: 1;
+    position: relative; z-index: 100;
     background: var(--bg-white);
     border-bottom: 1px solid var(--border);
   }
@@ -1710,6 +1780,42 @@
     background: rgba(255,255,255,0.15); border-radius: 4px;
     padding: 1px 5px; letter-spacing: 0; margin-left: 2px;
   }
+  /* Split fetch button */
+  .fetch-split { display: inline-flex; align-items: stretch; border-radius: 8px; flex-shrink: 0; position: relative; z-index: 101; }
+  .fetch-split-main {
+    display: flex; align-items: center; gap: 6px;
+    padding: 7px 14px; border: none; border-radius: 8px 0 0 8px;
+    background: var(--text-primary); color: #fff;
+    font-size: 13px; font-weight: 600; font-family: inherit;
+    cursor: pointer; transition: opacity 0.15s;
+  }
+  .fetch-split-main:hover { opacity: 0.85; }
+  .fetch-split-main .material-symbols-outlined { font-size: 15px; }
+  .fetch-split-main .case-fetch-shortcut { font-size: 10px; font-weight: 400; opacity: 0.65; background: rgba(255,255,255,0.15); border-radius: 4px; padding: 1px 5px; margin-left: 2px; }
+  .fetch-split-sep { width: 1px; background: rgba(255,255,255,0.22); flex-shrink: 0; }
+  .fetch-split-arrow {
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 9px; border: none; border-radius: 0 8px 8px 0;
+    background: var(--text-primary); color: rgba(255,255,255,0.85);
+    cursor: pointer; transition: opacity 0.15s;
+  }
+  .fetch-split-arrow:hover { opacity: 0.85; }
+  .fetch-split-arrow .material-symbols-outlined { font-size: 17px; }
+  .fetch-split-drop {
+    display: none; position: absolute; top: calc(100% + 6px); right: 0;
+    background: #fff; border: 1px solid var(--border);
+    border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.13);
+    min-width: 168px; padding: 4px 0; z-index: 1000;
+  }
+  .fetch-split-drop.open { display: block; }
+  .fetch-split-drop-item {
+    display: flex; align-items: center; gap: 9px;
+    padding: 9px 14px; font-size: 13px; cursor: pointer;
+    color: var(--text-primary); border: none; background: none;
+    width: 100%; text-align: left; font-family: inherit;
+  }
+  .fetch-split-drop-item:hover { background: var(--bg-light); }
+  .fetch-split-drop-item .material-symbols-outlined { font-size: 16px; color: var(--text-muted); }
   /* "Fetched by other" badge */
   .case-fetched-badge {
     display: flex; align-items: center; gap: 5px;
@@ -2214,7 +2320,7 @@
   /* ── Utility Sidebar ── */
   .utility-sidebar {
     display: flex; flex-direction: row;
-    flex-shrink: 0; height: 100%;
+    flex-shrink: 0; height: 100%; position: relative;
   }
   /* Sliding panel — border only visible when open */
   .utility-panel {
@@ -2258,6 +2364,102 @@
   .util-strip-btn:hover { background: var(--border); color: var(--text-primary); }
   .util-strip-btn.active { background: var(--bg-dark); color: #fff; }
   .util-strip-btn .material-symbols-outlined { font-size: 18px; }
+  /* Draft compose icon button in strip — pinned to bottom */
+  .util-compose-draft-btn { position: relative; margin-top: auto; }
+  .util-compose-dot {
+    position: absolute; top: 5px; right: 5px;
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #f97316; border: 1.5px solid var(--bg-light);
+    pointer-events: none;
+  }
+  /* ── Floating draft card (minimized compose, anchored near strip) ── */
+  .fc-header {
+    display: flex; align-items: center; gap: 4px;
+    padding: 8px 10px; border-bottom: 1px solid var(--border-light);
+    background: var(--bg-light); flex-shrink: 0;
+  }
+  .fc-type-wrap { position: relative; }
+  .fc-type-btn {
+    display: inline-flex; align-items: center; gap: 3px;
+    padding: 3px 4px 3px 7px; border-radius: 6px; border: none;
+    background: #fff; cursor: pointer;
+    font-size: 11px; font-weight: 500; color: var(--text-secondary);
+    font-family: inherit; transition: background 0.1s; white-space: nowrap;
+  }
+  .fc-type-btn:hover { background: var(--border); }
+  .fc-type-btn .material-symbols-outlined { font-size: 13px; }
+  .fc-type-menu {
+    position: absolute; bottom: calc(100% + 4px); left: 0; z-index: 300;
+    background: #fff; border: 1px solid var(--border);
+    border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.14);
+    overflow: hidden; min-width: 120px;
+  }
+  .fc-type-menu button {
+    display: flex; align-items: center; gap: 7px; width: 100%; padding: 7px 11px;
+    border: none; background: transparent; cursor: pointer;
+    font-size: 12px; color: var(--text-secondary); font-family: inherit; text-align: left;
+  }
+  .fc-type-menu button:hover { background: var(--bg-light); }
+  .fc-type-menu button .material-symbols-outlined { font-size: 14px; }
+  .fc-saved-label { font-size: 10px; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
+  .fc-ctrl {
+    width: 24px; height: 24px; border: none; background: transparent; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 4px; color: var(--text-muted); flex-shrink: 0;
+  }
+  .fc-ctrl:hover { background: var(--border); color: var(--text-primary); }
+  .fc-ctrl .material-symbols-outlined { font-size: 15px; }
+  .fc-field {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border-bottom: 1px solid var(--border-light); flex-shrink: 0;
+  }
+  .fc-label { font-size: 10px; color: var(--text-muted); width: 38px; flex-shrink: 0; }
+  .fc-input {
+    flex: 1; border: none; outline: none; background: transparent;
+    font-size: 12px; color: var(--text-primary); font-family: inherit;
+  }
+  .fc-input::placeholder { color: var(--text-muted); }
+  .fc-body {
+    flex: 1; border: none; outline: none; resize: none;
+    padding: 10px 12px; font-size: 12px; font-family: inherit;
+    line-height: 1.5; color: var(--text-primary); background: transparent;
+    min-height: 100px; max-height: 200px;
+  }
+  .fc-toolbar {
+    display: flex; align-items: center; gap: 2px;
+    padding: 6px 8px; border-top: 1px solid var(--border-light); flex-shrink: 0;
+  }
+  .fc-send-group {
+    display: flex; align-items: stretch; height: 26px;
+    border-radius: 6px; overflow: hidden; flex-shrink: 0; margin-right: 6px;
+  }
+  .fc-send-btn {
+    background: var(--text-primary); color: #fff; border: none;
+    padding: 0 12px; cursor: pointer;
+    font-size: 11px; font-weight: 500; font-family: inherit; transition: background 0.1s;
+  }
+  .fc-send-btn:hover { background: #333; }
+  .fc-send-caret {
+    background: var(--text-primary); color: #fff; border: none;
+    border-left: 1px solid rgba(255,255,255,0.2); width: 20px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: background 0.1s;
+  }
+  .fc-send-caret:hover { background: #333; }
+  .fc-send-caret .material-symbols-outlined { font-size: 15px; }
+  .fc-tool {
+    width: 24px; height: 24px; border: none; background: transparent; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 4px; color: var(--text-muted); flex-shrink: 0;
+  }
+  .fc-tool:hover { background: var(--bg-light); color: var(--text-secondary); }
+  .fc-tool .material-symbols-outlined { font-size: 15px; }
+  .fc-discard {
+    margin-left: auto; width: 24px; height: 24px; border: none; background: transparent;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    border-radius: 4px; color: var(--text-muted); flex-shrink: 0;
+  }
+  .fc-discard:hover { background: #feeaea; color: #c0392b; }
+  .fc-discard .material-symbols-outlined { font-size: 15px; }
   /* ── Conversations Panel ── */
   .conv-toolbar {
     display: flex; align-items: center; gap: 8px;
@@ -2273,6 +2475,8 @@
     transition: background 0.15s;
   }
   .conv-compose-btn:hover { background: var(--bg-dark); }
+  .conv-compose-btn:disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; opacity: 0.6; }
+  .conv-compose-btn:disabled:hover { background: var(--border); }
   .conv-compose-btn .material-symbols-outlined { font-size: 18px; }
   /* Compose dropdown (drawer) */
   .conv-compose-wrap { position: relative; flex-shrink: 0; }
@@ -2343,44 +2547,39 @@
   }
   .conv-list { display: flex; flex-direction: column; overflow-y: auto; flex: 1; }
   .conv-item {
-    display: flex; align-items: flex-start; gap: 0;
-    padding: 10px 14px; border-bottom: 1px solid var(--border-light);
-    cursor: pointer; transition: background 0.1s; min-height: 64px;
+    display: flex; align-items: center; gap: 12px;
+    padding: 8px 16px; border-bottom: 1px solid var(--border-light);
+    cursor: pointer; transition: background 0.1s; min-height: 35px;
   }
   .conv-item:hover { background: var(--bg-light); }
-  /* Drawer item avatar */
-  .conv-avatar-col { width: 36px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-  .conv-avatar-chip {
-    width: 26px; height: 26px; border-radius: 7px;
-    background: #e1e1e1; color: #474747;
-    font-size: 9px; font-weight: 600;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
+  /* Type badge pill */
+  .conv-type-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 3px 8px; border-radius: 9999px; flex-shrink: 0;
+    font-size: 10px; gap: 3px; white-space: nowrap;
   }
-  .conv-content-col { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; padding: 0 6px; }
-  .conv-sender-name { font-size: 12px; color: var(--text-secondary); font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .conv-sender-name.unread { font-weight: 700; }
-  .conv-content-title { font-size: 12px; font-weight: 400; color: #0f172b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .conv-content-title.unread { font-weight: 600; }
-  .conv-preview { font-size: 11px; color: #45556c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .conv-tag {
-    display: inline-flex; align-items: center;
-    height: 18px; padding: 0 7px; border-radius: 1000px;
-    border: 1px solid #474747;
-    font-size: 10px; font-weight: 500; color: #0f172b;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
-  }
-  .conv-time-col { width: 52px; flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; padding-top: 1px; }
-  .conv-time { font-size: 10px; color: #0f172b; white-space: nowrap; }
-  .conv-time-icon .material-symbols-outlined { font-size: 13px; color: var(--text-muted); }
+  .conv-type-badge .material-symbols-outlined { font-size: 12px; }
+  .conv-type-email   { background: #FFF3E2; color: #92400E; }
+  .conv-type-comment { background: #E8F0FF; color: #1E40AF; }
+  .conv-type-task    { background: #E8FFF0; color: #065F46; }
+  /* Thread data: sender + count */
+  .conv-thread-data { display: flex; align-items: center; gap: 4px; width: 104px; flex-shrink: 0; min-width: 0; overflow: hidden; }
+  .conv-sender-name { font-size: 12px; font-weight: 400; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .conv-thread-count { font-size: 12px; color: var(--text-muted); flex-shrink: 0; }
+  /* Subject */
+  .conv-subject { flex: 1; min-width: 0; font-size: 12px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .conv-subject.unread { color: var(--text-primary); font-weight: 500; }
+  /* Metadata: optional attachment + date */
+  .conv-meta { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+  .conv-attach-icon .material-symbols-outlined { font-size: 12px; color: var(--text-muted); opacity: 0.6; }
+  .conv-date { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
 
   /* ── Conversation Read Mode ── */
   .conv-read-header {
     display: flex; align-items: center; gap: 8px;
     padding: 12px 14px;
-    background: #fff;
-    border-bottom: 1px solid #e1e1e1;
-    flex-shrink: 0; min-height: 56px;
+    background: #fff; border-bottom: 1px solid #e1e1e1;
+    flex-shrink: 0;
   }
   .conv-read-back {
     width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0;
@@ -2396,7 +2595,18 @@
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .conv-thread { display: flex; flex-direction: column; gap: 0; padding: 8px 0; flex: 1; }
-  .conv-msg { padding: 12px 14px; border-bottom: 1px solid var(--border-light); }
+  .conv-msg { padding: 12px 14px; border-bottom: 1px solid var(--border-light); cursor: pointer; }
+  /* Collapsed state: truncated body, hidden attach & reply */
+  .conv-msg.collapsed .conv-msg-body { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-muted); }
+  .conv-msg.collapsed .conv-msg-attach-section { display: none; }
+  .conv-msg.collapsed .conv-msg-reply-btn { display: none !important; }
+  /* Reply button: shown on hover when expanded */
+  .conv-msg-reply-btn { opacity: 0; transition: opacity 0.1s; }
+  .conv-msg:not(.collapsed):hover .conv-msg-reply-btn { opacity: 1; }
+  /* Attachment section */
+  .conv-msg-attach-section { padding-left: 36px; margin-top: 8px; }
+  .conv-msg-attach-count { display: block; font-size: 11px; color: var(--text-muted); font-weight: 500; margin-bottom: 6px; }
+  .conv-msg-attach-chips { display: flex; flex-direction: column; gap: 4px; }
   .conv-msg-top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
   .conv-msg-avatar {
     width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
@@ -2420,7 +2630,7 @@
   .conv-msg-action-btn .material-symbols-outlined { font-size: 14px; }
   .conv-msg-body {
     font-size: 12px; color: var(--text-primary); line-height: 1.5;
-    padding-left: 36px;
+    padding-left: 36px; white-space: pre-wrap;
   }
   .conv-msg-attachments { display: flex; flex-direction: column; gap: 4px; padding-left: 36px; margin-top: 6px; }
   .conv-msg-attach-chip {
@@ -2433,6 +2643,228 @@
   .conv-msg-attach-chip .material-symbols-outlined { font-size: 14px; color: #474747; flex-shrink: 0; }
   .conv-msg-attach-name { font-size: 11px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0; }
   .conv-msg-attach-size { font-size: 10px; color: var(--text-muted); flex-shrink: 0; }
+
+  /* ── Inline compose card (sticky above footer) ── */
+  .conv-compose {
+    border-top: 1px solid var(--border);
+    background: #fff;
+    flex-shrink: 0;
+  }
+  .conv-compose-header {
+    position: relative;
+    display: flex; align-items: center; gap: 6px;
+    padding: 7px 10px 7px 12px;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .conv-compose-mode {
+    display: inline-flex; align-items: center; gap: 2px;
+    padding: 2px 4px 2px 6px; border-radius: 5px; flex-shrink: 0;
+    cursor: pointer; font-size: 12px; font-weight: 500;
+    color: var(--text-secondary); background: var(--bg-light);
+    border: none; font-family: inherit;
+    transition: background 0.1s;
+    white-space: nowrap;
+  }
+  .conv-compose-mode:hover { background: var(--border); }
+  .conv-compose-mode .material-symbols-outlined { font-size: 14px; }
+  .conv-compose-mode-caret { font-size: 16px !important; color: var(--text-muted); }
+  .conv-compose-mode-menu {
+    position: absolute; top: calc(100% + 2px); left: 10px;
+    background: #fff; border: 1px solid var(--border);
+    border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    z-index: 200; overflow: hidden; min-width: 130px; display: none;
+  }
+  .conv-compose-mode-menu button {
+    display: flex; align-items: center; gap: 8px;
+    width: 100%; padding: 8px 12px;
+    border: none; background: transparent; cursor: pointer;
+    font-size: 12px; color: var(--text-secondary); font-family: inherit;
+    text-align: left; white-space: nowrap;
+  }
+  .conv-compose-mode-menu button:hover { background: var(--bg-light); }
+  .conv-compose-mode-menu button .material-symbols-outlined { font-size: 15px; }
+  .conv-compose-to-sep {
+    font-size: 11px; color: var(--border); flex-shrink: 0; user-select: none;
+  }
+  .conv-compose-to-input {
+    flex: 1; min-width: 0; border: none; outline: none; background: transparent;
+    font-size: 12px; color: var(--text-secondary); font-family: inherit;
+  }
+  .conv-compose-to-input::placeholder { color: var(--text-muted); }
+  .conv-compose-textarea {
+    display: block; width: 100%; min-height: 120px; max-height: 260px;
+    border: none; outline: none; resize: none;
+    padding: 10px 14px; font-size: 12px; font-family: inherit;
+    line-height: 1.5; color: var(--text-primary); background: transparent;
+    box-sizing: border-box;
+  }
+  .conv-compose-bar {
+    display: flex; align-items: center; gap: 2px;
+    padding: 7px 10px; border-top: 1px solid var(--border-light);
+  }
+  .conv-compose-send {
+    display: flex; align-items: stretch; height: 28px;
+    border-radius: 6px; overflow: hidden; flex-shrink: 0; margin-right: 8px;
+  }
+  .conv-compose-send-btn {
+    background: var(--text-primary); color: #fff; border: none;
+    padding: 0 14px; cursor: pointer;
+    font-size: 12px; font-weight: 500; font-family: inherit;
+    transition: background 0.1s;
+  }
+  .conv-compose-send-btn:hover { background: #333; }
+  .conv-compose-send-caret {
+    background: var(--text-primary); color: #fff; border: none;
+    border-left: 1px solid rgba(255,255,255,0.2);
+    width: 22px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.1s;
+  }
+  .conv-compose-send-caret:hover { background: #333; }
+  .conv-compose-send-caret .material-symbols-outlined { font-size: 16px; }
+  .conv-compose-tool {
+    width: 26px; height: 26px; border: none; background: transparent; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 4px; color: var(--text-muted); flex-shrink: 0;
+  }
+  .conv-compose-tool:hover { background: var(--bg-light); color: var(--text-secondary); }
+  .conv-compose-tool .material-symbols-outlined { font-size: 16px; }
+  .conv-compose-discard {
+    margin-left: auto; width: 26px; height: 26px; border: none; background: transparent;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    border-radius: 4px; color: var(--text-muted); flex-shrink: 0;
+  }
+  .conv-compose-discard:hover { background: #feeaea; color: #c0392b; }
+  .conv-compose-discard .material-symbols-outlined { font-size: 16px; }
+
+  /* ── New compose full-panel overlay ── */
+  .conv-new-compose {
+    display: flex; flex-direction: column; flex: 1; overflow: hidden; background: #fff;
+    border-top: 1px solid var(--border);
+  }
+  .cnc-header {
+    display: flex; align-items: center; gap: 4px;
+    padding: 8px 10px; border-bottom: 1px solid var(--border-light); flex-shrink: 0;
+  }
+  .cnc-type-wrap { position: relative; }
+  .cnc-type-btn {
+    display: inline-flex; align-items: center; gap: 3px;
+    padding: 3px 5px 3px 8px; border-radius: 6px; border: none;
+    background: var(--bg-light); cursor: pointer;
+    font-size: 12px; font-weight: 500; color: var(--text-secondary);
+    font-family: inherit; transition: background 0.1s; white-space: nowrap;
+  }
+  .cnc-type-btn:hover { background: var(--border); }
+  .cnc-type-btn .material-symbols-outlined { font-size: 14px; }
+  .cnc-type-menu {
+    position: absolute; top: calc(100% + 3px); left: 0; z-index: 200;
+    background: #fff; border: 1px solid var(--border);
+    border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    overflow: hidden; min-width: 130px;
+  }
+  .cnc-type-menu button {
+    display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px;
+    border: none; background: transparent; cursor: pointer;
+    font-size: 12px; color: var(--text-secondary); font-family: inherit; text-align: left;
+  }
+  .cnc-type-menu button:hover { background: var(--bg-light); }
+  .cnc-type-menu button .material-symbols-outlined { font-size: 15px; }
+  .cnc-saved-label {
+    font-size: 10px; color: var(--text-muted); white-space: nowrap; flex-shrink: 0;
+    transition: opacity 0.3s;
+  }
+  .cnc-ctrl {
+    width: 26px; height: 26px; border: none; background: transparent; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 4px; color: var(--text-muted); flex-shrink: 0;
+  }
+  .cnc-ctrl:hover { background: var(--bg-light); color: var(--text-primary); }
+  .cnc-ctrl .material-symbols-outlined { font-size: 16px; }
+  .cnc-ctrl-muted { color: #b0b0b0; }
+  .cnc-ctrl-muted:hover { color: var(--text-secondary); }
+  .cnc-field {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 14px; border-bottom: 1px solid var(--border-light); flex-shrink: 0;
+  }
+  .cnc-label { font-size: 11px; color: var(--text-muted); width: 44px; flex-shrink: 0; }
+  .cnc-input {
+    flex: 1; border: none; outline: none; background: transparent;
+    font-size: 12px; color: var(--text-primary); font-family: inherit;
+  }
+  .cnc-input::placeholder { color: var(--text-muted); }
+  .cnc-body {
+    flex: 1; border: none; outline: none; resize: none;
+    padding: 12px 14px; font-size: 12px; font-family: inherit;
+    line-height: 1.5; color: var(--text-primary); background: transparent;
+    min-height: 80px;
+  }
+  .cnc-attach-row { padding: 6px 14px; border-top: 1px solid var(--border-light); flex-shrink: 0; }
+  .cnc-attach-chips { display: flex; flex-direction: column; gap: 4px; }
+  .cnc-toolbar {
+    display: flex; align-items: center; gap: 2px;
+    padding: 7px 10px; border-top: 1px solid var(--border-light); flex-shrink: 0;
+  }
+  .cnc-send-group {
+    display: flex; align-items: stretch; height: 28px;
+    border-radius: 6px; overflow: hidden; flex-shrink: 0; margin-right: 8px;
+  }
+  .cnc-send-btn {
+    background: var(--text-primary); color: #fff; border: none; padding: 0 14px;
+    cursor: pointer; font-size: 12px; font-weight: 500; font-family: inherit; transition: background 0.1s;
+  }
+  .cnc-send-btn:hover { background: #333; }
+  .cnc-send-caret {
+    background: var(--text-primary); color: #fff; border: none;
+    border-left: 1px solid rgba(255,255,255,0.2); width: 22px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: background 0.1s;
+  }
+  .cnc-send-caret:hover { background: #333; }
+  .cnc-send-caret .material-symbols-outlined { font-size: 16px; }
+  .cnc-tool {
+    width: 26px; height: 26px; border: none; background: transparent; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 4px; color: var(--text-muted); flex-shrink: 0;
+  }
+  .cnc-tool:hover { background: var(--bg-light); color: var(--text-secondary); }
+  .cnc-tool .material-symbols-outlined { font-size: 16px; }
+  .cnc-discard {
+    margin-left: auto; width: 26px; height: 26px; border: none; background: transparent;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    border-radius: 4px; color: var(--text-muted); flex-shrink: 0;
+  }
+  .cnc-discard:hover { background: #feeaea; color: #c0392b; }
+  .cnc-discard .material-symbols-outlined { font-size: 16px; }
+
+  /* Minimized compose bar — docked at the bottom of the panel */
+  .cnc-bar {
+    flex-shrink: 0; display: flex; align-items: center; gap: 8px;
+    height: 36px; padding: 0 10px 0 14px;
+    background: #2a2a2a; color: #fff; cursor: pointer;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    transition: background 0.1s;
+  }
+  .cnc-bar:hover { background: #333; }
+  .cnc-bar-icon { font-size: 14px !important; color: rgba(255,255,255,0.65); flex-shrink: 0; }
+  .cnc-bar-label {
+    font-size: 12px; font-weight: 500; flex: 1; min-width: 0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .cnc-bar-btn {
+    width: 22px; height: 22px; border: none; background: transparent; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 4px; color: rgba(255,255,255,0.65); flex-shrink: 0;
+  }
+  .cnc-bar-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+  .cnc-bar-btn .material-symbols-outlined { font-size: 14px; }
+  /* Popup mode — compose floats over the page (fixed, bottom-right) */
+  .conv-new-compose.cnc-popup-mode {
+    position: fixed; bottom: 44px; right: 44px;
+    width: 320px; max-height: 500px; flex: 0 0 auto;
+    border-radius: 10px; border: 1px solid var(--border);
+    box-shadow: 0 8px 28px rgba(0,0,0,0.22); z-index: 200;
+  }
+  /* "Open in panel" button — hidden in panel mode, visible in popup mode */
+
   .conv-read-footer {
     display: flex; align-items: center; gap: 6px;
     padding: 10px 14px;
@@ -3893,6 +4325,57 @@
   @keyframes wfCardOut { to { opacity:0; transform:translateX(-28px); max-height:0; padding-top:0; padding-bottom:0; margin-bottom:0; } }
   .wf-feed-card.wf-removing { animation: wfCardOut .45s ease-in forwards; overflow:hidden; pointer-events:none; }
 
+  /* ── Work Feed — Tile Mode ── */
+  #wf-tile-view { display: none; flex: 1; min-height: 0; overflow-y: auto; padding: 16px; }
+  .wf-tile-grid { display: flex; flex-direction: column; gap: 8px; }
+  .wf-tile {
+    background: #fff; border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 14px 12px; cursor: pointer;
+    transition: box-shadow 0.12s, border-color 0.12s;
+    display: flex; flex-direction: column; gap: 9px;
+  }
+  .wf-tile:hover { box-shadow: 0 2px 10px rgba(0,0,0,0.09); border-color: #c4c4c4; }
+  .wf-tile-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 6px; }
+  .wf-tile-top-left { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .wf-tile-id { font-size: 11px; font-weight: 600; color: var(--text-muted); letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
+  .wf-tile-customer { font-size: 13px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .wf-tile-stage { font-size: 12px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .wf-tile-status-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 500; white-space: nowrap; flex-shrink: 0;
+  }
+  .wf-tile-status-badge.intervention { background: #fee2e2; color: #dc2626; }
+  .wf-tile-status-badge.running      { background: #ede9fe; color: #7c3aed; }
+  .wf-tile-status-badge.awaiting     { background: #fef3c7; color: #d97706; }
+  .wf-tile-status-badge.complete     { background: #dcfce7; color: #16a34a; }
+  .wf-tile-status-badge.failed       { background: #fee2e2; color: #dc2626; }
+  .wf-tile-status-badge.pending      { background: #f3f4f6; color: var(--text-secondary); }
+  .wf-tile-status-badge .material-symbols-outlined { font-size: 12px; }
+  .wf-tile-divider { height: 1px; background: var(--border-light); }
+  .wf-tile-assists { display: flex; gap: 4px; flex-wrap: wrap; }
+  .wf-tile-assist-pill {
+    display: inline-flex; align-items: center; gap: 3px;
+    padding: 2px 7px; border-radius: 10px;
+    background: var(--bg-light); border: 1px solid var(--border);
+    font-size: 11px; color: var(--text-secondary);
+  }
+  .wf-tile-assist-pill .material-symbols-outlined { font-size: 11px; }
+  .wf-tile-footer { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: 2px; }
+  .wf-tile-meta { display: flex; align-items: center; gap: 5px; }
+  .wf-tile-priority { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-muted); font-weight: 500; }
+  .wf-tile-priority-dot { width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; }
+  .wf-tile-priority-dot.high { background: #ef4444; }
+  .wf-tile-priority-dot.medium { background: #f59e0b; }
+  .wf-tile-priority-dot.low { background: #9ca3af; }
+  .wf-tile-assignee { font-size: 11px; color: var(--text-muted); }
+  .wf-tile-ctx-btn {
+    display: flex; align-items: center; justify-content: center;
+    width: 26px; height: 26px; border: none; background: none;
+    border-radius: 5px; cursor: pointer; color: var(--text-muted); flex-shrink: 0;
+  }
+  .wf-tile-ctx-btn:hover { background: var(--border-light); color: var(--text-primary); }
+  .wf-tile-ctx-btn .material-symbols-outlined { font-size: 17px; }
+
   /* ── Work Feed — Table Mode — uses shared .toolbar + .table-wrapper ── */
   #wf-table-view { display: none; flex: 1; min-height: 0; overflow: hidden; flex-direction: column; }
   .wf-tbl { width: 100%; border-collapse: collapse; table-layout: fixed; }
@@ -5231,23 +5714,96 @@
               <span class="material-symbols-outlined">arrow_back</span>
             </button>
             <span class="conv-read-title" id="conv-read-title">Subject</span>
-            <button class="conv-action-btn" title="Attachments">
-              <span class="material-symbols-outlined">attach_file</span>
+            <button class="conv-action-btn" title="Refresh" onclick="refreshConversations()">
+              <span class="material-symbols-outlined">refresh</span>
+            </button>
+            <button class="conv-action-btn" title="Pop out" onclick="popOutConversations()">
+              <span class="material-symbols-outlined">open_in_new</span>
+            </button>
+            <button class="conv-action-btn" title="Minimize panel" onclick="closeUtility()">
+              <span class="material-symbols-outlined">chevron_right</span>
             </button>
           </div>
           <div class="utility-panel-body" id="utility-panel-body">
             <!-- Content rendered by JS -->
           </div>
+
+          <!-- New compose overlay (full form, hidden by default) -->
+          <div class="conv-new-compose" id="conv-new-compose" style="display:none">
+            <div class="cnc-header">
+              <div class="cnc-type-wrap">
+                <button class="cnc-type-btn" id="cnc-type-btn" onclick="_cncToggleTypeMenu(event)">
+                  <span class="material-symbols-outlined" id="cnc-type-icon">mail</span>
+                  <span id="cnc-type-label">New Email</span>
+                  <span class="material-symbols-outlined">arrow_drop_down</span>
+                </button>
+                <div class="cnc-type-menu" id="cnc-type-menu" style="display:none">
+                  <button onclick="_cncSetType('email')">
+                    <span class="material-symbols-outlined">mail</span> Email
+                  </button>
+                  <button onclick="_cncSetType('comment')">
+                    <span class="material-symbols-outlined">chat_bubble</span> Comment
+                  </button>
+                  <button onclick="_cncSetType('task')">
+                    <span class="material-symbols-outlined">check_box</span> Task
+                  </button>
+                </div>
+              </div>
+              <span class="cnc-saved-label" id="cnc-saved-label"></span>
+              <button class="cnc-ctrl" id="cnc-size-toggle-btn" title="Switch to popup" onclick="_cncToggleSize()">
+                <span class="material-symbols-outlined">close_fullscreen</span>
+              </button>
+            </div>
+            <div class="cnc-field">
+              <span class="cnc-label">To</span>
+              <input class="cnc-input" id="cnc-to" type="text" placeholder="Add recipient…" spellcheck="false" oninput="_cncScheduleSave()"/>
+            </div>
+            <div class="cnc-field">
+              <span class="cnc-label" id="cnc-subject-label">Subject</span>
+              <input class="cnc-input" id="cnc-subject" type="text" placeholder="Subject…" spellcheck="false" oninput="_cncScheduleSave()"/>
+            </div>
+            <textarea class="cnc-body" id="cnc-body" placeholder="Write your message…" oninput="_cncScheduleSave()"></textarea>
+            <div class="cnc-attach-row" id="cnc-attach-row" style="display:none">
+              <div class="cnc-attach-chips" id="cnc-attach-chips"></div>
+            </div>
+            <div class="cnc-toolbar">
+              <div class="cnc-send-group">
+                <button class="cnc-send-btn" onclick="alert('Send — coming soon')">Send</button>
+                <button class="cnc-send-caret" title="Send options">
+                  <span class="material-symbols-outlined">arrow_drop_down</span>
+                </button>
+              </div>
+              <button class="cnc-tool" title="Attach file" onclick="_cncTriggerAttach()">
+                <span class="material-symbols-outlined">attach_file</span>
+              </button>
+              <button class="cnc-tool" title="Bold">
+                <span class="material-symbols-outlined">format_bold</span>
+              </button>
+              <button class="cnc-tool" title="Italic">
+                <span class="material-symbols-outlined">format_italic</span>
+              </button>
+              <button class="cnc-tool" title="Flag priority">
+                <span class="material-symbols-outlined">flag</span>
+              </button>
+              <button class="cnc-tool" title="More options">
+                <span class="material-symbols-outlined">more_horiz</span>
+              </button>
+              <button class="cnc-discard" title="Discard draft" onclick="_cncClose()">
+                <span class="material-symbols-outlined">delete</span>
+              </button>
+            </div>
+          </div>
+
           <!-- Read mode footer (hidden in list mode) -->
           <div class="conv-read-footer" id="conv-read-footer" style="display:none">
-            <button class="conv-footer-primary" onclick="alert('Reply — coming soon')">
+            <button class="conv-footer-primary" onclick="_convOpenCompose('reply')">
               <span class="material-symbols-outlined">reply</span> Reply
             </button>
-            <button class="conv-footer-btn" onclick="alert('Forward — coming soon')">
-              <span class="material-symbols-outlined">forward</span> Forward
+            <button class="conv-footer-btn" onclick="_convOpenCompose('reply_all')">
+              <span class="material-symbols-outlined">reply_all</span> Reply All
             </button>
-            <button class="conv-footer-icon" onclick="alert('More — coming soon')">
-              <span class="material-symbols-outlined">more_horiz</span>
+            <button class="conv-footer-btn" onclick="_convOpenCompose('forward')">
+              <span class="material-symbols-outlined">forward</span> Forward
             </button>
           </div>
         </div>
@@ -5262,6 +5818,13 @@
           </button>
           <button class="util-strip-btn" id="util-btn-activity" data-util="activity" title="Activity Log" onclick="toggleUtility('activity')">
             <span class="material-symbols-outlined">history</span>
+          </button>
+          <!-- Draft compose icon — shown when compose is minimized -->
+          <button class="util-strip-btn util-compose-draft-btn" id="util-btn-compose-draft"
+            title="Draft — click to open" style="display:none"
+            onclick="_cncToggleDraftPopup()">
+            <span class="material-symbols-outlined">edit_square</span>
+            <span class="util-compose-dot"></span>
           </button>
         </div>
       </div>
@@ -5616,6 +6179,9 @@
             <button class="view-seg-btn active" id="wf-view-table" title="Table view" onclick="toggleWfMode('table')">
               <span class="material-symbols-outlined">table</span>
             </button>
+            <button class="view-seg-btn" id="wf-view-tile" title="Tile view" onclick="toggleWfMode('tile')">
+              <span class="material-symbols-outlined">grid_view</span>
+            </button>
             <button class="view-seg-btn" id="wf-view-feed" title="Split view" onclick="toggleWfMode('assist')">
               <span class="material-symbols-outlined">view_agenda</span>
             </button>
@@ -5809,6 +6375,11 @@
         </div>
       </div><!-- /wf-table-view -->
 
+      <!-- WF Tile View -->
+      <div id="wf-tile-view" style="display:none">
+        <div class="wf-tile-grid" id="wf-tile-grid"></div>
+      </div><!-- /wf-tile-view -->
+
     </div><!-- /portal-content-area -->
 
   <!-- Investigation modal -->
@@ -5916,11 +6487,19 @@
     <div class="ai-drawer-resize-handle" id="ai-drawer-resize-handle"
          onmousedown="startAiDrawerResize(event)" title="Drag to resize"></div>
     <div class="ai-drawer-inner">
-      <div class="ai-drawer-header">
+      <div class="ai-drawer-header" id="ai-drawer-header">
         <div class="ai-drawer-icon">
           <span class="material-symbols-outlined">auto_awesome</span>
         </div>
         <span class="ai-drawer-title">Casey</span>
+        <div class="ai-view-wrap">
+          <button class="ai-view-toggle-btn" id="ai-view-toggle-btn" title="Switch to floating" onclick="_aiToggleView()">
+            <span class="material-symbols-outlined" id="ai-view-icon">dock_to_right</span>
+          </button>
+        </div>
+        <button class="ai-drawer-close ai-float-min-btn" id="ai-float-min-btn" title="Minimize" onclick="_aiFloatToggleMin()">
+          <span class="material-symbols-outlined" id="ai-float-min-icon">remove</span>
+        </button>
         <button class="ai-drawer-close" onclick="toggleAiDrawer()" title="Close">
           <span class="material-symbols-outlined">close</span>
         </button>
@@ -8135,6 +8714,7 @@ const _deductionTeamData = [
 ];
 
 let wfTableMode = true;
+let wfTileMode  = false;
 const _wfTableStatuses = {}; // caseId → 'awaiting' | 'agent-taking-care' | 'complete'
 
 function _wfTableStatusHtml(caseId) {
@@ -8154,28 +8734,31 @@ function _updateWfTableStatus(caseId, status) {
 
 function toggleWfMode(mode) {
   wfTableMode = (mode === 'table');
-  const splitView  = document.getElementById('wf-split-view');
-  const tableView  = document.getElementById('wf-table-view');
-  const feedBtn    = document.getElementById('wf-view-feed');
-  const tableBtn   = document.getElementById('wf-view-table');
-  const aiDrawer   = document.getElementById('ai-drawer');
-  const groupWrap  = document.getElementById('wf-group-btn')?.closest('.tb-wrap');
-  const colsWrap   = document.getElementById('wf-columns-btn')?.closest('.tb-wrap');
-  if (splitView)  splitView.style.display  = wfTableMode ? 'none' : '';
-  if (tableView)  tableView.style.display  = wfTableMode ? 'flex' : 'none';
-  const feedPgBar  = document.getElementById('wf-feed-pagination-bar');
+  wfTileMode  = (mode === 'tile');
+  const splitView   = document.getElementById('wf-split-view');
+  const tableView   = document.getElementById('wf-table-view');
+  const tileView    = document.getElementById('wf-tile-view');
+  const feedBtn     = document.getElementById('wf-view-feed');
+  const tableBtn    = document.getElementById('wf-view-table');
+  const tileBtn     = document.getElementById('wf-view-tile');
+  const aiDrawer    = document.getElementById('ai-drawer');
+  const groupWrap   = document.getElementById('wf-group-btn')?.closest('.tb-wrap');
+  const colsWrap    = document.getElementById('wf-columns-btn')?.closest('.tb-wrap');
+  if (splitView)  splitView.style.display = (mode === 'assist') ? '' : 'none';
+  if (tableView)  tableView.style.display = wfTableMode ? 'flex' : 'none';
+  if (tileView)   tileView.style.display  = wfTileMode  ? 'flex' : 'none';
+  const feedPgBar   = document.getElementById('wf-feed-pagination-bar');
   const feedBulkBar = document.getElementById('wf-feed-bulk-bar');
-  if (feedPgBar)   feedPgBar.style.display  = wfTableMode ? 'none' : '';
-  // Bulk bar visibility managed by _wfOnCardCheck; just hide it when switching to table
-  if (feedBulkBar && wfTableMode) feedBulkBar.classList.remove('visible');
-  if (feedBtn)    feedBtn.classList.toggle('active',  !wfTableMode);
-  if (tableBtn)   tableBtn.classList.toggle('active',  wfTableMode);
-  // Hide Group + Columns controls in split/feed view — not relevant
-  if (groupWrap)  groupWrap.style.display  = wfTableMode ? '' : 'none';
-  if (colsWrap)   colsWrap.style.display   = wfTableMode ? '' : 'none';
-  // Hide AI drawer in table mode; leave it closed in split mode (user opens manually)
-  if (aiDrawer && wfTableMode) aiDrawer.classList.remove('open');
-  if (wfTableMode) { renderWfTableHeader(); renderWorkFeedTable(); }
+  if (feedPgBar)  feedPgBar.style.display = (mode === 'assist') ? '' : 'none';
+  if (feedBulkBar && mode !== 'assist') feedBulkBar.classList.remove('visible');
+  if (feedBtn)   feedBtn.classList.toggle('active',   mode === 'assist');
+  if (tableBtn)  tableBtn.classList.toggle('active',  mode === 'table');
+  if (tileBtn)   tileBtn.classList.toggle('active',   mode === 'tile');
+  if (groupWrap) groupWrap.style.display = wfTableMode ? '' : 'none';
+  if (colsWrap)  colsWrap.style.display  = wfTableMode ? '' : 'none';
+  if (aiDrawer && (wfTableMode || wfTileMode)) aiDrawer.classList.remove('open');
+  if (wfTableMode)     { renderWfTableHeader(); renderWorkFeedTable(); }
+  else if (wfTileMode) { renderWorkFeedTiles(); }
   else { renderWorkFeedList(); renderWorkFeedSolver(activeWorkFeedCase); renderWorkFeedCasey(activeWorkFeedCase); _renderWfFetchBtn(activeWorkFeedCase); }
 }
 
@@ -8339,6 +8922,7 @@ function wfUpdateBulkBar() {
     sa.checked       = n > 0 && n === allCbs.length;
     sa.indeterminate = n > 0 && n < allCbs.length;
   }
+  _syncRowCtxState('wf-tbl-tbody');
 }
 function wfToggleAll(cb) {
   document.querySelectorAll('#wf-tbl-tbody .wf-row-cb').forEach(c => c.checked = cb.checked);
@@ -8836,6 +9420,13 @@ function renderWfTableHeader() {
     trailingThStyle: 'width:0;min-width:0;padding:0;border:none',
     checkboxTh,
   });
+  // Insert ctx-menu th right after checkbox th
+  const wfHeaderTr = thead.querySelector('tr');
+  if (wfHeaderTr) {
+    const ctxTh = document.createElement('th');
+    ctxTh.className = 'col-row-ctx';
+    wfHeaderTr.insertBefore(ctxTh, wfHeaderTr.children[1]);
+  }
   // Column filter buttons removed — filtering via column context menu instead
 }
 
@@ -8957,6 +9548,54 @@ function _renderWfTaskCellContent(c, key) {
   }
 }
 
+function renderWorkFeedTiles() {
+  const grid = document.getElementById('wf-tile-grid');
+  if (!grid) return;
+  let data = (typeof _wfFilteredData === 'function') ? [..._wfFilteredData()] : [...workFeedData];
+
+  const _statusIcon = { intervention: 'warning', running: 'autorenew', awaiting: 'hourglass_empty', complete: 'check_circle', failed: 'cancel', pending: 'schedule' };
+  const _pClass = p => p === 'High' ? 'high' : p === 'Medium' ? 'medium' : 'low';
+
+  grid.innerHTML = data.map(c => {
+    const isTask   = c.type === 'task';
+    const statusCls = (c.status || 'pending').toLowerCase().replace(/\s+/g,'');
+    const icon = _statusIcon[statusCls] || 'circle';
+    const assists = isTask
+      ? `<span class="wf-tile-assist-pill"><span class="material-symbols-outlined">${c.needIcon||'help'}</span>${c.need||''}</span>`
+      : (c.assists||[]).map(a => `<span class="wf-tile-assist-pill">${a.label}${a.count>1?` ×${a.count}`:''}</span>`).join('');
+    const stageOrNeed = isTask ? (c.agent||'Agent') : (c.stage||'');
+    const titleLine   = isTask ? (c.summary||c.id) : (c.customer||c.id);
+    const idLine      = isTask ? c.id : c.id;
+    const pDot = `<div class="wf-tile-priority-dot ${_pClass(c.priority)}"></div>`;
+    const assignee = c.assignTo ? `<span class="wf-tile-assignee">${c.assignTo}</span>` : '';
+    return `
+    <div class="wf-tile" onclick="${isTask ? `selectWorkFeedCase('${c.id}')` : `openWfCaseTab('${c.id}')`}">
+      <div class="wf-tile-top">
+        <div class="wf-tile-top-left">
+          <span class="wf-tile-id">${idLine}</span>
+          <span class="wf-tile-customer">${titleLine}</span>
+        </div>
+        <span class="wf-tile-status-badge ${statusCls}">
+          <span class="material-symbols-outlined">${icon}</span>${c.status||'pending'}
+        </span>
+      </div>
+      <div class="wf-tile-stage">${stageOrNeed}</div>
+      ${assists ? `<div class="wf-tile-assists">${assists}</div>` : ''}
+      <div class="wf-tile-divider"></div>
+      <div class="wf-tile-footer">
+        <div class="wf-tile-meta">
+          <div class="wf-tile-priority">${pDot}${c.priority||'Low'}</div>
+          ${assignee}
+        </div>
+        <button class="wf-tile-ctx-btn" title="Row actions"
+          onclick="event.stopPropagation();_wfRowCtxOpen(event,'${c.id}')">
+          <span class="material-symbols-outlined">more_vert</span>
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 function renderWorkFeedTable() {
   const tbody = document.getElementById('wf-tbl-tbody');
   if (!tbody) return;
@@ -9005,8 +9644,9 @@ function renderWorkFeedTable() {
       <td style="width:36px;padding:0 8px;text-align:center" onclick="event.stopPropagation()">
         <input type="checkbox" class="wf-row-cb" value="${c.id}" onchange="wfUpdateBulkBar()">
       </td>
+      <td class="col-row-ctx" onclick="event.stopPropagation()"><button class="row-ctx-btn" title="Row actions" onclick="_wfRowCtxOpen(event,'${c.id}')"><span class="material-symbols-outlined">more_vert</span></button></td>
       ${cells}
-      <td class="row-actions-cell" onclick="event.stopPropagation()"><div class="row-actions"><div class="row-action-panel">${actionsHtml}</div><button class="row-action-trigger" title="Actions"><span class="material-symbols-outlined">more_horiz</span></button></div></td>
+      <td class="row-actions-cell" onclick="event.stopPropagation()"><div class="row-actions"><div class="row-action-panel">${actionsHtml}</div></div></td>
     </tr>`;
   }
 
@@ -13124,8 +13764,9 @@ function renderRow(row) {
   const rowId = String(row.id).replace(/^#\s*/, '');
   const visibleCols = colOrder.filter(c => !hiddenCols.has(c.key));
   const cells = visibleCols.map(c => `<td data-col="${c.key}">${renderCellContent(row, c.key)}</td>`).join('');
-  const actionsTd = `<td class="row-actions-cell" onclick="event.stopPropagation()"><div class="row-actions"><div class="row-action-panel"><button class="row-action-btn" title="Quick View" onclick="openQuickView(event,'${row.id}')"><span class="material-symbols-outlined">preview</span><span>Quick View</span></button>${_rowFetchBtn(rowId, row.id)}<button class="row-action-btn" title="Assignee"><span class="material-symbols-outlined">person_add</span><span>Assign</span></button></div><button class="row-action-trigger" title="Actions"><span class="material-symbols-outlined">more_horiz</span></button></div></td>`;
-  return `<tr style="cursor:pointer" data-rowid="${rowId}" onclick="handleRowClick(event, '${row.id}')"><td onclick="event.stopPropagation()"><input type="checkbox"></td>${cells}${actionsTd}</tr>`;
+  const actionsTd = `<td class="row-actions-cell" onclick="event.stopPropagation()"><div class="row-actions"><div class="row-action-panel"><button class="row-action-btn" title="Quick View" onclick="openQuickView(event,'${row.id}')"><span class="material-symbols-outlined">preview</span><span>Quick View</span></button>${_rowFetchBtn(rowId, row.id)}<button class="row-action-btn" title="Assignee"><span class="material-symbols-outlined">person_add</span><span>Assign</span></button></div></div></td>`;
+  const ctxTd = `<td class="col-row-ctx" onclick="event.stopPropagation()"><button class="row-ctx-btn" title="Row actions" onclick="_rowCtxOpen(event,'${row.id}')"><span class="material-symbols-outlined">more_vert</span></button></td>`;
+  return `<tr style="cursor:pointer" data-rowid="${rowId}" onclick="handleRowClick(event, '${row.id}')"><td onclick="event.stopPropagation()"><input type="checkbox" onchange="updateBulkBar()"></td>${ctxTd}${cells}${actionsTd}</tr>`;
 }
 
 function fetchCaseFromList(rawId) {
@@ -13195,6 +13836,127 @@ function renderTableHeader() {
     checkboxTh,
     trailingThClass: 'row-actions-cell',
   });
+  // Insert ctx-menu th right after checkbox th
+  const headerTr = thead.querySelector('tr');
+  if (headerTr) {
+    const ctxTh = document.createElement('th');
+    ctxTh.className = 'col-row-ctx';
+    headerTr.insertBefore(ctxTh, headerTr.children[1]);
+  }
+}
+
+// ── Row context menu ──────────────────────────────────────────────────────────
+function _syncRowCtxState(tbodyId) {
+  const tbody = document.getElementById(tbodyId);
+  if (!tbody) return;
+  const table = tbody.closest('table');
+  if (!table) return;
+  const anyChecked = !!tbody.querySelector('input[type="checkbox"]:checked');
+  table.classList.toggle('has-row-selection', anyChecked);
+}
+
+function _rowCtxOpen(e, rowId) {
+  e.stopPropagation();
+  const id = String(rowId).replace(/^#\s*/, '');
+  let menu = document.getElementById('row-ctx-menu');
+  if (!menu) {
+    menu = document.createElement('div');
+    menu.id = 'row-ctx-menu';
+    menu.className = 'col-ctx-menu'; // reuse existing menu styles
+    document.body.appendChild(menu);
+  }
+  const isFetched = !!_fetchedCases[id];
+  menu.innerHTML = `
+    <button class="col-ctx-item" onclick="_rowCtxAct('open','${rowId}')">
+      <span class="material-symbols-outlined">open_in_new</span> Open case
+    </button>
+    <button class="col-ctx-item" onclick="_rowCtxAct('quickview','${rowId}',event)">
+      <span class="material-symbols-outlined">preview</span> Quick view
+    </button>
+    <div class="col-ctx-divider"></div>
+    <button class="col-ctx-item" onclick="_rowCtxAct('${isFetched ? 'return' : 'fetch'}','${rowId}')">
+      <span class="material-symbols-outlined">${isFetched ? 'upload' : 'download'}</span>
+      ${isFetched ? 'Return case' : 'Fetch case'}
+    </button>
+    <button class="col-ctx-item" onclick="_rowCtxAct('assign','${rowId}')">
+      <span class="material-symbols-outlined">person_add</span> Assign
+    </button>
+  `;
+  const rect = e.currentTarget.getBoundingClientRect();
+  menu.style.display = '';
+  menu.classList.remove('hidden');
+  const mw = 200;
+  let left = rect.right + 4;
+  if (left + mw > window.innerWidth - 8) left = rect.left - mw - 4;
+  menu.style.left = left + 'px';
+  menu.style.top  = rect.top + 'px';
+  menu.onmouseleave = _rowCtxClose;
+  setTimeout(() => document.addEventListener('click', _rowCtxClose, { once: true }), 0);
+}
+
+function _rowCtxClose() {
+  const menu = document.getElementById('row-ctx-menu');
+  if (menu) menu.classList.add('hidden');
+}
+
+function _rowCtxAct(action, rowId, e) {
+  _rowCtxClose();
+  if (action === 'open') { openCaseTab(rowId); }
+  else if (action === 'quickview') { openQuickView(e || { currentTarget: document.body }, rowId); }
+  else if (action === 'fetch')  { fetchCaseFromList(rowId); }
+  else if (action === 'return') { returnCaseFromList(rowId); }
+  else if (action === 'assign') { alert('Assign — coming soon'); }
+}
+
+function _wfRowCtxOpen(e, caseId) {
+  e.stopPropagation();
+  let menu = document.getElementById('row-ctx-menu');
+  if (!menu) {
+    menu = document.createElement('div');
+    menu.id = 'row-ctx-menu';
+    menu.className = 'col-ctx-menu';
+    document.body.appendChild(menu);
+  }
+  const isFetched = !!_fetchedCases[caseId];
+  menu.innerHTML = `
+    <button class="col-ctx-item" onclick="_wfRowCtxAct('open','${caseId}')">
+      <span class="material-symbols-outlined">open_in_new</span> Open case
+    </button>
+    <button class="col-ctx-item" onclick="_wfRowCtxAct('quickview','${caseId}')">
+      <span class="material-symbols-outlined">preview</span> Quick view
+    </button>
+    <div class="col-ctx-divider"></div>
+    <button class="col-ctx-item" onclick="_wfRowCtxAct('${isFetched ? 'return' : 'fetch'}','${caseId}')">
+      <span class="material-symbols-outlined">${isFetched ? 'upload' : 'download'}</span>
+      ${isFetched ? 'Return case' : 'Fetch case'}
+    </button>
+    <button class="col-ctx-item" onclick="_wfRowCtxAct('casey','${caseId}')">
+      <span class="material-symbols-outlined">auto_awesome</span> Ask Casey
+    </button>
+    <button class="col-ctx-item" onclick="_wfRowCtxAct('actions','${caseId}')">
+      <span class="material-symbols-outlined">bolt</span> Quick actions
+    </button>
+  `;
+  const rect = e.currentTarget.getBoundingClientRect();
+  menu.style.display = '';
+  menu.classList.remove('hidden');
+  const mw = 200;
+  let left = rect.right + 4;
+  if (left + mw > window.innerWidth - 8) left = rect.left - mw - 4;
+  menu.style.left = left + 'px';
+  menu.style.top  = rect.top + 'px';
+  menu.onmouseleave = _rowCtxClose;
+  setTimeout(() => document.addEventListener('click', _rowCtxClose, { once: true }), 0);
+}
+
+function _wfRowCtxAct(action, caseId) {
+  _rowCtxClose();
+  if (action === 'open')      { openWfCaseTab(caseId); }
+  else if (action === 'quickview') { selectWorkFeedCase(caseId); }
+  else if (action === 'fetch')     { const r = [...(wfData||[])].find(x=>x.id===caseId); if(r) { _fetchedCases[caseId]=_currentUser; renderWorkFeedTable(); } }
+  else if (action === 'return')    { delete _fetchedCases[caseId]; renderWorkFeedTable(); }
+  else if (action === 'casey')     { _wfAskCaseyToSolve(caseId); }
+  else if (action === 'actions')   { openWfQuickActions(caseId); }
 }
 
 // Legacy wrapper (used by search handler)
@@ -13271,6 +14033,7 @@ function updateBulkBar() {
     bar.classList.add('visible');
     document.getElementById('bulk-count').textContent = `${n} selected`;
   }
+  _syncRowCtxState('table-body');
 }
 
 function unselectAll() {
@@ -15851,20 +16614,48 @@ function _renderFetchBtn(caseId) {
   const kbd = isMac ? 'Cmd+J' : 'Ctrl+J';
   if (!fetchedBy) {
     el.innerHTML = `
-      <button class="case-fetch-btn" onclick="fetchCase('${caseId}')">
-        <span class="material-symbols-outlined" style="font-size:15px">download</span>
-        Fetch case
-        <span class="case-fetch-shortcut">${kbd}</span>
-      </button>`;
+      <div class="fetch-split" id="fetch-split-wrap">
+        <button class="fetch-split-main" onclick="fetchCase('${caseId}')">
+          <span class="material-symbols-outlined">download</span>
+          Fetch case
+          <span class="case-fetch-shortcut">${kbd}</span>
+        </button>
+        <div class="fetch-split-sep"></div>
+        <button class="fetch-split-arrow" title="More options" onclick="_fetchSplitToggle(event)">
+          <span class="material-symbols-outlined">expand_more</span>
+        </button>
+        <div class="fetch-split-drop" id="fetch-split-drop">
+          <button class="fetch-split-drop-item" onclick="_fetchSplitAct('allocate','${caseId}')">
+            <span class="material-symbols-outlined">group</span> Allocate
+          </button>
+          <button class="fetch-split-drop-item" onclick="_fetchSplitAct('assign','${caseId}')">
+            <span class="material-symbols-outlined">person_add</span> Assign
+          </button>
+        </div>
+      </div>`;
   } else if (fetchedBy === _currentUser) {
     el.innerHTML = `
       <div style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-secondary)">
         ${_activeUserAvatarHtml(fetchedBy, 'sm')}
         <span>Fetched by you</span>
-        <button class="case-fetch-btn" onclick="returnCase()">
-          <span class="material-symbols-outlined" style="font-size:15px">undo</span> Return
-          <span class="case-fetch-shortcut">${kbd}</span>
-        </button>
+        <div class="fetch-split" id="fetch-split-wrap">
+          <button class="fetch-split-main" onclick="returnCase()">
+            <span class="material-symbols-outlined">undo</span> Return
+            <span class="case-fetch-shortcut">${kbd}</span>
+          </button>
+          <div class="fetch-split-sep"></div>
+          <button class="fetch-split-arrow" title="More options" onclick="_fetchSplitToggle(event)">
+            <span class="material-symbols-outlined">expand_more</span>
+          </button>
+          <div class="fetch-split-drop" id="fetch-split-drop">
+            <button class="fetch-split-drop-item" onclick="_fetchSplitAct('allocate','${caseId}')">
+              <span class="material-symbols-outlined">group</span> Allocate
+            </button>
+            <button class="fetch-split-drop-item" onclick="_fetchSplitAct('assign','${caseId}')">
+              <span class="material-symbols-outlined">person_add</span> Assign
+            </button>
+          </div>
+        </div>
       </div>`;
   } else {
     el.innerHTML = `
@@ -15943,6 +16734,25 @@ function _applyWfSolverLock(caseId) {
     body._lockHandler = () => showToast('Fetch this case first to start editing', { type: 'warning' });
     body.addEventListener('click', body._lockHandler);
   }
+}
+
+function _fetchSplitToggle(e) {
+  e.stopPropagation();
+  const drop = document.getElementById('fetch-split-drop');
+  if (!drop) return;
+  const isOpen = drop.classList.toggle('open');
+  if (isOpen) {
+    setTimeout(() => document.addEventListener('click', _fetchSplitClose, { once: true }), 0);
+  }
+}
+function _fetchSplitClose() {
+  const drop = document.getElementById('fetch-split-drop');
+  if (drop) drop.classList.remove('open');
+}
+function _fetchSplitAct(action, caseId) {
+  _fetchSplitClose();
+  if (action === 'allocate') alert('Allocate — coming soon');
+  else if (action === 'assign')   alert('Assign — coming soon');
 }
 
 function fetchCase(caseId) {
@@ -16328,9 +17138,42 @@ function _renderStagePopover() {
 // renderProgressSection removed — stepper moved to stage popover in header
 
 const CONV_ITEMS = [
+  { type: 'email', initials: 'LC', name: 'Laura Chen', subject: 'Re: Freight discrepancy — BOL #64868',
+    preview: 'We\'ve reviewed the documentation and there are several outstanding items.',
+    tag: 'Freight', secondary: 'Action needed', time: '09:12', ts: '2026-05-28T09:12:00', unread: true,
+    messages: [
+      { initials: 'LC', name: 'Laura Chen', time: '08 May 09:14',
+        body: 'Hi team,\n\nI wanted to flag a discrepancy we\'ve identified on BOL #64868 for the Walmart Inc. shipment dispatched on May 6th. The declared freight weight on the BOL is listed as 4,820 lbs, however the carrier\'s weigh-in at the Chicago distribution hub recorded 5,310 lbs — a difference of 490 lbs. This exceeds our standard tolerance threshold of ±150 lbs and will trigger an automatic freight charge adjustment under our current carrier agreement with RCEV Logistics.\n\nI\'ve attached the original BOL scan, the carrier weigh-in ticket, and the relevant section of the carrier agreement for your reference. Please review and let me know how you\'d like to proceed. We\'ll need a resolution before the carrier invoices on May 15th to avoid a dispute.\n\nBest,\nLaura',
+        attachments: [
+          { name: 'BOL_64868_Original.pdf', size: '312 KB', icon: 'picture_as_pdf' },
+          { name: 'WeighIn_Ticket_CHI.pdf', size: '88 KB', icon: 'picture_as_pdf' },
+          { name: 'RCEV_Agreement_Section4.pdf', size: '540 KB', icon: 'picture_as_pdf' }
+        ]
+      },
+      { initials: 'ME', name: 'Me', time: '08 May 11:03',
+        body: 'Laura,\n\nThanks for flagging this. I\'ve reviewed the documents you attached. The weight difference of 490 lbs is significant. A few initial thoughts:\n\n1. We need to verify whether the 4,820 lbs figure on the BOL matches what was logged in our WMS at the time of dispatch. I\'ve asked our warehouse team in Clorox University Park to pull the original outbound scan records.\n2. The carrier weigh-in ticket shows a timestamp of 07:22 on May 7th — which is after an overnight hold at the Chicago hub. There\'s a possibility of a re-palleting event during that hold that added weight. I\'ve reached out to RCEV\'s operations team for clarification.\n3. In the meantime, I recommend we do not acknowledge the weight discrepancy in writing with the carrier until we have our internal records verified.\n\nI\'ll update you once I hear back from the warehouse and RCEV.\n\nRegards',
+        attachments: []
+      },
+      { initials: 'RP', name: 'Ravi Patel', time: '08 May 14:47',
+        body: 'Hi all,\n\nJumping in here as the account manager for RCEV. I\'ve spoken with our operations team in Chicago and they\'ve confirmed the re-palleting event you mentioned. On the evening of May 6th, a partial load from a cancelled shipment (Order #WM-7741) was temporarily staged on the same pallet bay as the Walmart goods. The re-palleting that took place at 06:55 on May 7th should have restored the original configuration, but our team believes there may have been a pallet mis-assignment error.\n\nWe\'re treating this as an internal error on our side and will be issuing a corrected weigh-in ticket reflecting the original 4,820 lbs. I\'ll email that over by end of day today. This means the freight charge adjustment should not apply and the original BOL weight should stand.\n\nApologies for the confusion. Let me know if you need anything further from us.\n\nRavi Patel\nAccount Manager, RCEV Logistics',
+        attachments: [{ name: 'RCEV_Internal_Memo_WM7741.pdf', size: '176 KB', icon: 'picture_as_pdf' }]
+      },
+      { initials: 'LC', name: 'Laura Chen', time: '08 May 16:22',
+        body: 'Ravi,\n\nThank you for the quick response and for the internal memo. That clarifies the situation considerably. A few follow-up items before we close this out:\n\n1. Please ensure the corrected weigh-in ticket is issued on official RCEV letterhead and references both the original BOL #64868 and the cancelled Order #WM-7741. We\'ll need this for our audit trail.\n2. Can you also provide a written confirmation from your Chicago hub supervisor acknowledging the mis-assignment error? Our compliance team requires this for any weight discrepancy cases that exceed the 300 lb threshold.\n3. Once I receive both documents, I\'ll file the resolution in our case management system and notify the billing team to hold on any charge adjustment processing.\n\nI\'ll keep this thread open until we have everything documented.\n\nThanks again,\nLaura',
+        attachments: []
+      },
+      { initials: 'ME', name: 'Me', time: '09:12',
+        body: 'Laura, Ravi,\n\nI\'ve now received the corrected weigh-in ticket and the hub supervisor\'s written confirmation from Ravi\'s team (see attached). Both documents reference BOL #64868 and Order #WM-7741 as requested. I\'ve uploaded everything to the case file under DED-00124.\n\nOur warehouse team has also confirmed that the outbound WMS scan recorded 4,820 lbs at dispatch, which is consistent with the corrected ticket. The discrepancy is fully explained by the pallet mis-assignment and no freight charge adjustment will apply.\n\nI\'m marking this issue as resolved. The billing team has been notified and the carrier invoice will be processed at the original rate. Please let me know if there\'s anything else needed on your end.\n\nThanks to both of you for the quick turnaround.',
+        attachments: [
+          { name: 'RCEV_Corrected_WeighIn.pdf', size: '91 KB', icon: 'picture_as_pdf' },
+          { name: 'HubSupervisor_Confirmation.pdf', size: '64 KB', icon: 'picture_as_pdf' }
+        ]
+      }
+    ]
+  },
   { type: 'email', initials: 'AH', name: 'Ahmed Arah', subject: 'Invoice follow-up',
     preview: 'The client responded with the invoice confirmation.',
-    tag: 'Invoice', secondary: 'Please review ASAP', time: '14:06', unread: true,
+    tag: 'Invoice', secondary: 'Please review ASAP', time: '14:06', ts: '2026-05-28T14:06:00', unread: true,
     messages: [
       { initials: 'AH', name: 'Ahmed Arah', time: '13:45',
         body: 'Hi, just wanted to follow up on the Q1 invoice. Please let me know if you need any additional information to process it.',
@@ -16342,7 +17185,7 @@ const CONV_ITEMS = [
   },
   { type: 'comment', initials: 'BS', name: 'Ben Septer', subject: 'Good evening to all',
     preview: 'Can you check the attachment I sent?',
-    tag: 'General', secondary: '', time: '2h ago', unread: false,
+    tag: 'General', secondary: '', time: '2h ago', ts: '2026-05-28T12:30:00', unread: false,
     messages: [
       { initials: 'BS', name: 'Ben Septer', time: '2h ago',
         body: 'Good evening to all. Can you check the attachment I sent? I think there might be an issue with the formatting on page 3.',
@@ -16351,7 +17194,7 @@ const CONV_ITEMS = [
   },
   { type: 'task', initials: 'EF', name: 'Emily Foster', subject: 'Status update required',
     preview: 'Updated the status to Pending Review.',
-    tag: 'Status', secondary: 'Due tomorrow', time: '1d ago', unread: true,
+    tag: 'Status', secondary: 'Due tomorrow', time: '1d ago', ts: '2026-05-27T09:15:00', unread: true,
     messages: [
       { initials: 'EF', name: 'Emily Foster', time: '1d ago',
         body: 'Updated the status to Pending Review. Please take a look and confirm if everything is in order before the deadline.',
@@ -16363,7 +17206,7 @@ const CONV_ITEMS = [
   },
   { type: 'email', initials: 'CD', name: "Cara D'Angelo", subject: 'Escalation notice',
     preview: 'Escalated to Tier 2 team for resolution.',
-    tag: 'Escalation', secondary: '', time: '2d ago', unread: false,
+    tag: 'Escalation', secondary: '', time: '2d ago', ts: '2026-05-26T16:45:00', unread: false,
     messages: [
       { initials: 'CD', name: "Cara D'Angelo", time: '2d ago',
         body: 'Escalated to Tier 2 team for resolution. The issue has been assigned to the senior support team and they will follow up within 24 hours.',
@@ -16372,7 +17215,7 @@ const CONV_ITEMS = [
   },
   { type: 'task', initials: 'DE', name: 'David Ellis', subject: 'Settlement confirmation',
     preview: 'Please confirm the settlement amount.',
-    tag: 'Settlement', secondary: 'Overdue', time: '3d ago', unread: false,
+    tag: 'Settlement', secondary: 'Overdue', time: '3d ago', ts: '2026-05-25T11:20:00', unread: false,
     messages: [
       { initials: 'DE', name: 'David Ellis', time: '3d ago',
         body: 'Please confirm the settlement amount. We need this by end of week to proceed with the closing documentation.',
@@ -16380,35 +17223,49 @@ const CONV_ITEMS = [
     ]
   },
 ];
-const CONV_TYPE_ICONS = { email: 'mail', comment: 'chat_bubble', task: 'check_box' };
+const CONV_TYPE_ICONS  = { email: 'mail', comment: 'chat_bubble', task: 'check_box' };
+const CONV_TYPE_LABELS = { email: 'mail', comment: 'comment',     task: 'task'      };
+
+function _convFmtDate(ts) {
+  if (!ts) return '';
+  const d = new Date(ts);
+  const now = new Date();
+  const isToday = d.toDateString() === now.toDateString();
+  if (isToday) return d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+}
 
 function renderConversationsPanel(container) {
   const items = window._convFilter
     ? CONV_ITEMS.filter(c =>
         c.name.toLowerCase().includes(window._convFilter) ||
-        c.subject.toLowerCase().includes(window._convFilter) ||
-        c.preview.toLowerCase().includes(window._convFilter))
+        c.subject.toLowerCase().includes(window._convFilter))
     : CONV_ITEMS;
 
   const badge = document.getElementById('conv-count-badge');
   if (badge) badge.textContent = items.length;
 
-  container.innerHTML = `<div class="att-table-wrap" style="margin:0 14px 14px;">${items.map(c => { const idx = CONV_ITEMS.indexOf(c); const hasAttach = c.messages.some(m => m.attachments.length > 0); return `
+  container.innerHTML = items.map(c => {
+    const idx         = CONV_ITEMS.indexOf(c);
+    const typeIcon    = CONV_TYPE_ICONS[c.type]  || 'mail';
+    const threadCount = c.messages.length;
+    const hasAttach   = c.messages.some(m => m.attachments.length > 0);
+    return `
     <div class="conv-item" onclick="openConversation(${idx})">
-      <div class="conv-avatar-col">
-        <div class="conv-avatar-chip">${c.initials}</div>
+      <div class="conv-type-badge conv-type-${c.type}">
+        <span class="material-symbols-outlined">${typeIcon}</span>
       </div>
-      <div class="conv-content-col">
+      <div class="conv-thread-data">
         <span class="conv-sender-name${c.unread ? ' unread' : ''}">${c.name}</span>
-        <span class="conv-content-title${c.unread ? ' unread' : ''}">${c.subject}</span>
-        <span class="conv-preview">${c.preview}</span>
+        <span class="conv-thread-count">${threadCount}</span>
       </div>
-      <div class="conv-time-col">
-        <span class="conv-time">${c.time}</span>
-        <span class="conv-tag">${c.tag}</span>
-        ${hasAttach ? '<span class="conv-time-icon"><span class="material-symbols-outlined">attach_file</span></span>' : ''}
+      <span class="conv-subject${c.unread ? ' unread' : ''}">${c.subject}</span>
+      <div class="conv-meta">
+        ${hasAttach ? '<span class="conv-attach-icon"><span class="material-symbols-outlined">attach_file</span></span>' : ''}
+        <span class="conv-date">${_convFmtDate(c.ts) || c.time}</span>
       </div>
-    </div>`; }).join('')}</div>`;
+    </div>`;
+  }).join('');
 }
 
 function filterConversations(val) {
@@ -16436,17 +17293,417 @@ function toggleComposeMenu(e) {
   menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
 }
 
-function openNewConversation(type) {
-  // Close dropdown if open
-  const menu = document.getElementById('conv-compose-menu');
-  if (menu) menu.style.display = 'none';
-  alert(`New ${type} — coming soon.`);
+let _cncCurrentType = 'email';
+const _cncTypeMap = {
+  email:   { icon: 'mail',        label: 'New Email',   subjectLabel: 'Subject' },
+  comment: { icon: 'chat_bubble', label: 'New Comment', subjectLabel: 'Topic'   },
+  task:    { icon: 'check_box',   label: 'New Task',    subjectLabel: 'Title'   }
+};
+
+function _cncSetComposeBtnState(disabled) {
+  const btn = document.getElementById('conv-compose-btn') ||
+              document.querySelector('.conv-compose-btn');
+  if (btn) btn.disabled = disabled;
 }
 
-// Close compose dropdown on outside click
-document.addEventListener('click', () => {
+function openNewConversation(type) {
+  _cncCurrentType = type || 'email';
+  const def = _cncTypeMap[_cncCurrentType];
+
+  _cncSetComposeBtnState(true); // disable + button while composing
+
+  // Close the "+" dropdown
+  const menu = document.getElementById('conv-compose-menu');
+  if (menu) menu.style.display = 'none';
+
+  // Discard any open reply compose
+  _convDiscardCompose();
+
+  // Hide body and footer to give compose full space
+  const body = document.getElementById('utility-panel-body');
+  if (body) body.style.display = 'none';
+  const footer = document.getElementById('conv-read-footer');
+  if (footer) footer.style.display = 'none';
+
+  // Hide minimized bar if visible
+  const bar = document.getElementById('conv-new-compose-bar');
+  if (bar) bar.style.display = 'none';
+
+  // Update type indicator
+  document.getElementById('cnc-type-icon').textContent = def.icon;
+  document.getElementById('cnc-type-label').textContent = def.label;
+  document.getElementById('cnc-subject-label').textContent = def.subjectLabel;
+
+  // Show compose panel, then restore any saved draft
+  const compose = document.getElementById('conv-new-compose');
+  if (compose) {
+    compose.classList.remove('cnc-popup-mode');
+    compose.style.display = 'flex';
+    setTimeout(() => {
+      if (compose.style.display === 'none') return; // already docked — don't interfere
+      const hasDraft = _cncRestoreDraft();
+      // Focus body if draft restored (to is already filled), else focus To
+      document.getElementById(hasDraft ? 'cnc-body' : 'cnc-to')?.focus();
+    }, 50);
+  }
+}
+
+function _cncDockToStrip() {
+  // Dock compose to strip icon + immediately open as popup with icon active
+  const compose = document.getElementById('conv-new-compose');
+  const draftBtn = document.getElementById('util-btn-compose-draft');
+  const body = document.getElementById('utility-panel-body');
+  if (!compose) return;
+
+  const def = _cncTypeMap[_cncCurrentType] || {};
+  const subject = document.getElementById('cnc-subject')?.value.trim();
+  if (draftBtn) {
+    draftBtn.title = (subject || def.label || 'Draft') + ' — click to open';
+    draftBtn.style.display = 'flex';
+    draftBtn.classList.add('active');
+  }
+
+  // Restore panel body behind the popup
+  if (body) body.style.display = '';
+  if (_activeConvIndex !== null && !document.getElementById('conv-compose-card')) {
+    const footer = document.getElementById('conv-read-footer');
+    if (footer) footer.style.display = 'flex';
+  }
+
+  // Immediately open as popup (strip icon stays active/pressed)
+  compose.classList.add('cnc-popup-mode');
+  compose.style.display = 'flex';
+  const toggleBtn = document.getElementById('cnc-size-toggle-btn');
+  if (toggleBtn) { toggleBtn.querySelector('span').textContent = 'open_in_full'; toggleBtn.title = 'Switch to full panel'; }
+  setTimeout(() => document.getElementById('cnc-body')?.focus(), 50);
+}
+
+function _cncMinimize() { _cncDockToStrip(); }
+
+function _cncToggleSize() {
+  const compose = document.getElementById('conv-new-compose');
+  const btn = document.getElementById('cnc-size-toggle-btn');
+  const body = document.getElementById('utility-panel-body');
+  const footer = document.getElementById('conv-read-footer');
+  const draftBtn = document.getElementById('util-btn-compose-draft');
+  if (!compose) return;
+
+  const isPopup = compose.classList.contains('cnc-popup-mode');
+  if (isPopup) {
+    // Popup → Full panel — ensure utility panel is open
+    const panel = document.getElementById('utility-panel');
+    if (panel && !panel.classList.contains('open')) toggleUtility('conversations');
+    compose.classList.remove('cnc-popup-mode');
+    if (body) body.style.display = 'none';
+    if (footer) footer.style.display = 'none';
+    if (draftBtn) { draftBtn.style.display = 'none'; draftBtn.classList.remove('active'); }
+    if (btn) { btn.querySelector('span').textContent = 'close_fullscreen'; btn.title = 'Switch to popup'; }
+  } else {
+    // Full panel → Popup
+    compose.classList.add('cnc-popup-mode');
+    if (body) body.style.display = '';
+    if (_activeConvIndex !== null && !document.getElementById('conv-compose-card')) {
+      if (footer) footer.style.display = 'flex';
+    }
+    if (draftBtn) {
+      const def = _cncTypeMap[_cncCurrentType] || {};
+      const subject = document.getElementById('cnc-subject')?.value.trim();
+      draftBtn.title = (subject || def.label || 'Draft') + ' — click to open';
+      draftBtn.style.display = 'flex';
+      draftBtn.classList.add('active');
+    }
+    if (btn) { btn.querySelector('span').textContent = 'open_in_full'; btn.title = 'Switch to full panel'; }
+  }
+  setTimeout(() => document.getElementById('cnc-body')?.focus(), 50);
+}
+
+function _cncToggleDraftPopup() {
+  // Strip icon click: toggle popup open/closed (icon active = popup open)
+  const compose = document.getElementById('conv-new-compose');
+  const draftBtn = document.getElementById('util-btn-compose-draft');
+  if (!compose) return;
+
+  const isOpen = compose.style.display !== 'none';
+  if (isOpen) {
+    // Close popup → keep icon visible but inactive
+    compose.classList.remove('cnc-popup-mode');
+    compose.style.display = 'none';
+    if (draftBtn) draftBtn.classList.remove('active');
+  } else {
+    // Open popup → mark icon active
+    if (draftBtn) draftBtn.classList.add('active');
+    compose.classList.add('cnc-popup-mode');
+    compose.style.display = 'flex';
+    setTimeout(() => document.getElementById('cnc-body')?.focus(), 50);
+  }
+}
+
+function _cncRestoreAsPopup() {
+  // Open compose as popup and mark strip icon active
+  const compose = document.getElementById('conv-new-compose');
+  const draftBtn = document.getElementById('util-btn-compose-draft');
+  if (!compose) return;
+
+  if (draftBtn) draftBtn.classList.add('active');
+  compose.classList.add('cnc-popup-mode');
+  compose.style.display = 'flex';
+  const toggleBtn = document.getElementById('cnc-size-toggle-btn');
+  if (toggleBtn) { toggleBtn.querySelector('span').textContent = 'open_in_full'; toggleBtn.title = 'Switch to full panel'; }
+  setTimeout(() => document.getElementById('cnc-body')?.focus(), 50);
+}
+
+function _cncToPanel() {
+  // Promote popup back to full panel mode (hides body, fills panel)
+  const compose = document.getElementById('conv-new-compose');
+  const draftBtn = document.getElementById('util-btn-compose-draft');
+  const body = document.getElementById('utility-panel-body');
+  const footer = document.getElementById('conv-read-footer');
+  if (!compose) return;
+
+  if (draftBtn) { draftBtn.style.display = 'none'; draftBtn.classList.remove('active'); }
+  compose.classList.remove('cnc-popup-mode');
+  compose.style.display = 'flex';
+  if (body) body.style.display = 'none';
+  if (footer) footer.style.display = 'none';
+  const toggleBtn = document.getElementById('cnc-size-toggle-btn');
+  if (toggleBtn) { toggleBtn.querySelector('span').textContent = 'close_fullscreen'; toggleBtn.title = 'Switch to popup'; }
+  setTimeout(() => document.getElementById('cnc-body')?.focus(), 50);
+}
+
+function _cncClose() {
+  const compose = document.getElementById('conv-new-compose');
+  const draftBtn = document.getElementById('util-btn-compose-draft');
+  const body = document.getElementById('utility-panel-body');
+
+  if (compose) { compose.classList.remove('cnc-popup-mode'); compose.style.display = 'none'; }
+  if (draftBtn) { draftBtn.style.display = 'none'; draftBtn.classList.remove('active'); }
+  if (body) body.style.display = '';
+
+  _cncSetComposeBtnState(false); // re-enable + button after discard
+
+  // Clear fields and draft
+  _cncClearDraft();
+  ['cnc-to','cnc-subject','cnc-body'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const attachRow = document.getElementById('cnc-attach-row');
+  if (attachRow) attachRow.style.display = 'none';
+
+  // Restore footer if in thread mode
+  if (_activeConvIndex !== null && !document.getElementById('conv-compose-card')) {
+    const footer = document.getElementById('conv-read-footer');
+    if (footer) footer.style.display = 'flex';
+  }
+  _cncCurrentType = 'email';
+}
+
+function _cncToggleTypeMenu(e) {
+  e.stopPropagation();
+  const menu = document.getElementById('cnc-type-menu');
+  if (!menu) return;
+  menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+
+function _cncSetType(type) {
+  _cncCurrentType = type;
+  const def = _cncTypeMap[type];
+  document.getElementById('cnc-type-icon').textContent = def.icon;
+  document.getElementById('cnc-type-label').textContent = def.label;
+  document.getElementById('cnc-subject-label').textContent = def.subjectLabel;
+  document.getElementById('cnc-type-menu').style.display = 'none';
+}
+
+function _cncTriggerAttach() {
+  alert('Attach file — coming soon');
+}
+
+// ── Draft auto-save ──────────────────────────────────────────
+const CNC_DRAFT_KEY = 'cnc_draft';
+let _cncSaveTimer = null;
+
+function _cncScheduleSave() {
+  clearTimeout(_cncSaveTimer);
+  _cncSaveTimer = setTimeout(_cncSaveDraft, 1000);
+}
+
+function _cncSaveDraft() {
+  const draft = {
+    type:    _cncCurrentType,
+    to:      document.getElementById('cnc-to')?.value      || '',
+    subject: document.getElementById('cnc-subject')?.value || '',
+    body:    document.getElementById('cnc-body')?.value     || '',
+    savedAt: new Date().toISOString()
+  };
+  try { localStorage.setItem(CNC_DRAFT_KEY, JSON.stringify(draft)); } catch(e) {}
+
+  // Show "Saved HH:MM" in header
+  const lbl = document.getElementById('cnc-saved-label');
+  if (lbl) {
+    const t = new Date(draft.savedAt);
+    lbl.textContent = 'Saved ' + t.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  }
+}
+
+function _cncRestoreDraft() {
+  try {
+    const raw = localStorage.getItem(CNC_DRAFT_KEY);
+    if (!raw) return false;
+    const d = JSON.parse(raw);
+    if (d.type) { _cncCurrentType = d.type; _cncSetType(d.type); }
+    if (d.to)      { const el = document.getElementById('cnc-to');      if (el) el.value = d.to; }
+    if (d.subject) { const el = document.getElementById('cnc-subject'); if (el) el.value = d.subject; }
+    if (d.body)    { const el = document.getElementById('cnc-body');    if (el) el.value = d.body; }
+    // Show saved timestamp
+    const lbl = document.getElementById('cnc-saved-label');
+    if (lbl && d.savedAt) {
+      const t = new Date(d.savedAt);
+      lbl.textContent = 'Saved ' + t.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    }
+    return !!(d.to || d.subject || d.body);
+  } catch(e) { return false; }
+}
+
+function _cncClearDraft() {
+  clearTimeout(_cncSaveTimer);
+  try { localStorage.removeItem(CNC_DRAFT_KEY); } catch(e) {}
+  const lbl = document.getElementById('cnc-saved-label');
+  if (lbl) lbl.textContent = '';
+}
+
+// ── (floating mini compose removed) ──
+const FC_DRAFT_KEY = 'fc_draft'; // keep key so stale localStorage doesn't break
+let _fcCurrentType = 'email';
+let _fcSaveTimer   = null;
+
+const _fcTypeMap = {
+  email:   { icon: 'mail',        label: 'New Email',   subjectLabel: 'Subject' },
+  comment: { icon: 'chat_bubble', label: 'New Comment', subjectLabel: 'Topic'   },
+  task:    { icon: 'check_box',   label: 'New Task',    subjectLabel: 'Title'   }
+};
+
+function _fcToggle() {
+  const fl = document.getElementById('fc-float');
+  if (!fl) return;
+  if (fl.style.display === 'none') {
+    fl.style.display = 'flex';
+    _fcRestoreDraft();
+    setTimeout(() => document.getElementById('fc-to')?.focus(), 50);
+    // Highlight the compose button as active
+    document.getElementById('util-btn-fc-compose')?.classList.add('active');
+  } else {
+    fl.style.display = 'none';
+    document.getElementById('util-btn-fc-compose')?.classList.remove('active');
+  }
+}
+
+function _fcClose() {
+  const fl = document.getElementById('fc-float');
+  if (fl) fl.style.display = 'none';
+  document.getElementById('util-btn-fc-compose')?.classList.remove('active');
+  _fcClearDraft();
+  ['fc-to','fc-subject','fc-body'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  const lbl = document.getElementById('fc-saved-label');
+  if (lbl) lbl.textContent = '';
+}
+
+function _fcToggleTypeMenu(e) {
+  e.stopPropagation();
+  const menu = document.getElementById('fc-type-menu');
+  if (!menu) return;
+  menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+
+function _fcSetType(type) {
+  _fcCurrentType = type;
+  const def = _fcTypeMap[type];
+  document.getElementById('fc-type-icon').textContent = def.icon;
+  document.getElementById('fc-type-label').textContent = def.label;
+  document.getElementById('fc-subject-label').textContent = def.subjectLabel;
+  document.getElementById('fc-type-menu').style.display = 'none';
+}
+
+function _fcScheduleSave() {
+  clearTimeout(_fcSaveTimer);
+  _fcSaveTimer = setTimeout(_fcSaveDraft, 1000);
+}
+
+function _fcSaveDraft() {
+  const draft = {
+    type:    _fcCurrentType,
+    to:      document.getElementById('fc-to')?.value      || '',
+    subject: document.getElementById('fc-subject')?.value || '',
+    body:    document.getElementById('fc-body')?.value     || '',
+    savedAt: new Date().toISOString()
+  };
+  try { localStorage.setItem(FC_DRAFT_KEY, JSON.stringify(draft)); } catch(e) {}
+  const lbl = document.getElementById('fc-saved-label');
+  if (lbl) {
+    const t = new Date(draft.savedAt);
+    lbl.textContent = 'Saved ' + t.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  }
+}
+
+function _fcRestoreDraft() {
+  try {
+    const raw = localStorage.getItem(FC_DRAFT_KEY);
+    if (!raw) return;
+    const d = JSON.parse(raw);
+    if (d.type) { _fcCurrentType = d.type; _fcSetType(d.type); }
+    if (d.to)      { const el = document.getElementById('fc-to');      if (el) el.value = d.to; }
+    if (d.subject) { const el = document.getElementById('fc-subject'); if (el) el.value = d.subject; }
+    if (d.body)    { const el = document.getElementById('fc-body');    if (el) el.value = d.body; }
+    if (d.savedAt) {
+      const lbl = document.getElementById('fc-saved-label');
+      if (lbl) {
+        const t = new Date(d.savedAt);
+        lbl.textContent = 'Saved ' + t.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+      }
+    }
+  } catch(e) {}
+}
+
+function _fcClearDraft() {
+  clearTimeout(_fcSaveTimer);
+  try { localStorage.removeItem(FC_DRAFT_KEY); } catch(e) {}
+}
+
+function _fcExpandToPanel() {
+  // Copy float fields into panel compose
+  const to      = document.getElementById('fc-to')?.value      || '';
+  const subject = document.getElementById('fc-subject')?.value || '';
+  const body    = document.getElementById('fc-body')?.value     || '';
+  const type    = _fcCurrentType;
+
+  // Close the float
+  _fcClose();
+
+  // Ensure conversations panel is open
+  if (activeUtil !== 'conversations') toggleUtility('conversations');
+
+  // Open panel compose with the type, then populate fields
+  openNewConversation(type);
+  setTimeout(() => {
+    const toEl = document.getElementById('cnc-to');
+    const sjEl = document.getElementById('cnc-subject');
+    const bdEl = document.getElementById('cnc-body');
+    if (toEl) toEl.value = to;
+    if (sjEl) sjEl.value = subject;
+    if (bdEl) { bdEl.value = body; bdEl.focus(); }
+    _cncSaveDraft(); // persist in panel draft
+  }, 100);
+}
+
+// Close compose dropdowns on outside click
+document.addEventListener('click', (e) => {
   const m = document.getElementById('conv-compose-menu');
   if (m) m.style.display = 'none';
+  const mm = document.getElementById('conv-compose-mode-menu');
+  if (mm) mm.style.display = 'none';
+  const mt = document.getElementById('cnc-type-menu');
+  if (mt) mt.style.display = 'none';
 });
 
 let _activeConvIndex = null;
@@ -16459,9 +17716,13 @@ function openConversation(index) {
   document.getElementById('conv-read-header').style.display = 'flex';
   document.getElementById('conv-read-footer').style.display = 'flex';
   document.getElementById('conv-read-title').textContent = conv.subject;
+  const total = conv.messages.length;
   const body = document.getElementById('utility-panel-body');
-  body.innerHTML = `<div class="conv-thread">${conv.messages.map(m => `
-    <div class="conv-msg">
+  body.innerHTML = `<div class="conv-thread">${conv.messages.map((m, i) => {
+    const isExpanded = (i === 0 || i === total - 1);
+    const hasAttach  = m.attachments.length > 0;
+    return `
+    <div class="conv-msg${isExpanded ? '' : ' collapsed'}" onclick="_convToggleMsg(this,${i},${total - 1})">
       <div class="conv-msg-top">
         <div class="conv-msg-avatar${m.name === 'Me' ? ' self' : ''}">${m.initials}</div>
         <div class="conv-msg-meta">
@@ -16469,28 +17730,174 @@ function openConversation(index) {
           <div class="conv-msg-time">${m.time}</div>
         </div>
         <div class="conv-msg-actions">
-          <button class="conv-msg-action-btn" title="Reply" onclick="alert('Reply — coming soon')">
+          <button class="conv-msg-action-btn conv-msg-reply-btn" title="Reply to this message"
+            onclick="event.stopPropagation();alert('Reply — coming soon')">
             <span class="material-symbols-outlined">reply</span>
-          </button>
-          <button class="conv-msg-action-btn" title="Forward" onclick="alert('Forward — coming soon')">
-            <span class="material-symbols-outlined">forward</span>
-          </button>
-          <button class="conv-msg-action-btn" title="More" onclick="alert('More — coming soon')">
-            <span class="material-symbols-outlined">more_horiz</span>
           </button>
         </div>
       </div>
       <div class="conv-msg-body">${m.body}</div>
-      ${m.attachments.length ? `<div class="conv-msg-attachments">${m.attachments.map(a => `
-        <div class="conv-msg-attach-chip">
-          <span class="material-symbols-outlined">${a.icon}</span>
-          <span class="conv-msg-attach-name">${a.name}</span>
-          <span class="conv-msg-attach-size">${a.size}</span>
-        </div>`).join('')}</div>` : ''}
-    </div>`).join('')}</div>`;
+      ${hasAttach ? `
+      <div class="conv-msg-attach-section">
+        <span class="conv-msg-attach-count">${m.attachments.length} attachment${m.attachments.length > 1 ? 's' : ''}</span>
+        <div class="conv-msg-attach-chips">${m.attachments.map(a => `
+          <div class="conv-msg-attach-chip">
+            <span class="material-symbols-outlined">${a.icon}</span>
+            <span class="conv-msg-attach-name">${a.name}</span>
+            <span class="conv-msg-attach-size">${a.size}</span>
+          </div>`).join('')}
+        </div>
+      </div>` : ''}
+    </div>`;
+  }).join('')}</div>`;
+  // Scroll to the last message after render
+  requestAnimationFrame(() => { body.scrollTop = body.scrollHeight; });
+}
+function _convToggleMsg(el, idx, lastIdx) {
+  if (idx === 0 || idx === lastIdx) return; // first & last always stay expanded
+  el.classList.toggle('collapsed');
+}
+
+function _convOpenCompose(mode) {
+  // Remove any existing compose card
+  const existing = document.getElementById('conv-compose-card');
+  if (existing) existing.remove();
+
+  const conv = CONV_ITEMS[_activeConvIndex];
+  if (!conv) return;
+
+  // Determine recipient(s)
+  const others = [...new Set(conv.messages.filter(m => m.name !== 'Me').map(m => m.name))];
+  let toVal = '';
+  if (mode === 'forward') {
+    toVal = '';
+  } else if (mode === 'reply_all') {
+    toVal = others.join(', ');
+  } else {
+    const lastOther = [...conv.messages].reverse().find(m => m.name !== 'Me');
+    toVal = lastOther ? lastOther.name : (others[0] || '');
+  }
+
+  const modeMap = {
+    reply:     { icon: 'reply',     label: 'Reply',     placeholder: 'Write your reply…' },
+    reply_all: { icon: 'reply_all', label: 'Reply All', placeholder: 'Write your reply…' },
+    forward:   { icon: 'forward',   label: 'Forward',   placeholder: 'Add a message…' }
+  };
+  const m = modeMap[mode] || modeMap.reply;
+
+  const card = document.createElement('div');
+  card.className = 'conv-compose';
+  card.id = 'conv-compose-card';
+  card.dataset.mode = mode;
+  card.innerHTML = `
+    <div class="conv-compose-header">
+      <button class="conv-compose-mode" id="conv-compose-mode-btn"
+              onclick="_convToggleModeMenu(event)">
+        <span class="material-symbols-outlined" id="conv-compose-mode-icon">${m.icon}</span>
+        <span id="conv-compose-mode-text">${m.label}</span>
+        <span class="material-symbols-outlined conv-compose-mode-caret">arrow_drop_down</span>
+      </button>
+      <div class="conv-compose-mode-menu" id="conv-compose-mode-menu">
+        <button onclick="_convSwitchMode('reply')">
+          <span class="material-symbols-outlined">reply</span> Reply
+        </button>
+        <button onclick="_convSwitchMode('reply_all')">
+          <span class="material-symbols-outlined">reply_all</span> Reply All
+        </button>
+        <button onclick="_convSwitchMode('forward')">
+          <span class="material-symbols-outlined">forward</span> Forward
+        </button>
+      </div>
+      <span class="conv-compose-to-sep">·</span>
+      <input class="conv-compose-to-input" id="conv-compose-to-input" type="text"
+             value="${toVal}" placeholder="Add recipient…" spellcheck="false"/>
+    </div>
+    <textarea class="conv-compose-textarea" placeholder="${m.placeholder}"></textarea>
+    <div class="conv-compose-bar">
+      <div class="conv-compose-send">
+        <button class="conv-compose-send-btn" onclick="alert('Send — coming soon')">Send</button>
+        <button class="conv-compose-send-caret" title="Send options">
+          <span class="material-symbols-outlined">arrow_drop_down</span>
+        </button>
+      </div>
+      <button class="conv-compose-tool" title="Attach file">
+        <span class="material-symbols-outlined">attach_file</span>
+      </button>
+      <button class="conv-compose-tool" title="Bold">
+        <span class="material-symbols-outlined">format_bold</span>
+      </button>
+      <button class="conv-compose-tool" title="Italic">
+        <span class="material-symbols-outlined">format_italic</span>
+      </button>
+      <button class="conv-compose-tool" title="Flag as priority">
+        <span class="material-symbols-outlined">flag</span>
+      </button>
+      <button class="conv-compose-tool" title="More options">
+        <span class="material-symbols-outlined">more_horiz</span>
+      </button>
+      <button class="conv-compose-discard" title="Discard draft" onclick="_convDiscardCompose()">
+        <span class="material-symbols-outlined">delete</span>
+      </button>
+    </div>
+  `;
+
+  // Sticky — insert between scrolling body and footer; hide footer while composing
+  const footer = document.getElementById('conv-read-footer');
+  if (footer) {
+    footer.parentNode.insertBefore(card, footer);
+    footer.style.display = 'none';
+    card.querySelector('.conv-compose-textarea').focus();
+  }
+}
+
+function _convDiscardCompose() {
+  const card = document.getElementById('conv-compose-card');
+  if (card) card.remove();
+  // Restore footer if we're still in thread-read mode
+  if (_activeConvIndex !== null) {
+    const footer = document.getElementById('conv-read-footer');
+    if (footer) footer.style.display = 'flex';
+  }
+}
+
+function _convToggleModeMenu(e) {
+  e.stopPropagation();
+  const menu = document.getElementById('conv-compose-mode-menu');
+  if (!menu) return;
+  menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+
+function _convSwitchMode(mode) {
+  const card = document.getElementById('conv-compose-card');
+  if (!card) return;
+  card.dataset.mode = mode;
+
+  const conv = CONV_ITEMS[_activeConvIndex];
+  const others = [...new Set(conv.messages.filter(m => m.name !== 'Me').map(m => m.name))];
+  let toVal = '';
+  if (mode === 'reply_all') {
+    toVal = others.join(', ');
+  } else if (mode === 'reply') {
+    const last = [...conv.messages].reverse().find(m => m.name !== 'Me');
+    toVal = last ? last.name : (others[0] || '');
+  }
+
+  const modeMap = {
+    reply:     { icon: 'reply',     label: 'Reply',     placeholder: 'Write your reply…' },
+    reply_all: { icon: 'reply_all', label: 'Reply All', placeholder: 'Write your reply…' },
+    forward:   { icon: 'forward',   label: 'Forward',   placeholder: 'Add a message…' }
+  };
+  const m = modeMap[mode];
+  document.getElementById('conv-compose-mode-icon').textContent = m.icon;
+  document.getElementById('conv-compose-mode-text').textContent = m.label;
+  document.getElementById('conv-compose-to-input').value = toVal;
+  document.getElementById('conv-compose-to-input').placeholder = mode === 'forward' ? 'Add recipient…' : '';
+  card.querySelector('.conv-compose-textarea').placeholder = m.placeholder;
+  document.getElementById('conv-compose-mode-menu').style.display = 'none';
 }
 
 function closeConversation() {
+  _convDiscardCompose();
   _activeConvIndex = null;
   document.getElementById('conv-toolbar').style.display = 'flex';
   document.getElementById('conv-title-row').style.display = 'flex';
@@ -17698,6 +19105,45 @@ function _updateAiBadge() {
 const AI_DRAWER_MIN_W = 260;
 const AI_DRAWER_MAX_W = 700;
 
+let _aiViewMode = 'docked';
+let _aiCloseTimer = null;
+
+function _aiToggleView() {
+  _aiSetView(_aiViewMode === 'float' ? 'docked' : 'float');
+}
+
+function _aiSetView(mode) {
+  _aiViewMode = mode;
+  const drawer = document.getElementById('ai-drawer');
+  const icon   = document.getElementById('ai-view-icon');
+  const btn    = document.getElementById('ai-view-toggle-btn');
+  if (!drawer) return;
+
+  if (mode === 'float') {
+    drawer.style.left = ''; drawer.style.top = '';
+    drawer.style.display = '';
+    drawer.classList.add('ai-float');
+    drawer.classList.add('open');
+    if (icon) icon.textContent = 'dock_to_right';
+    if (btn)  btn.title = 'Switch to docked';
+  } else {
+    drawer.classList.remove('ai-float');
+    drawer.style.left = ''; drawer.style.top = '';
+    drawer.style.bottom = ''; drawer.style.right = '';
+    if (icon) icon.textContent = 'dock_to_right';
+    if (btn)  btn.title = 'Switch to floating';
+  }
+}
+
+function _aiFloatToggleMin() {
+  const drawer = document.getElementById('ai-drawer');
+  const icon   = document.getElementById('ai-float-min-icon');
+  if (!drawer) return;
+  const isMin = drawer.classList.toggle('ai-float-min');
+  if (icon) icon.textContent = isMin ? 'open_in_full' : 'remove';
+  document.getElementById('ai-float-min-btn').title = isMin ? 'Restore' : 'Minimize';
+}
+
 function startAiDrawerResize(e) {
   e.preventDefault();
   const drawer  = document.getElementById('ai-drawer');
@@ -17732,6 +19178,63 @@ function startAiDrawerResize(e) {
 function toggleAiDrawer() {
   const drawer = document.getElementById('ai-drawer');
   const btn    = document.getElementById('ai-btn');
+
+  // Float-mode close → animate panel flying to the Casey button
+  // Float-mode: handle open/close with animation
+  if (_aiViewMode === 'float') {
+    const isNowOpen = !drawer.classList.contains('open');
+    if (!isNowOpen) {
+      // CLOSE — animate to Casey button, then hide
+      const drawerRect = drawer.getBoundingClientRect();
+      const btnRect    = btn.getBoundingClientRect();
+      const dx = (btnRect.left + btnRect.width  / 2) - (drawerRect.left + drawerRect.width  / 2);
+      const dy = (btnRect.top  + btnRect.height / 2) - (drawerRect.top  + drawerRect.height / 2);
+      const sx = Math.max(0.05, btnRect.width  / drawerRect.width);
+      const sy = Math.max(0.05, btnRect.height / drawerRect.height);
+      drawer.style.transformOrigin = 'center center';
+      drawer.classList.add('ai-float-closing');
+      // Apply transform in next frame so transition fires
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        drawer.style.transform = `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`;
+      }));
+      _aiCloseTimer = setTimeout(() => {
+        _aiCloseTimer = null;
+        drawer.classList.remove('ai-float-closing');
+        drawer.style.transform = '';
+        drawer.style.transformOrigin = '';
+        drawer.classList.remove('open');
+        drawer.classList.remove('ai-float-min');
+        drawer.style.display = 'none';  // fully hide the fixed panel
+        const minIcon = document.getElementById('ai-float-min-icon');
+        if (minIcon) minIcon.textContent = 'remove';
+        btn.classList.remove('active');
+      }, 280);
+    } else {
+      // OPEN — cancel any in-flight close animation first
+      if (_aiCloseTimer) {
+        clearTimeout(_aiCloseTimer);
+        _aiCloseTimer = null;
+      }
+      drawer.classList.remove('ai-float-closing');
+      drawer.style.transform = '';
+      drawer.style.transformOrigin = '';
+      drawer.classList.remove('ai-float-min');
+      const minIcon = document.getElementById('ai-float-min-icon');
+      if (minIcon) minIcon.textContent = 'remove';
+      // Show and mark active
+      drawer.style.display = '';
+      drawer.classList.add('open');
+      btn.classList.add('active');
+      const btnBadge = document.getElementById('ai-btn-badge');
+      if (btnBadge) btnBadge.style.display = 'none';
+      _renderAiFooter();
+      const caseId = sectionActiveTab[activeSection];
+      if (caseId && caseId !== 'home') _setAiContext(caseId); else _clearAiContext();
+      setTimeout(() => { const inp = document.getElementById('ai-input'); if (inp) inp.focus(); }, 50);
+    }
+    return;
+  }
+
   const isOpen = drawer.classList.toggle('open');
   btn.classList.toggle('active', isOpen);
   if (isOpen) {
