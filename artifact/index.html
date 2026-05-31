@@ -16673,22 +16673,45 @@ function _renderWfFetchBtn(caseId) {
   const fetchedBy = _fetchedCases[caseId];
   const isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
   const kbd = isMac ? 'Cmd+J' : 'Ctrl+J';
+  const _dropHtml = `
+    <div class="fetch-split-drop" id="wf-fetch-split-drop">
+      <button class="fetch-split-drop-item" onclick="_wfFetchSplitAct('allocate','${caseId}')">
+        <span class="material-symbols-outlined">group</span> Allocate
+      </button>
+      <button class="fetch-split-drop-item" onclick="_wfFetchSplitAct('assign','${caseId}')">
+        <span class="material-symbols-outlined">person_add</span> Assign
+      </button>
+    </div>`;
   if (!fetchedBy) {
     ctrl.innerHTML = `
-      <button class="case-fetch-btn" onclick="fetchCaseFromList('${caseId}')">
-        <span class="material-symbols-outlined" style="font-size:15px">download</span>
-        Fetch case
-        <span class="case-fetch-shortcut">${kbd}</span>
-      </button>`;
+      <div class="fetch-split" id="wf-fetch-split-wrap">
+        <button class="fetch-split-main" onclick="fetchCaseFromList('${caseId}')">
+          <span class="material-symbols-outlined">download</span>
+          Fetch case
+          <span class="case-fetch-shortcut">${kbd}</span>
+        </button>
+        <div class="fetch-split-sep"></div>
+        <button class="fetch-split-arrow" title="More options" onclick="_wfFetchSplitToggle(event)">
+          <span class="material-symbols-outlined">expand_more</span>
+        </button>
+        ${_dropHtml}
+      </div>`;
   } else if (fetchedBy === _currentUser) {
     ctrl.innerHTML = `
       <div style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-secondary)">
         ${_activeUserAvatarHtml(fetchedBy, 'sm')}
         <span>Fetched by you</span>
-        <button class="case-fetch-btn" onclick="returnCaseFromList('${caseId}')">
-          <span class="material-symbols-outlined" style="font-size:15px">undo</span> Return
-          <span class="case-fetch-shortcut">${kbd}</span>
-        </button>
+        <div class="fetch-split" id="wf-fetch-split-wrap">
+          <button class="fetch-split-main" onclick="returnCaseFromList('${caseId}')">
+            <span class="material-symbols-outlined">undo</span> Return
+            <span class="case-fetch-shortcut">${kbd}</span>
+          </button>
+          <div class="fetch-split-sep"></div>
+          <button class="fetch-split-arrow" title="More options" onclick="_wfFetchSplitToggle(event)">
+            <span class="material-symbols-outlined">expand_more</span>
+          </button>
+          ${_dropHtml}
+        </div>
       </div>`;
   } else {
     ctrl.innerHTML = `
@@ -16697,6 +16720,31 @@ function _renderWfFetchBtn(caseId) {
         <span>In progress by <strong>${fetchedBy}</strong></span>
       </div>`;
   }
+}
+
+function _wfFetchSplitToggle(e) {
+  e.stopPropagation();
+  const drop = document.getElementById('wf-fetch-split-drop');
+  if (!drop) return;
+  const isOpen = drop.classList.toggle('open');
+  if (isOpen) {
+    // Use fixed positioning to escape overflow:hidden on .wf-solver / .wf-panels
+    const btnRect = e.currentTarget.getBoundingClientRect();
+    drop.style.position = 'fixed';
+    drop.style.top      = (btnRect.bottom + 6) + 'px';
+    drop.style.right    = (window.innerWidth - btnRect.right) + 'px';
+    drop.style.left     = '';
+    setTimeout(() => document.addEventListener('click', _wfFetchSplitClose, { once: true }), 0);
+  }
+}
+function _wfFetchSplitClose() {
+  const drop = document.getElementById('wf-fetch-split-drop');
+  if (drop) drop.classList.remove('open');
+}
+function _wfFetchSplitAct(action, caseId) {
+  _wfFetchSplitClose();
+  if (action === 'allocate') alert('Allocate — coming soon');
+  else if (action === 'assign') alert('Assign — coming soon');
 }
 
 // Lock / unlock the full case page form area
