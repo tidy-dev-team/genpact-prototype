@@ -1,7 +1,0 @@
-{
-  "buildCommand": "",
-  "outputDirectory": "artifact",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
-}
