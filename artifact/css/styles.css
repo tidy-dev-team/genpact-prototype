@@ -2610,10 +2610,13 @@
   .conv-item-wrap.open .conv-expand-icon { transform: rotate(180deg); }
   /* Row-level hover actions */
   .conv-item-actions {
-    display: flex; gap: 2px; flex-shrink: 0; margin-left: auto;
-    opacity: 0; transition: opacity 0.12s;
+    display: flex; gap: 2px;
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    background: var(--hover-row); border-radius: 5px; padding: 1px;
+    opacity: 0; pointer-events: none; transition: opacity 0.12s;
   }
-  .conv-item-header:hover .conv-item-actions { opacity: 1; }
+  .conv-item-header:hover .conv-item-actions,
+  .conv-email-row:hover .conv-item-actions { opacity: 1; pointer-events: auto; }
   .conv-item-action-btn {
     width: 26px; height: 26px; border-radius: 5px;
     background: none; border: none; cursor: pointer;
@@ -2623,6 +2626,7 @@
   .conv-item-action-btn:hover { background: var(--border); color: var(--text-primary); }
   .conv-item-action-btn .material-symbols-outlined { font-size: 15px; }
   .conv-item-action-btn.active { color: var(--text-primary); }
+  .conv-item-action-btn.conv-flag-btn.active { color: #f59e0b; }
   /* Label chips on thread row */
   .conv-item-labels { display: flex; gap: 4px; flex-shrink: 0; align-items: center; }
   .conv-label-chip {
@@ -2729,7 +2733,7 @@
   .conv-msg.collapsed .conv-msg-snippet { display: block; }
 
   /* ── Per-email inbox row ── */
-  .conv-email-row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; cursor: pointer; min-height: 48px; transition: background 0.1s; }
+  .conv-email-row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; cursor: pointer; min-height: 48px; transition: background 0.1s; position: relative; }
   .conv-email-row:hover { background: var(--hover-row); }
   .conv-item-wrap.open .conv-email-row { background: var(--bg-light); }
   .conv-email-info { flex: 1; min-width: 0; }

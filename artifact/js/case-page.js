@@ -1363,8 +1363,8 @@ const CONV_LABELS = [
   { id: 'approved',  name: 'Approved',  color: '#15803d', bg: '#dcfce7' },
   { id: 'pending',   name: 'Pending',   color: '#1d4ed8', bg: '#dbeafe' },
 ];
-// Ensure each thread has a labels array
-CONV_ITEMS.forEach(c => { if (!c.labels) c.labels = []; });
+// Ensure each thread has a labels array and flagged state
+CONV_ITEMS.forEach(c => { if (!c.labels) c.labels = []; if (!('flagged' in c)) c.flagged = false; });
 
 function _convFmtDate(ts) {
   if (!ts) return '';
@@ -1434,6 +1434,23 @@ function renderConversationsPanel(container) {
           <div class="conv-email-subject${unread ? ' unread' : ''}">${subject}</div>
           <div class="conv-email-snippet">${snippet}</div>
           ${labels ? `<div class="conv-item-labels" style="margin-top:3px">${labels}</div>` : ''}
+        </div>
+        <div class="conv-item-actions" onclick="event.stopPropagation()">
+          <button class="conv-item-action-btn conv-flag-btn${c.flagged ? ' active' : ''}"
+                  title="${c.flagged ? 'Remove flag' : 'Flag'}"
+                  onclick="_convToggleFlag(${convIdx},this)">
+            <span class="material-symbols-outlined">flag</span>
+          </button>
+          <button class="conv-item-action-btn${unread ? ' active' : ''}"
+                  title="${unread ? 'Mark as read' : 'Mark as unread'}"
+                  onclick="_convMarkUnread(${convIdx},this)">
+            <span class="material-symbols-outlined">${unread ? 'mark_email_read' : 'mark_email_unread'}</span>
+          </button>
+          <button class="conv-item-action-btn"
+                  title="Add label"
+                  onclick="_convLabelDropdown(${convIdx},this,event)">
+            <span class="material-symbols-outlined">label</span>
+          </button>
         </div>
       </div>
       <div class="conv-thread-inline" id="conv-email-inline-${key}"></div>
@@ -2032,34 +2049,44 @@ function _convToggleLabel(idx, labelId, optEl) {
 }
 
 function _convUpdateLabelChips(idx) {
-  const c    = CONV_ITEMS[idx];
-  const wrap = document.getElementById(`conv-item-wrap-${idx}`);
-  if (!wrap) return;
-  let chipsEl = wrap.querySelector('.conv-item-labels');
-  if (!chipsEl) {
-    chipsEl = document.createElement('div');
-    chipsEl.className = 'conv-item-labels';
-    const row2 = wrap.querySelector('.conv-item-row2');
-    if (row2) row2.appendChild(chipsEl);
-  }
-  chipsEl.innerHTML = c.labels.map(lid => {
+  const c     = CONV_ITEMS[idx];
+  const chips = c.labels.map(lid => {
     const lb = CONV_LABELS.find(l => l.id === lid);
     return lb ? `<span class="conv-label-chip" style="color:${lb.color};background:${lb.bg}">${lb.name}</span>` : '';
   }).join('');
+  document.querySelectorAll(`[id^="conv-email-wrap-${idx}-"]`).forEach(wrap => {
+    let chipsEl = wrap.querySelector('.conv-item-labels');
+    if (!chipsEl && chips) {
+      chipsEl = document.createElement('div');
+      chipsEl.className = 'conv-item-labels';
+      chipsEl.style.marginTop = '3px';
+      const info = wrap.querySelector('.conv-email-info');
+      if (info) info.appendChild(chipsEl);
+    }
+    if (chipsEl) chipsEl.innerHTML = chips;
+  });
 }
 
 // Mark thread as unread / read toggle
 function _convMarkUnread(idx, btn) {
   const c = CONV_ITEMS[idx];
   c.unread = !c.unread;
-  // Update sender name + subject unread style in the header row
-  const wrap = document.getElementById(`conv-item-wrap-${idx}`);
-  if (!wrap) return;
-  wrap.querySelector('.conv-sender-name').classList.toggle('unread', c.unread);
-  wrap.querySelector('.conv-subject') && wrap.querySelector('.conv-subject').classList.toggle('unread', c.unread);
-  // Highlight the button when marked unread
+  document.querySelectorAll(`[id^="conv-email-wrap-${idx}-"]`).forEach(wrap => {
+    const subj = wrap.querySelector('.conv-email-subject');
+    if (subj) subj.classList.toggle('unread', c.unread);
+  });
   btn.classList.toggle('active', c.unread);
   btn.title = c.unread ? 'Mark as read' : 'Mark as unread';
+  const icon = btn.querySelector('.material-symbols-outlined');
+  if (icon) icon.textContent = c.unread ? 'mark_email_read' : 'mark_email_unread';
+}
+
+// Flag / unflag thread
+function _convToggleFlag(idx, btn) {
+  const c = CONV_ITEMS[idx];
+  c.flagged = !c.flagged;
+  btn.classList.toggle('active', c.flagged);
+  btn.title = c.flagged ? 'Remove flag' : 'Flag';
 }
 
 /* ── Per-email open/close ── */
