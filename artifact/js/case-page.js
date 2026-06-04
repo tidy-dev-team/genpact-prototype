@@ -2820,9 +2820,11 @@ function _convMinimizeCompose() {
   const card     = document.getElementById('conv-compose-card');
   const stripBtn = document.getElementById('util-btn-reply-draft');
   if (!card) return;
-  // Dock out of popup mode before hiding so it returns to panel on restore
   card.classList.remove('ccc-popup-mode');
   card.style.display = 'none';
+  // Restore conversations list
+  const panelBody = document.getElementById('utility-panel-body');
+  if (panelBody) { panelBody.style.display = ''; renderConversationsPanel(panelBody); }
   if (stripBtn) {
     const conv = _activeConvIndex !== null ? CONV_ITEMS[_activeConvIndex] : null;
     stripBtn.title = (conv ? conv.subject : 'Reply') + ' — click to open';
@@ -2839,6 +2841,10 @@ function _convRestoreCompose() {
   const panel = document.getElementById('utility-panel');
   if (panel && !panel.classList.contains('open')) toggleUtility('conversations');
   card.style.display = '';
+  card.classList.add('conv-compose-expanded');
+  // Hide conversations list so compose fills the panel
+  const panelBody = document.getElementById('utility-panel-body');
+  if (panelBody) panelBody.style.display = 'none';
   if (stripBtn) { stripBtn.style.display = 'none'; stripBtn.classList.remove('active'); }
   requestAnimationFrame(() => card.querySelector('#conv-compose-body')?.focus());
 }
