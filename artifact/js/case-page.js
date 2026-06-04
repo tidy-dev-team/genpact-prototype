@@ -2252,15 +2252,17 @@ function _convOpenCompose(mode) {
   card.dataset.mode = mode;
   card.innerHTML = `
     <div class="conv-compose-titlebar">
-      <span class="material-symbols-outlined" style="font-size:14px;color:var(--text-muted)">${modeIcons[mode]||'reply'}</span>
-      <span class="conv-compose-title">${modeLabels[mode]||'Reply'}</span>
-      <button class="conv-cmp-icon-btn" onclick="_convToggleModeMenu(event)" title="Change mode">
-        <span class="material-symbols-outlined">arrow_drop_down</span>
-      </button>
-      <div class="conv-compose-mode-menu" id="conv-compose-mode-menu">
-        <button onclick="_convSwitchMode('reply')"><span class="material-symbols-outlined">reply</span> Reply</button>
-        <button onclick="_convSwitchMode('reply_all')"><span class="material-symbols-outlined">reply_all</span> Reply All</button>
-        <button onclick="_convSwitchMode('forward')"><span class="material-symbols-outlined">forward</span> Forward</button>
+      <div class="cnc-type-wrap">
+        <button class="cnc-type-btn" id="conv-mode-btn" onclick="_convToggleModeMenu(event)" title="Change mode">
+          <span class="material-symbols-outlined" id="conv-mode-icon">${modeIcons[mode]||'reply'}</span>
+          <span id="conv-mode-label">${modeLabels[mode]||'Reply'}</span>
+          <span class="material-symbols-outlined">arrow_drop_down</span>
+        </button>
+        <div class="conv-compose-mode-menu" id="conv-compose-mode-menu" style="display:none">
+          <button onclick="_convSwitchMode('reply')"><span class="material-symbols-outlined">reply</span> Reply</button>
+          <button onclick="_convSwitchMode('reply_all')"><span class="material-symbols-outlined">reply_all</span> Reply All</button>
+          <button onclick="_convSwitchMode('forward')"><span class="material-symbols-outlined">forward</span> Forward</button>
+        </div>
       </div>
       <div style="flex:1"></div>
       <button class="conv-cmp-icon-btn" id="conv-compose-popup-btn" onclick="_convToggleComposePopup()" title="Switch to popup">
@@ -2353,8 +2355,48 @@ function _convOpenCompose(mode) {
   if (footer) {
     footer.parentNode.insertBefore(card, footer);
     footer.style.display = 'none';
-    requestAnimationFrame(() => card.querySelector('#conv-compose-body').focus());
+    // Hide panel body so compose fills the full panel
+    const panelBody = document.getElementById('utility-panel-body');
+    if (panelBody) panelBody.style.display = 'none';
+    card.classList.add('conv-compose-expanded');
+    // Populate body with quoted thread then place cursor at top
+    requestAnimationFrame(() => {
+      const body = card.querySelector('#conv-compose-body');
+      if (!body) return;
+      body.innerHTML = _buildQuotedThread(conv, mode);
+      body.focus();
+      // Move cursor to the very first node (before quoted thread)
+      const range = document.createRange();
+      range.setStart(body, 0);
+      range.collapse(true);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    });
   }
+}
+
+// Build quoted thread HTML — placed below a separator line in the compose body
+function _buildQuotedThread(conv, mode) {
+  const msgs = conv.messages;
+  if (!msgs || msgs.length === 0) return '<br>';
+  const label = mode === 'forward' ? 'Forwarded message' : 'Previous messages';
+  const items = msgs.map(msg => {
+    const name = msg.name === 'Me' ? 'Me' : msg.name;
+    // Preserve <img> tags, strip everything else
+    const bodyHtml = msg.body
+      .replace(/<(?!img\b)[^>]+>/gi, '')   // remove all tags except <img ...>
+      .replace(/\n/g, '<br>')
+      .trim();
+    return `
+      <div style="margin-bottom:14px">
+        <div style="font-size:11px;color:#7a7a7a;margin-bottom:3px">
+          <strong style="color:#1a1a1a">${name}</strong>&nbsp;·&nbsp;${msg.time}
+        </div>
+        <div style="font-size:12px;color:#474747;line-height:1.5">${bodyHtml}</div>
+      </div>`;
+  }).join('');
+  return `<br><hr style="border:none;border-top:1px solid #e0e0e0;margin:12px 0"><div style="font-size:10px;font-weight:600;color:#9e9e9e;letter-spacing:0.4px;margin-bottom:10px;text-transform:uppercase">${label}</div>${items}`;
 }
 
 /* ── Rich-text editor helpers ── */
@@ -2511,6 +2553,9 @@ function _convDiscardCompose() {
   if (card) card.remove();
   if (stripBtn) { stripBtn.style.display = 'none'; stripBtn.classList.remove('active'); }
   _convAttachSelected.clear();
+  // Restore conversations list
+  const panelBody = document.getElementById('utility-panel-body');
+  if (panelBody) { panelBody.style.display = ''; renderConversationsPanel(panelBody); }
 }
 
 /* ── Attach-from-case overlay ── */
@@ -2727,8 +2772,11 @@ function _convSwitchMode(mode) {
     forward:   { icon: 'forward',   label: 'Forward',   placeholder: 'Add a message…' }
   };
   const m = modeMap[mode];
-  document.getElementById('conv-compose-mode-icon').textContent = m.icon;
-  document.getElementById('conv-compose-mode-text').textContent = m.label;
+  // Update the badge in the titlebar
+  const modeIcon  = document.getElementById('conv-mode-icon');
+  const modeLabel = document.getElementById('conv-mode-label');
+  if (modeIcon)  modeIcon.textContent  = m.icon;
+  if (modeLabel) modeLabel.textContent = m.label;
   document.getElementById('conv-compose-to-input').value = toVal;
   document.getElementById('conv-compose-to-input').placeholder = mode === 'forward' ? 'Add recipient…' : '';
   card.querySelector('.conv-compose-textarea').placeholder = m.placeholder;
@@ -2744,17 +2792,18 @@ function _convToggleComposePopup() {
 
   const isPopup = card.classList.contains('ccc-popup-mode');
   if (isPopup) {
-    // Popup → dock back: conversations stay visible above, compose at bottom
+    // Popup → dock back: full panel compose, hide body
     const panel = document.getElementById('utility-panel');
     if (panel && !panel.classList.contains('open')) toggleUtility('conversations');
     card.classList.remove('ccc-popup-mode');
-    // Keep conversations list visible above the compose
-    if (body) { body.style.display = ''; renderConversationsPanel(body); }
+    card.classList.add('conv-compose-expanded');
+    if (body) body.style.display = 'none';
     if (draftBtn) { draftBtn.style.display = 'none'; draftBtn.classList.remove('active'); }
     if (btn) { btn.querySelector('span').textContent = 'open_in_full'; btn.title = 'Switch to popup'; }
   } else {
-    // Panel → popup: float compose, conversations list stays in panel
+    // Panel → popup: float compose, restore conversations list in panel
     card.classList.add('ccc-popup-mode');
+    card.classList.remove('conv-compose-expanded');
     if (body) { body.style.display = ''; renderConversationsPanel(body); }
     if (draftBtn) {
       const conv = _activeConvIndex !== null ? CONV_ITEMS[_activeConvIndex] : null;
