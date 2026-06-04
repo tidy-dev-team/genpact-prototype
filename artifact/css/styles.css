@@ -2609,10 +2609,13 @@
   }
   .conv-item-wrap.open .conv-expand-icon { transform: rotate(180deg); }
   /* Row-level hover actions */
+  .conv-flag-btn {
+    opacity: 0; pointer-events: none; transition: opacity 0.12s; flex-shrink: 0;
+  }
+  .conv-flag-btn.active { opacity: 1 !important; pointer-events: auto !important; }
+  .conv-email-row:hover .conv-flag-btn { opacity: 1; pointer-events: auto; }
   .conv-item-actions {
-    display: flex; gap: 2px;
-    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-    background: var(--hover-row); border-radius: 5px; padding: 1px;
+    display: flex; gap: 2px; flex-shrink: 0;
     opacity: 0; pointer-events: none; transition: opacity 0.12s;
   }
   .conv-item-header:hover .conv-item-actions,
@@ -2629,6 +2632,7 @@
   .conv-item-action-btn.conv-flag-btn.active { color: #f59e0b; }
   /* Label chips on thread row */
   .conv-item-labels { display: flex; gap: 4px; flex-shrink: 0; align-items: center; }
+  .conv-item-labels-inline { display: inline-flex; gap: 4px; align-items: center; vertical-align: middle; margin-left: 4px; }
   .conv-label-chip {
     font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 10px;
     white-space: nowrap; line-height: 1.6;
@@ -2733,14 +2737,14 @@
   .conv-msg.collapsed .conv-msg-snippet { display: block; }
 
   /* ── Per-email inbox row ── */
-  .conv-email-row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; cursor: pointer; min-height: 48px; transition: background 0.1s; position: relative; }
+  .conv-email-row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; cursor: pointer; min-height: 48px; transition: background 0.1s; }
   .conv-email-row:hover { background: var(--hover-row); }
   .conv-item-wrap.open .conv-email-row { background: var(--bg-light); }
   .conv-email-info { flex: 1; min-width: 0; }
-  .conv-email-row1 { display: flex; align-items: baseline; gap: 6px; }
+  .conv-email-row1 { display: flex; align-items: center; gap: 6px; }
   .conv-email-sender { font-size: 12px; font-weight: 600; color: var(--text-primary); white-space: nowrap; }
   .conv-email-sender.sent { color: var(--text-muted); font-weight: 400; }
-  .conv-email-time { font-size: 11px; color: var(--text-muted); white-space: nowrap; margin-left: auto; flex-shrink: 0; }
+  .conv-email-time { font-size: 11px; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
   .conv-email-subject { font-size: 11px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
   .conv-email-subject.unread { color: var(--text-primary); font-weight: 600; }
   .conv-email-snippet { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

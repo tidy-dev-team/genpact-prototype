@@ -1363,8 +1363,14 @@ const CONV_LABELS = [
   { id: 'approved',  name: 'Approved',  color: '#15803d', bg: '#dcfce7' },
   { id: 'pending',   name: 'Pending',   color: '#1d4ed8', bg: '#dbeafe' },
 ];
-// Ensure each thread has a labels array and flagged state
-CONV_ITEMS.forEach(c => { if (!c.labels) c.labels = []; if (!('flagged' in c)) c.flagged = false; });
+// Ensure each message has its own labels, flagged, and unread state
+CONV_ITEMS.forEach(c => {
+  c.messages.forEach((msg, i) => {
+    if (!msg.labels)            msg.labels  = [];
+    if (!('flagged' in msg))    msg.flagged = false;
+    if (!('unread'  in msg))    msg.unread  = (c.unread && i === c.messages.length - 1);
+  });
+});
 
 function _convFmtDate(ts) {
   if (!ts) return '';
@@ -1378,25 +1384,27 @@ function _convFmtDate(ts) {
 window._convLabelFilter = new Set(); // active label IDs for filter
 
 function renderConversationsPanel(container) {
-  let convs = window._convFilter
-    ? CONV_ITEMS.filter(c =>
-        c.name.toLowerCase().includes(window._convFilter) ||
-        c.subject.toLowerCase().includes(window._convFilter))
-    : CONV_ITEMS;
-
-  if (window._convLabelFilter.size > 0) {
-    convs = convs.filter(c =>
-      c.labels && c.labels.some(lbl => window._convLabelFilter.has(lbl.id)));
-  }
-
-  // Flatten: one row per individual message, newest first
-  const rows = [];
-  convs.forEach(c => {
-    const convIdx = CONV_ITEMS.indexOf(c);
+  // Flatten all messages first, then filter at row level
+  let rows = [];
+  CONV_ITEMS.forEach((c, convIdx) => {
     c.messages.forEach((msg, msgIdx) => {
       rows.push({ c, convIdx, msg, msgIdx, _sortKey: (new Date(c.ts).getTime() || 0) + msgIdx });
     });
   });
+
+  // Text search filter (matches sender name or subject)
+  if (window._convFilter) {
+    rows = rows.filter(({ c, msg }) =>
+      msg.name.toLowerCase().includes(window._convFilter) ||
+      c.subject.toLowerCase().includes(window._convFilter));
+  }
+
+  // Label filter — show only rows whose message has the label
+  if (window._convLabelFilter.size > 0) {
+    rows = rows.filter(({ msg }) =>
+      msg.labels && msg.labels.some(lid => window._convLabelFilter.has(lid)));
+  }
+
   rows.sort((a, b) => b._sortKey - a._sortKey);
 
   const badge = document.getElementById('conv-count-badge');
@@ -1414,9 +1422,9 @@ function renderConversationsPanel(container) {
     const subject   = isReply ? 'Re: ' + c.subject : c.subject;
     const snippet   = msg.body.replace(/<[^>]*>/g, '').replace(/\n/g, ' ').trim().substring(0, 90);
     const hasAttach = msg.attachments.length > 0;
-    const unread    = c.unread && msgIdx === c.messages.length - 1;
-    const labels    = c.labels && c.labels.length
-      ? c.labels.map(lid => { const lb = CONV_LABELS.find(l => l.id === lid); return lb ? `<span class="conv-label-chip" style="color:${lb.color};background:${lb.bg}">${lb.name}</span>` : ''; }).join('')
+    const unread    = !!msg.unread;
+    const labels    = msg.labels && msg.labels.length
+      ? msg.labels.map(lid => { const lb = CONV_LABELS.find(l => l.id === lid); return lb ? `<span class="conv-label-chip" style="color:${lb.color};background:${lb.bg}">${lb.name}</span>` : ''; }).join('')
       : '';
     return `
     <div class="conv-item-wrap" id="conv-email-wrap-${key}">
@@ -1429,28 +1437,28 @@ function renderConversationsPanel(container) {
             <span class="conv-email-sender${isSent ? ' sent' : ''}">${isSent ? 'Team Member (Sent)' : msg.name}</span>
             ${isReply ? '<span class="conv-email-reply-tag">Re</span>' : ''}
             ${hasAttach ? '<span class="material-symbols-outlined" style="font-size:12px;color:var(--text-muted);opacity:.7">attach_file</span>' : ''}
+            <button class="conv-item-action-btn conv-flag-btn${msg.flagged ? ' active' : ''}"
+                    style="margin-left:auto;flex-shrink:0"
+                    title="${msg.flagged ? 'Remove flag' : 'Flag'}"
+                    onclick="event.stopPropagation();_convToggleFlag(${convIdx},${msgIdx},this)">
+              <span class="material-symbols-outlined">flag</span>
+            </button>
+            <div class="conv-item-actions" onclick="event.stopPropagation()">
+              <button class="conv-item-action-btn${unread ? ' active' : ''}"
+                      title="${unread ? 'Mark as read' : 'Mark as unread'}"
+                      onclick="_convMarkUnread(${convIdx},${msgIdx},this)">
+                <span class="material-symbols-outlined">${unread ? 'mark_email_read' : 'mark_email_unread'}</span>
+              </button>
+              <button class="conv-item-action-btn"
+                      title="Add label"
+                      onclick="_convLabelDropdown(${convIdx},${msgIdx},this,event)">
+                <span class="material-symbols-outlined">label</span>
+              </button>
+            </div>
             <span class="conv-email-time">${msg.time}</span>
           </div>
-          <div class="conv-email-subject${unread ? ' unread' : ''}">${subject}</div>
+          <div class="conv-email-subject${unread ? ' unread' : ''}">${subject}${labels ? `&nbsp;<span class="conv-item-labels-inline">${labels}</span>` : ''}</div>
           <div class="conv-email-snippet">${snippet}</div>
-          ${labels ? `<div class="conv-item-labels" style="margin-top:3px">${labels}</div>` : ''}
-        </div>
-        <div class="conv-item-actions" onclick="event.stopPropagation()">
-          <button class="conv-item-action-btn conv-flag-btn${c.flagged ? ' active' : ''}"
-                  title="${c.flagged ? 'Remove flag' : 'Flag'}"
-                  onclick="_convToggleFlag(${convIdx},this)">
-            <span class="material-symbols-outlined">flag</span>
-          </button>
-          <button class="conv-item-action-btn${unread ? ' active' : ''}"
-                  title="${unread ? 'Mark as read' : 'Mark as unread'}"
-                  onclick="_convMarkUnread(${convIdx},this)">
-            <span class="material-symbols-outlined">${unread ? 'mark_email_read' : 'mark_email_unread'}</span>
-          </button>
-          <button class="conv-item-action-btn"
-                  title="Add label"
-                  onclick="_convLabelDropdown(${convIdx},this,event)">
-            <span class="material-symbols-outlined">label</span>
-          </button>
         </div>
       </div>
       <div class="conv-thread-inline" id="conv-email-inline-${key}"></div>
@@ -1999,31 +2007,32 @@ document.addEventListener('click', (e) => {
 let _activeConvIndex = null;
 let _activeEmailKey  = null;
 
-// Label dropdown
-function _convLabelDropdown(idx, btn, ev) {
+// Label dropdown — per message
+function _convLabelDropdown(convIdx, msgIdx, btn, ev) {
   ev.stopPropagation();
+  const key = `${convIdx}-${msgIdx}`;
   const existing = document.getElementById('conv-label-dropdown');
   if (existing) {
-    const sameBtn = existing.dataset.idx == idx;
+    const same = existing.dataset.key === key;
     existing.remove();
-    if (sameBtn) return;
+    if (same) return;
   }
-  const c    = CONV_ITEMS[idx];
+  const msg  = CONV_ITEMS[convIdx].messages[msgIdx];
   const rect = btn.getBoundingClientRect();
   const drop = document.createElement('div');
   drop.id = 'conv-label-dropdown';
-  drop.dataset.idx = idx;
+  drop.dataset.key = key;
   drop.className = 'conv-label-drop';
   drop.style.cssText = `position:fixed;top:${rect.bottom + 6}px;left:${rect.left - 8}px;z-index:9999;`;
   drop.innerHTML = `
     <div class="conv-label-drop-title">Add label</div>
     ${CONV_LABELS.map(label => `
-    <div class="conv-label-opt${c.labels.includes(label.id) ? ' selected' : ''}"
-         onclick="_convToggleLabel(${idx},'${label.id}',this)">
+    <div class="conv-label-opt${msg.labels.includes(label.id) ? ' selected' : ''}"
+         onclick="_convToggleLabel(${convIdx},${msgIdx},'${label.id}',this)">
       <span class="conv-label-dot" style="background:${label.color}"></span>
       <span class="conv-label-opt-name">${label.name}</span>
       <span class="conv-label-check material-symbols-outlined"
-            style="opacity:${c.labels.includes(label.id) ? 1 : 0}">check</span>
+            style="opacity:${msg.labels.includes(label.id) ? 1 : 0}">check</span>
     </div>`).join('')}
   `;
   document.body.appendChild(drop);
@@ -2034,59 +2043,60 @@ function _convLabelDropdown(idx, btn, ev) {
   }, 0);
 }
 
-function _convToggleLabel(idx, labelId, optEl) {
-  const c = CONV_ITEMS[idx];
-  if (c.labels.includes(labelId)) {
-    c.labels = c.labels.filter(l => l !== labelId);
+function _convToggleLabel(convIdx, msgIdx, labelId, optEl) {
+  const msg = CONV_ITEMS[convIdx].messages[msgIdx];
+  if (msg.labels.includes(labelId)) {
+    msg.labels = msg.labels.filter(l => l !== labelId);
     optEl.classList.remove('selected');
     optEl.querySelector('.conv-label-check').style.opacity = 0;
   } else {
-    c.labels.push(labelId);
+    msg.labels.push(labelId);
     optEl.classList.add('selected');
     optEl.querySelector('.conv-label-check').style.opacity = 1;
   }
-  _convUpdateLabelChips(idx);
+  _convUpdateLabelChips(convIdx, msgIdx);
 }
 
-function _convUpdateLabelChips(idx) {
-  const c     = CONV_ITEMS[idx];
-  const chips = c.labels.map(lid => {
+function _convUpdateLabelChips(convIdx, msgIdx) {
+  const msg   = CONV_ITEMS[convIdx].messages[msgIdx];
+  const chips = msg.labels.map(lid => {
     const lb = CONV_LABELS.find(l => l.id === lid);
     return lb ? `<span class="conv-label-chip" style="color:${lb.color};background:${lb.bg}">${lb.name}</span>` : '';
   }).join('');
-  document.querySelectorAll(`[id^="conv-email-wrap-${idx}-"]`).forEach(wrap => {
-    let chipsEl = wrap.querySelector('.conv-item-labels');
-    if (!chipsEl && chips) {
-      chipsEl = document.createElement('div');
-      chipsEl.className = 'conv-item-labels';
-      chipsEl.style.marginTop = '3px';
-      const info = wrap.querySelector('.conv-email-info');
-      if (info) info.appendChild(chipsEl);
-    }
-    if (chipsEl) chipsEl.innerHTML = chips;
-  });
+  const wrap = document.getElementById(`conv-email-wrap-${convIdx}-${msgIdx}`);
+  if (!wrap) return;
+  const subj = wrap.querySelector('.conv-email-subject');
+  if (!subj) return;
+  let chipsEl = subj.querySelector('.conv-item-labels-inline');
+  if (!chipsEl && chips) {
+    chipsEl = document.createElement('span');
+    chipsEl.className = 'conv-item-labels-inline';
+    subj.appendChild(chipsEl);
+  }
+  if (chipsEl) chipsEl.innerHTML = chips;
 }
 
-// Mark thread as unread / read toggle
-function _convMarkUnread(idx, btn) {
-  const c = CONV_ITEMS[idx];
-  c.unread = !c.unread;
-  document.querySelectorAll(`[id^="conv-email-wrap-${idx}-"]`).forEach(wrap => {
+// Mark message as unread / read
+function _convMarkUnread(convIdx, msgIdx, btn) {
+  const msg = CONV_ITEMS[convIdx].messages[msgIdx];
+  msg.unread = !msg.unread;
+  const wrap = document.getElementById(`conv-email-wrap-${convIdx}-${msgIdx}`);
+  if (wrap) {
     const subj = wrap.querySelector('.conv-email-subject');
-    if (subj) subj.classList.toggle('unread', c.unread);
-  });
-  btn.classList.toggle('active', c.unread);
-  btn.title = c.unread ? 'Mark as read' : 'Mark as unread';
+    if (subj) subj.classList.toggle('unread', msg.unread);
+  }
+  btn.classList.toggle('active', msg.unread);
+  btn.title = msg.unread ? 'Mark as read' : 'Mark as unread';
   const icon = btn.querySelector('.material-symbols-outlined');
-  if (icon) icon.textContent = c.unread ? 'mark_email_read' : 'mark_email_unread';
+  if (icon) icon.textContent = msg.unread ? 'mark_email_read' : 'mark_email_unread';
 }
 
-// Flag / unflag thread
-function _convToggleFlag(idx, btn) {
-  const c = CONV_ITEMS[idx];
-  c.flagged = !c.flagged;
-  btn.classList.toggle('active', c.flagged);
-  btn.title = c.flagged ? 'Remove flag' : 'Flag';
+// Flag / unflag message
+function _convToggleFlag(convIdx, msgIdx, btn) {
+  const msg = CONV_ITEMS[convIdx].messages[msgIdx];
+  msg.flagged = !msg.flagged;
+  btn.classList.toggle('active', msg.flagged);
+  btn.title = msg.flagged ? 'Remove flag' : 'Flag';
 }
 
 /* ── Per-email open/close ── */
@@ -2253,6 +2263,9 @@ function _convOpenCompose(mode) {
         <button onclick="_convSwitchMode('forward')"><span class="material-symbols-outlined">forward</span> Forward</button>
       </div>
       <div style="flex:1"></div>
+      <button class="conv-cmp-icon-btn" id="conv-compose-popup-btn" onclick="_convToggleComposePopup()" title="Switch to popup">
+        <span class="material-symbols-outlined">open_in_full</span>
+      </button>
       <button class="conv-cmp-icon-btn" onclick="_convMinimizeCompose()" title="Minimize">
         <span class="material-symbols-outlined">remove</span>
       </button>
@@ -2723,20 +2736,35 @@ function _convSwitchMode(mode) {
 }
 
 function _convToggleComposePopup() {
-  const card = document.getElementById('conv-compose-card');
-  const btn  = document.getElementById('conv-compose-popup-btn');
-  if (!card || !btn) return;
+  const card     = document.getElementById('conv-compose-card');
+  const btn      = document.getElementById('conv-compose-popup-btn');
+  const body     = document.getElementById('utility-panel-body');
+  const draftBtn = document.getElementById('util-btn-reply-draft');
+  if (!card) return;
+
   const isPopup = card.classList.contains('ccc-popup-mode');
   if (isPopup) {
+    // Popup → dock back: conversations stay visible above, compose at bottom
+    const panel = document.getElementById('utility-panel');
+    if (panel && !panel.classList.contains('open')) toggleUtility('conversations');
     card.classList.remove('ccc-popup-mode');
-    btn.querySelector('span').textContent = 'open_in_full';
-    btn.title = 'Pop out';
+    // Keep conversations list visible above the compose
+    if (body) { body.style.display = ''; renderConversationsPanel(body); }
+    if (draftBtn) { draftBtn.style.display = 'none'; draftBtn.classList.remove('active'); }
+    if (btn) { btn.querySelector('span').textContent = 'open_in_full'; btn.title = 'Switch to popup'; }
   } else {
+    // Panel → popup: float compose, conversations list stays in panel
     card.classList.add('ccc-popup-mode');
-    btn.querySelector('span').textContent = 'close_fullscreen';
-    btn.title = 'Dock back';
+    if (body) { body.style.display = ''; renderConversationsPanel(body); }
+    if (draftBtn) {
+      const conv = _activeConvIndex !== null ? CONV_ITEMS[_activeConvIndex] : null;
+      draftBtn.title = (conv ? conv.subject : 'Reply') + ' — click to open';
+      draftBtn.style.display = 'flex';
+      draftBtn.classList.add('active');
+    }
+    if (btn) { btn.querySelector('span').textContent = 'close_fullscreen'; btn.title = 'Dock back'; }
   }
-  requestAnimationFrame(() => card.querySelector('#conv-compose-body')?.focus());
+  setTimeout(() => document.getElementById('conv-compose-body')?.focus(), 50);
 }
 
 function _convMinimizeCompose() {
@@ -3077,9 +3105,6 @@ function renderAttachmentsPanel(container) {
             </button>
             <div class="conv-label-filter-drop" id="att-type-filter-drop" style="display:none"></div>
           </div>
-          <button class="conv-action-btn" title="Minimize panel" onclick="closeUtility()">
-            <span class="material-symbols-outlined">chevron_right</span>
-          </button>
         </div>
       </div>
       <div class="att-title-row">
@@ -3334,9 +3359,6 @@ function renderActivityPanel(container) {
           </button>
           <button class="conv-action-btn" title="Pop out" onclick="popOutHistory()">
             <span class="material-symbols-outlined">open_in_new</span>
-          </button>
-          <button class="conv-action-btn" title="Minimize panel" onclick="closeUtility()">
-            <span class="material-symbols-outlined">chevron_right</span>
           </button>
         </div>
       </div>
